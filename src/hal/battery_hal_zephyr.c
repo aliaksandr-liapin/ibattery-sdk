@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include "battery_hal.h"
 
 #include <zephyr/kernel.h>

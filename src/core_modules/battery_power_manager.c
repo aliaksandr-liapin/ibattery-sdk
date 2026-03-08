@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include <battery_sdk/battery_power_manager.h>
 #include <battery_sdk/battery_status.h>
 

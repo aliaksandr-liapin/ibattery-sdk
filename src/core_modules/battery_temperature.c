@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include <battery_sdk/battery_temperature.h>
 #include <battery_sdk/battery_status.h>
 
