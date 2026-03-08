@@ -1,36 +1,56 @@
 #include <zephyr/kernel.h>
-#include <zephyr/logging/log.h>
-#include "battery_adc.h"
+#include <zephyr/sys/printk.h>
 
-LOG_MODULE_REGISTER(app_main, LOG_LEVEL_INF);
+#include <battery_sdk/battery_adc.h>
+#include <battery_sdk/battery_voltage.h>
+#include <battery_sdk/battery_temperature.h>
+#include <battery_sdk/battery_soc_estimator.h>
+#include <battery_sdk/battery_power_manager.h>
+#include <battery_sdk/battery_telemetry.h>
 
 int main(void)
 {
-    int err;
-    int heartbeat = 0;
+    int rc;
+    int32_t voltage_mv = 0;
+    int32_t temperature_c_x100 = 0;
+    uint16_t soc_pct_x100 = 0;
+    struct battery_telemetry_packet telemetry;
 
-    LOG_INF("Battery SDK experiment template booting");
-    LOG_INF("Phase 0 firmware baseline started");
+    printk("Battery SDK Phase 1 skeleton starting...\n");
 
-    err = battery_adc_init();
-    if (err) {
-        LOG_ERR("battery_adc_init failed: %d", err);
-    }
+    rc = battery_adc_init();
+    printk("battery_adc_init: %d\n", rc);
+
+    rc = battery_voltage_init();
+    printk("battery_voltage_init: %d\n", rc);
+
+    rc = battery_temperature_init();
+    printk("battery_temperature_init: %d\n", rc);
+
+    rc = battery_soc_estimator_init();
+    printk("battery_soc_estimator_init: %d\n", rc);
+
+    rc = battery_power_manager_init();
+    printk("battery_power_manager_init: %d\n", rc);
+
+    rc = battery_telemetry_init();
+    printk("battery_telemetry_init: %d\n", rc);
+
+    rc = battery_voltage_get_mv(&voltage_mv);
+    printk("battery_voltage_get_mv: rc=%d, value=%d mV\n", rc, voltage_mv);
+
+    rc = battery_temperature_get_c_x100(&temperature_c_x100);
+    printk("battery_temperature_get_c_x100: rc=%d, value=%d\n", rc, temperature_c_x100);
+
+    rc = battery_soc_estimator_get_pct_x100(&soc_pct_x100);
+    printk("battery_soc_estimator_get_pct_x100: rc=%d, value=%u\n", rc, soc_pct_x100);
+
+    rc = battery_telemetry_collect(&telemetry);
+    printk("battery_telemetry_collect: rc=%d\n", rc);
 
     while (1) {
-        int mv;
-
-        heartbeat++;
-        LOG_INF("Heartbeat #%d", heartbeat);
-
-        mv = battery_adc_read_mv();
-        if (mv >= 0) {
-            LOG_INF("Battery sample: %d mV", mv);
-        } else {
-            LOG_ERR("Battery sample failed: %d", mv);
-        }
-
-        k_sleep(K_SECONDS(3));
+        k_sleep(K_SECONDS(5));
+        printk("Battery SDK skeleton alive...\n");
     }
 
     return 0;
