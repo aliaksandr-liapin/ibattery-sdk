@@ -49,9 +49,28 @@ int main(void)
     printk("battery_telemetry_collect: rc=%d\n", rc);
 
     while (1) {
-        k_sleep(K_SECONDS(5));
-        printk("Battery SDK skeleton alive...\n");
-    }
+
+    int32_t voltage_mv = 0;
+    int32_t temperature_c = 0;
+    uint16_t soc = 0;
+
+    battery_voltage_get_mv(&voltage_mv);
+    battery_temperature_get_c_x100(&temperature_c);
+    battery_soc_estimator_get_pct_x100(&soc);
+
+    printk("Voltage: %d mV\n", voltage_mv);
+    printk("Temperature: %d.%02d C\n",
+           temperature_c / 100,
+           temperature_c % 100);
+
+    printk("SOC: %d.%02d %%\n",
+           soc / 100,
+           soc % 100);
+
+    printk("Battery SDK skeleton alive...\n\n");
+
+    k_sleep(K_SECONDS(5));
+}
 
     return 0;
 }
