@@ -202,3 +202,142 @@ AI diagnostics
 ---
 
 Battery SDK Architecture Document
+
+---
+
+# Phase 1 — Hardware Integration Progress
+
+## Step 1 — SDK Skeleton (Completed)
+
+The Battery SDK architecture skeleton compiles and runs on the nRF52840 DK using Zephyr RTOS.
+
+Implemented modules:
+
+- battery_adc
+- battery_voltage
+- battery_temperature
+- battery_soc_estimator
+- battery_power_manager
+- battery_telemetry
+
+Terminal output confirmed SDK initialization:
+---
+
+# Phase 1 — Hardware Integration Progress
+
+## Step 1 — SDK Skeleton (Completed)
+
+The Battery SDK architecture skeleton compiles and runs on the nRF52840 DK using Zephyr RTOS.
+
+Implemented modules:
+
+- battery_adc
+- battery_voltage
+- battery_temperature
+- battery_soc_estimator
+- battery_power_manager
+- battery_telemetry
+
+Terminal output confirmed SDK initialization:
+---
+
+# Phase 1 — Hardware Integration Progress
+
+## Step 1 — SDK Skeleton (Completed)
+
+The Battery SDK architecture skeleton compiles and runs on the nRF52840 DK using Zephyr RTOS.
+
+Implemented modules:
+
+- battery_adc
+- battery_voltage
+- battery_temperature
+- battery_soc_estimator
+- battery_power_manager
+- battery_telemetry
+
+Terminal output confirmed SDK initialization:
+Voltage: 2100 mV
+Temperature: 25.00 C
+SOC: 0.00 %
+Battery SDK skeleton alive...
+
+
+At this stage all values were stubbed.
+
+---
+
+## Step 2 — Real ADC Integration (Completed)
+
+Phase 1 Step 2 replaced the stub ADC implementation with a real hardware-backed implementation using the **nRF52840 SAADC via Zephyr ADC driver**.
+
+### Architecture Path
+Application
+↓
+Battery SDK API
+↓
+Battery Core Modules
+↓
+HAL Layer
+↓
+Zephyr Drivers
+↓
+nRF52840 SAADC Hardware
+
+
+### Implementation Location
+
+HAL implementation:
+src/hal/battery_hal_adc_zephyr.c
+
+Voltage calculation:
+src/core_modules/battery_voltage.c
+
+
+### Devicetree Integration
+
+Board overlay:
+app/boards/nrf52840dk_nrf52840.overlay
+
+
+### Hardware Input
+
+ADC input pin:
+AIN0 (P0.02)
+
+
+### Validation
+
+Firmware output now shows live voltage values:
+Voltage: 206 mV
+Voltage: 212 mV
+Voltage: 218 mV
+
+
+This confirms that:
+
+- SAADC initialization works
+- HAL integration works
+- SDK voltage module uses real hardware data
+- SDK architecture boundaries remain intact
+
+### Notes
+
+Low voltage values observed during testing were caused by a floating ADC input pin.
+
+Proper measurements require either:
+AIN0 → GND
+or
+AIN0 → VDD (3.3V)
+
+or a battery connected through a resistor divider.
+
+---
+
+## Architecture Status
+
+The Battery SDK architecture is now validated with real hardware signals.
+
+The HAL abstraction successfully isolates platform-specific drivers from the SDK core modules.
+
+This confirms the SDK architecture is scalable for future hardware platforms.

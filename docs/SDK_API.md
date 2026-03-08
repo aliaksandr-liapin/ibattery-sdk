@@ -187,3 +187,196 @@ battery_status.h
 ---
 
 Battery SDK API Specification
+
+---
+
+# Hardware Integration Status
+
+## Voltage Measurement
+
+The Battery SDK now supports real voltage measurements via the platform HAL.
+
+Public API:
+
+```c
+int battery_voltage_init(void);
+int battery_voltage_get_mv(int32_t *voltage_mv_out);
+
+Source
+Voltage readings originate from:
+nRF52840 SAADC
+via:
+Zephyr ADC driver
+through:
+battery_hal_adc_zephyr.c
+
+Measurement Flow
+SAADC Hardware
+↓
+Zephyr ADC Driver
+↓
+HAL Layer
+↓
+battery_adc module
+↓
+battery_voltage module
+↓
+SDK API
+
+Expected Output
+Voltage: 3987 mV
+
+Temperature Measurement
+Temperature measurement is currently stubbed.
+Current API:
+int battery_temperature_get_c_x100(int32_t *temp_c_x100);
+
+Planned future sources:
+- MCU internal temperature sensor
+- external thermistor
+- battery pack temperature sensors
+
+State-of-Charge Estimation
+SOC estimation API:
+int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100);
+
+Current status:
+SOC calculation not yet integrated with real voltage filtering.
+
+SOC accuracy will improve after voltage filtering is introduced in Phase 1 Step 3.
+
+
+---
+
+# 3️⃣ Create `docs/DEVELOPMENT_ROADMAP.md`
+
+This helps track phases clearly.
+
+```markdown
+# Battery SDK Development Roadmap
+
+---
+
+# Phase 0 — Hardware Bring-up
+
+Completed.
+
+Objectives:
+
+- nRF52840 DK setup
+- Zephyr RTOS environment
+- toolchain validation
+- firmware flashing pipeline
+
+---
+
+# Phase 1 — Embedded SDK Foundation
+
+## Step 1 — SDK Architecture Skeleton
+
+Completed.
+
+Achievements:
+
+- defined module boundaries
+- implemented SDK skeleton
+- verified firmware execution on hardware
+
+Modules created:
+
+- battery_adc
+- battery_voltage
+- battery_temperature
+- battery_soc_estimator
+- battery_power_manager
+- battery_telemetry
+
+---
+
+## Step 2 — Real ADC Integration
+
+Completed.
+
+Achievements:
+
+- integrated Zephyr ADC driver
+- configured nRF52840 SAADC
+- implemented HAL ADC layer
+- replaced stub voltage measurement
+- validated real voltage readings on hardware
+
+This step confirms the SDK can interact with real hardware sensors.
+
+---
+
+## Step 3 — Voltage Stabilization (Next)
+
+Objective:
+
+Improve voltage measurement quality.
+
+Implementation tasks:
+
+- implement moving average filtering
+- implement oversampling smoothing
+- reduce ADC noise
+- stabilize voltage readings for SOC estimation
+
+Expected outcome:
+Stable voltage telemetry suitable for battery analytics.
+
+
+---
+
+# Future Phases
+
+## Phase 2 — Battery Intelligence Core
+
+- advanced SOC estimation
+- battery health metrics
+- charging detection
+- discharge modeling
+
+---
+
+## Phase 3 — Battery Telemetry Protocol
+
+- telemetry data schema
+- device-to-cloud protocol
+- battery event logging
+
+---
+
+## Phase 4 — Battery Cloud Platform
+
+- battery fleet monitoring
+- anomaly detection
+- predictive diagnostics
+
+---
+
+## Phase 5 — AI Battery Intelligence
+
+- AI battery degradation prediction
+- device battery optimization
+- cloud-driven firmware updates
+
+---
+
+# Long-Term Vision
+
+Battery SDK will evolve into the foundational firmware layer for the **Battery Intelligence Platform**.
+
+Architecture evolution:
+Battery Hardware
+↓
+Embedded Battery SDK
+↓
+Battery Telemetry Protocol
+↓
+Battery Cloud Platform
+↓
+AI Battery Diagnostics
+↓
+Battery Developer Ecosystem
+
