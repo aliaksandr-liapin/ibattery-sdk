@@ -1,42 +1,48 @@
 #include <stddef.h>
+#include <stdint.h>
+#include <errno.h>
 
-#include <battery_sdk/battery_voltage.h>
-#include <battery_sdk/battery_adc.h>
-#include <battery_sdk/battery_status.h>
+#include "battery_sdk/battery_voltage.h"
 
-#include "../core/battery_internal.h"
+/* Internal module functions */
+int battery_adc_init(void);
+int battery_adc_read_raw(int16_t *raw_out);
+int battery_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out);
 
-#define BATTERY_VOLTAGE_STUB_SCALE_NUM 4200
-#define BATTERY_VOLTAGE_STUB_SCALE_DEN 4095
+#define BATTERY_DIVIDER_R_TOP_OHMS     1000000
+#define BATTERY_DIVIDER_R_BOTTOM_OHMS  1000000
 
 int battery_voltage_init(void)
 {
-    struct battery_sdk_runtime_state *state = battery_sdk_state();
-    state->voltage_initialized = true;
-    return BATTERY_STATUS_OK;
+    return battery_adc_init();
 }
 
-int battery_voltage_get_mv(int32_t *voltage_mv)
+int battery_voltage_get_mv(int32_t *voltage_mv_out)
 {
-    int rc;
-    int16_t raw_value = 0;
-    struct battery_sdk_runtime_state *state = battery_sdk_state();
+    int ret;
+    int16_t raw_adc;
+    int32_t pin_mv;
+    int64_t battery_mv;
 
-    if (voltage_mv == NULL) {
-        return BATTERY_STATUS_INVALID_ARG;
+    if (voltage_mv_out == NULL) {
+        return -EINVAL;
     }
 
-    if (!state->voltage_initialized) {
-        return BATTERY_STATUS_NOT_INITIALIZED;
+    ret = battery_adc_read_raw(&raw_adc);
+    if (ret < 0) {
+        return ret;
     }
 
-    rc = battery_adc_read_raw(&raw_value);
-    if (rc != BATTERY_STATUS_OK) {
-        return rc;
+    ret = battery_adc_raw_to_pin_mv(raw_adc, &pin_mv);
+    if (ret < 0) {
+        return ret;
     }
 
-    *voltage_mv = ((int32_t)raw_value * BATTERY_VOLTAGE_STUB_SCALE_NUM) /
-                  BATTERY_VOLTAGE_STUB_SCALE_DEN;
+    battery_mv =
+        ((int64_t)pin_mv *
+         (BATTERY_DIVIDER_R_TOP_OHMS + BATTERY_DIVIDER_R_BOTTOM_OHMS)) /
+        BATTERY_DIVIDER_R_BOTTOM_OHMS;
 
-    return BATTERY_STATUS_OK;
+    *voltage_mv_out = (int32_t)battery_mv;
+    return 0;
 }

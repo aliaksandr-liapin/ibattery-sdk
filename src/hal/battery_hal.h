@@ -3,16 +3,11 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 int battery_hal_init(void);
-int battery_hal_adc_read_raw(int16_t *raw_value);
-int battery_hal_get_uptime_ms(uint32_t *uptime_ms);
+int battery_hal_get_uptime_ms(uint32_t *uptime_ms_out);
 
-#ifdef __cplusplus
-}
+int battery_hal_adc_init(void);
+int battery_hal_adc_read_raw(int16_t *raw_out);
+int battery_hal_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out);
+
 #endif
-
-#endif /* BATTERY_HAL_H */
