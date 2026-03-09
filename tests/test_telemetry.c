@@ -5,8 +5,8 @@
 #include <string.h>
 
 /* Mock control functions — implemented in mocks/ */
-extern void mock_hal_set_uptime_rc(int rc);
-extern void mock_hal_set_uptime_ms(uint32_t ms);
+extern void mock_sdk_set_uptime_rc(int rc);
+extern void mock_sdk_set_uptime_ms(uint32_t ms);
 extern void mock_voltage_set_rc(int rc);
 extern void mock_voltage_set_mv(uint16_t mv);
 extern void mock_temperature_set_rc(int rc);
@@ -19,8 +19,8 @@ extern void mock_power_set_state(enum battery_power_state s);
 void setUp(void)
 {
     /* Reset all mocks to happy-path defaults before each test */
-    mock_hal_set_uptime_rc(BATTERY_STATUS_OK);
-    mock_hal_set_uptime_ms(4000);
+    mock_sdk_set_uptime_rc(BATTERY_STATUS_OK);
+    mock_sdk_set_uptime_ms(4000);
     mock_voltage_set_rc(BATTERY_STATUS_OK);
     mock_voltage_set_mv(2950);
     mock_temperature_set_rc(BATTERY_STATUS_OK);
@@ -127,7 +127,7 @@ void test_collect_power_error_sets_flag(void)
 void test_collect_timestamp_error_sets_flag(void)
 {
     struct battery_telemetry_packet pkt;
-    mock_hal_set_uptime_rc(BATTERY_STATUS_IO);
+    mock_sdk_set_uptime_rc(BATTERY_STATUS_IO);
 
     TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK,
                           battery_telemetry_collect(&pkt));

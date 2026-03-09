@@ -1,3 +1,11 @@
+/*
+ * ADC overlay for Battery SDK.
+ *
+ * The HAL configures the SAADC channel directly via adc_channel_setup()
+ * using NRFX_ANALOG_INTERNAL_VDD (internal VDD rail measurement).
+ * The zephyr,user io-channels node is retained as a placeholder for
+ * future external ADC channels (e.g., NTC thermistor in Phase 2).
+ */
 / {
     zephyr,user {
         io-channels = <&adc 0>;

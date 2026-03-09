@@ -3,6 +3,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct battery_sdk_runtime_state {
     bool adc_initialized;
     bool voltage_initialized;
@@ -13,5 +17,9 @@ struct battery_sdk_runtime_state {
 };
 
 struct battery_sdk_runtime_state *battery_sdk_state(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BATTERY_INTERNAL_H */

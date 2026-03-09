@@ -62,7 +62,6 @@ target_include_directories(test_telemetry PRIVATE
     ${SDK_INCLUDE}
     ${SDK_SRC}
     ${SDK_SRC}/core
-    ${SDK_SRC}/hal
     ${SDK_SRC}/telemetry
     ${unity_SOURCE_DIR}/src
 )

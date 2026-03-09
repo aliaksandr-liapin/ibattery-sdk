@@ -1,6 +1,5 @@
 #include "battery_hal.h"
 
-#include <stddef.h>
 #include <stdint.h>
 
 #include <zephyr/device.h>

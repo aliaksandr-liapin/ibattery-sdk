@@ -24,6 +24,11 @@ struct battery_sdk_runtime_state *battery_sdk_state(void)
     return &g_battery_sdk_state;
 }
 
+int battery_sdk_get_uptime_ms(uint32_t *uptime_ms_out)
+{
+    return battery_hal_get_uptime_ms(uptime_ms_out);
+}
+
 int battery_sdk_init(void)
 {
     int rc;

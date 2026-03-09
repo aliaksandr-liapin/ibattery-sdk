@@ -1,3 +1,4 @@
+#include <battery_sdk/battery_sdk.h>
 #include <battery_sdk/battery_telemetry.h>
 #include <battery_sdk/battery_voltage.h>
 #include <battery_sdk/battery_temperature.h>
@@ -6,7 +7,6 @@
 #include <battery_sdk/battery_status.h>
 
 #include "../core/battery_internal.h"
-#include "../hal/battery_hal.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -34,7 +34,7 @@ int battery_telemetry_collect(struct battery_telemetry_packet *packet)
     packet->telemetry_version = BATTERY_TELEMETRY_VERSION;
 
     /* Timestamp — best-effort */
-    rc = battery_hal_get_uptime_ms(&uptime_ms);
+    rc = battery_sdk_get_uptime_ms(&uptime_ms);
     if (rc == BATTERY_STATUS_OK) {
         packet->timestamp_ms = uptime_ms;
     } else {

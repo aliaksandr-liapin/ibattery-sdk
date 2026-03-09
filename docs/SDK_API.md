@@ -6,12 +6,13 @@ All functions return `int` using the `battery_status.h` error codes. Output valu
 
 ---
 
-## battery_sdk.h — SDK Lifecycle
+## battery_sdk.h — SDK Lifecycle & Utilities
 
 ```c
 #include <battery_sdk/battery_sdk.h>
 
 int battery_sdk_init(void);
+int battery_sdk_get_uptime_ms(uint32_t *uptime_ms_out);
 ```
 
 ### `battery_sdk_init`
@@ -27,6 +28,16 @@ Initializes subsystems in dependency order:
 6. Telemetry
 
 **Returns:** `BATTERY_STATUS_OK` on success, or the first error encountered (initialization stops at the first failure).
+
+### `battery_sdk_get_uptime_ms`
+
+Get system uptime in milliseconds. Provides a platform-independent timestamp via the HAL.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `uptime_ms_out` | out | System uptime in milliseconds |
+
+**Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer), or `BATTERY_STATUS_IO`.
 
 ---
 

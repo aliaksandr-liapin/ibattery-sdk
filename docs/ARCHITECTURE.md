@@ -126,7 +126,7 @@
 ```
 battery_telemetry_collect(&pkt)
   |
-  +-> battery_hal_get_uptime_ms() -> pkt.timestamp_ms
+  +-> battery_sdk_get_uptime_ms() -> pkt.timestamp_ms
   |
   +-> battery_voltage_get_mv()
   |     +-> battery_adc_read_mv()

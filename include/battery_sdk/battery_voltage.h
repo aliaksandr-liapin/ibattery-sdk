@@ -1,5 +1,5 @@
-#ifndef BATTERY_VOLTAGE_H
-#define BATTERY_VOLTAGE_H
+#ifndef BATTERY_SDK_BATTERY_VOLTAGE_H
+#define BATTERY_SDK_BATTERY_VOLTAGE_H
 
 #include <stdint.h>
 
@@ -14,4 +14,4 @@ int battery_voltage_get_mv(uint16_t *voltage_mv_out);
 }
 #endif
 
-#endif /* BATTERY_VOLTAGE_H */
+#endif /* BATTERY_SDK_BATTERY_VOLTAGE_H */
