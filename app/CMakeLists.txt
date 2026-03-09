@@ -18,11 +18,15 @@ target_sources(app PRIVATE
     ../src/telemetry/battery_telemetry.c
     ../src/hal/battery_hal_zephyr.c
     ../src/hal/battery_hal_adc_zephyr.c
+    ../src/core_modules/battery_voltage_filter.c
 )
 
 target_include_directories(app PRIVATE
-    .
-    ../include
-    ../src/core
-    ../src/hal
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/core_modules
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/hal
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/intelligence
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/telemetry
 )

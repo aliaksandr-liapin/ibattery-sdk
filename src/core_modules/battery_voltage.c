@@ -1,48 +1,63 @@
+#include <battery_sdk/battery_voltage.h>
+#include "battery_adc.h"
+#include "battery_voltage_filter.h"
+
+#include <errno.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <errno.h>
 
-#include "battery_sdk/battery_voltage.h"
-
-/* Internal module functions */
-int battery_adc_init(void);
-int battery_adc_read_raw(int16_t *raw_out);
-int battery_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out);
-
-#define BATTERY_DIVIDER_R_TOP_OHMS     1000000
-#define BATTERY_DIVIDER_R_BOTTOM_OHMS  1000000
+static battery_voltage_filter_t g_voltage_filter;
+static bool g_voltage_initialized = false;
 
 int battery_voltage_init(void)
 {
-    return battery_adc_init();
+    int ret;
+
+    ret = battery_adc_init();
+    if (ret != 0) {
+        return ret;
+    }
+
+    ret = battery_voltage_filter_init(&g_voltage_filter,
+                                      BATTERY_VOLTAGE_FILTER_DEFAULT_WINDOW_SIZE);
+    if (ret != 0) {
+        return ret;
+    }
+
+    g_voltage_initialized = true;
+    return 0;
 }
 
-int battery_voltage_get_mv(int32_t *voltage_mv_out)
+int battery_voltage_get_mv(uint16_t *voltage_mv_out)
 {
     int ret;
-    int16_t raw_adc;
-    int32_t pin_mv;
-    int64_t battery_mv;
+    uint16_t raw_voltage_mv;
+    uint16_t filtered_voltage_mv;
 
     if (voltage_mv_out == NULL) {
         return -EINVAL;
     }
 
-    ret = battery_adc_read_raw(&raw_adc);
-    if (ret < 0) {
+    if (!g_voltage_initialized) {
+        ret = battery_voltage_init();
+        if (ret != 0) {
+            return ret;
+        }
+    }
+
+    ret = battery_adc_read_mv(&raw_voltage_mv);
+    if (ret != 0) {
         return ret;
     }
 
-    ret = battery_adc_raw_to_pin_mv(raw_adc, &pin_mv);
-    if (ret < 0) {
+    ret = battery_voltage_filter_update(&g_voltage_filter,
+                                        raw_voltage_mv,
+                                        &filtered_voltage_mv);
+    if (ret != 0) {
         return ret;
     }
 
-    battery_mv =
-        ((int64_t)pin_mv *
-         (BATTERY_DIVIDER_R_TOP_OHMS + BATTERY_DIVIDER_R_BOTTOM_OHMS)) /
-        BATTERY_DIVIDER_R_BOTTOM_OHMS;
-
-    *voltage_mv_out = (int32_t)battery_mv;
+    *voltage_mv_out = filtered_voltage_mv;
     return 0;
 }
