@@ -75,6 +75,7 @@
 ### core/battery_sdk.c
 - Owns the SDK runtime state (`battery_sdk_runtime_state`)
 - `battery_sdk_init()` calls each subsystem init in dependency order
+- `battery_sdk_get_uptime_ms()` provides platform-independent timestamp (delegates to HAL)
 - Tracks which modules are initialized via boolean flags
 
 ### core_modules/battery_voltage.c

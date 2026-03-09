@@ -94,14 +94,14 @@ Tests the telemetry collection logic with configurable mocks for all dependencie
 | Test | What it verifies |
 |------|-----------------|
 | `test_collect_null_packet` | NULL packet pointer returns INVALID_ARG |
-| `test_collect_all_ok` | Full packet with all fields populated, flags=0 |
-| `test_collect_voltage_error` | Voltage failure sets VOLTAGE_ERR flag, field zeroed |
-| `test_collect_temperature_error` | Temperature failure sets TEMP_ERR flag |
-| `test_collect_soc_error` | SoC failure sets SOC_ERR flag |
-| `test_collect_power_state_error` | Power state failure sets POWER_STATE_ERR flag |
-| `test_collect_all_errors` | All subsystems fail — all flags set, all fields zeroed |
-| `test_collect_version` | telemetry_version matches BATTERY_TELEMETRY_VERSION |
-| `test_collect_partial_failure` | Some fields fail, others succeed — correct mixed state |
+| `test_collect_full_packet` | Full packet with all fields populated, flags=0 |
+| `test_collect_voltage_error_sets_flag` | Voltage failure sets VOLTAGE_ERR flag, field zeroed |
+| `test_collect_temp_error_sets_flag` | Temperature failure sets TEMP_ERR flag |
+| `test_collect_soc_error_sets_flag` | SoC failure sets SOC_ERR flag |
+| `test_collect_power_error_sets_flag` | Power state failure sets POWER_STATE_ERR flag |
+| `test_collect_timestamp_error_sets_flag` | Timestamp failure sets TIMESTAMP_ERR flag, field zeroed |
+| `test_collect_multiple_failures` | Multiple subsystems fail — correct flags accumulated, good fields intact |
+| `test_init_returns_ok` | `battery_telemetry_init()` returns OK |
 
 ---
 
@@ -116,12 +116,12 @@ Mock files are in `tests/mocks/`. Each mock provides:
 
 | Mock | Replaces | Configurable state |
 |------|----------|-------------------|
-| `mock_hal.c` | `battery_hal_zephyr.c` | uptime_ms, return code |
+| `mock_hal.c` | `battery_hal_zephyr.c` + `battery_hal_adc_zephyr.c` | uptime_ms, adc_raw, adc_mv, return codes |
 | `mock_voltage.c` | `battery_voltage.c` | voltage_mv, return code |
 | `mock_temperature.c` | `battery_temperature.c` | temperature_c_x100, return code |
 | `mock_soc.c` | `battery_soc_estimator.c` | soc_pct_x100, return code |
 | `mock_power.c` | `battery_power_manager.c` | power_state, return code |
-| `mock_sdk_state.c` | `battery_sdk.c` (state only) | all-initialized state |
+| `mock_sdk_state.c` | `battery_sdk.c` (state + uptime) | all-initialized state, uptime_ms, return code |
 
 ### Example: configuring a mock
 
