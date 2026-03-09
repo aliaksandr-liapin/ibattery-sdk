@@ -15,6 +15,7 @@ target_sources(app PRIVATE
     ../src/core_modules/battery_temperature.c
     ../src/core_modules/battery_voltage.c
     ../src/intelligence/battery_soc_estimator.c
+    ../src/intelligence/battery_soc_lut.c
     ../src/telemetry/battery_telemetry.c
     ../src/hal/battery_hal_zephyr.c
     ../src/hal/battery_hal_adc_zephyr.c

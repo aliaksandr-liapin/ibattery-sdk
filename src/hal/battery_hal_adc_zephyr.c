@@ -2,13 +2,12 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <errno.h>
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/adc.h>
 
-#include <hal/nrf_saadc.h>
+#include <helpers/nrfx_analog_common.h>
 
 #define BATTERY_ADC_NODE DT_NODELABEL(adc)
 
@@ -21,7 +20,7 @@
 #define BATTERY_ADC_REFERENCE        ADC_REF_INTERNAL
 #define BATTERY_ADC_ACQ_TIME         ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 40)
 #define BATTERY_ADC_CHANNEL_ID       0
-#define BATTERY_ADC_INPUT_POSITIVE   NRF_SAADC_INPUT_AIN0
+#define BATTERY_ADC_INPUT_POSITIVE   NRFX_ANALOG_INTERNAL_VDD
 
 static const struct device *g_adc_dev = DEVICE_DT_GET(BATTERY_ADC_NODE);
 static int16_t g_adc_sample_buffer;
@@ -39,15 +38,18 @@ int battery_hal_adc_init(void)
     };
 
     if (!device_is_ready(g_adc_dev)) {
-        return -ENODEV;
+        return BATTERY_STATUS_IO;
     }
 
-    return adc_channel_setup(g_adc_dev, &channel_cfg);
+    if (adc_channel_setup(g_adc_dev, &channel_cfg) < 0) {
+        return BATTERY_STATUS_IO;
+    }
+
+    return BATTERY_STATUS_OK;
 }
 
 int battery_hal_adc_read_raw(int16_t *raw_out)
 {
-    int ret;
     struct adc_sequence sequence = {
         .channels     = BIT(BATTERY_ADC_CHANNEL_ID),
         .buffer       = &g_adc_sample_buffer,
@@ -58,35 +60,32 @@ int battery_hal_adc_read_raw(int16_t *raw_out)
     };
 
     if (raw_out == NULL) {
-        return -EINVAL;
+        return BATTERY_STATUS_INVALID_ARG;
     }
 
-    ret = adc_read(g_adc_dev, &sequence);
-    if (ret < 0) {
-        return ret;
+    if (adc_read(g_adc_dev, &sequence) < 0) {
+        return BATTERY_STATUS_IO;
     }
 
     *raw_out = g_adc_sample_buffer;
-    return 0;
+    return BATTERY_STATUS_OK;
 }
 
 int battery_hal_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out)
 {
-    int ret;
     int32_t value = raw;
 
     if (mv_out == NULL) {
-        return -EINVAL;
+        return BATTERY_STATUS_INVALID_ARG;
     }
 
-    ret = adc_raw_to_millivolts(600,
-                                BATTERY_ADC_GAIN,
-                                BATTERY_ADC_RESOLUTION,
-                                &value);
-    if (ret < 0) {
-        return ret;
+    if (adc_raw_to_millivolts(600,
+                               BATTERY_ADC_GAIN,
+                               BATTERY_ADC_RESOLUTION,
+                               &value) < 0) {
+        return BATTERY_STATUS_ERROR;
     }
 
     *mv_out = value;
-    return 0;
+    return BATTERY_STATUS_OK;
 }

@@ -1,130 +1,119 @@
 # Battery SDK
 
-Battery SDK is an embedded firmware library designed to provide a **standardized battery intelligence layer** for embedded devices.
+Embedded firmware library providing a **standardized battery intelligence layer** for battery-powered IoT devices. Measures voltage, estimates state-of-charge, monitors temperature and power state, and packages everything into structured telemetry packets.
 
-The project targets battery-powered IoT devices and aims to evolve into a **Battery Intelligence Platform** capable of providing diagnostics, telemetry, and predictive analytics for batteries.
-
----
-
-# Vision
-
-Battery SDK will evolve from a firmware component into a full platform:
-
-Battery Hardware  
-↓  
-Embedded Battery SDK  
-↓  
-Battery Telemetry Protocol  
-↓  
-Battery Cloud Platform  
-↓  
-AI Battery Diagnostics  
-↓  
-Battery Developer Ecosystem
+Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. Designed to scale to other MCUs and battery chemistries.
 
 ---
 
-# Current Status
+## Current Status: Phase 1 Complete
 
-Phase 1 is currently in progress.
-
-### Completed Steps
-
-| Step | Description | Status |
-|-----|-------------|------|
-| Phase 0 | Hardware setup, firmware skeleton | ✅ Complete |
-| Phase 1 Step 1 | SDK skeleton and architecture | ✅ Complete |
-| Phase 1 Step 2 | Real ADC hardware integration | ✅ Complete |
-| Phase 1 Step 3 | Voltage filtering | ✅ Complete |
+| Phase | Description | Status |
+|-------|-------------|--------|
+| Phase 0 | Hardware setup, firmware skeleton | Done |
+| Phase 1 | Core battery intelligence (voltage, SoC, telemetry) | **Done** |
+| Phase 2 | Advanced diagnostics and health monitoring | Planned |
+| Phase 3 | Telemetry protocol and transport | Planned |
+| Phase 4 | Cloud platform integration | Planned |
+| Phase 5 | AI-driven battery analytics | Planned |
 
 ---
 
-# Hardware Platform
+## Hardware
 
-Current development hardware:
-
-- **nRF52840 DK**
-- **Zephyr RTOS**
-- **SAADC driver**
-
----
-
-# Voltage Measurement Pipeline
-Application
-↓
-Battery SDK API
-↓
-battery_voltage
-↓
-battery_voltage_filter
-↓
-battery_adc
-↓
-battery_hal
-↓
-Zephyr ADC driver
-↓
-nRF52840 SAADC
-
+- **Board**: nRF52840-DK (PCA10056 rev 3.0.3)
+- **Battery**: CR2032 Energizer (3V primary lithium)
+- **Power switch**: VDD position
+- **SDK**: nRF Connect SDK v3.2.2 / Zephyr OS v4.2.99
+- **ADC**: SAADC measuring VDD rail, 12-bit, 1/6 gain, 0.6V internal reference (3.6V full-scale)
 
 ---
 
-# Current Features
+## Features
 
-✔ Hardware ADC integration  
-✔ Voltage filtering (moving average)  
-✔ Clean HAL abstraction  
-✔ Modular SDK architecture  
-✔ Telemetry framework skeleton  
-✔ SOC estimation placeholder
-
----
-
-# Example Runtime Output
-
-Example terminal output on nRF52840 DK:
-Voltage: 144 mV
-Voltage: 148 mV
-Voltage: 150 mV
-Voltage: 147 mV
-Temperature read failed
-SOC: 0.00 %
-Battery SDK skeleton alive...
-
-
-Voltage readings are stabilized using a moving average filter.
+- Real voltage measurement via nRF52840 SAADC (VDD input)
+- Moving average voltage filter (window=12, O(1), 28 bytes RAM)
+- CR2032 voltage-to-SoC lookup table with linear interpolation (integer math only)
+- Temperature monitoring (die temperature)
+- Power state tracking
+- Resilient telemetry collection with per-field error flags
+- Unified error codes (`battery_status.h`)
+- Centralized SDK initialization (`battery_sdk_init()`)
+- Host-based unit tests (Unity framework, 32 tests, no Zephyr required)
 
 ---
 
-# Repository Structure
-battery-sdk/
+## Quick Start
 
-app/
-boards/
+### Build firmware
 
-include/battery_sdk/
+```bash
+cd app
+west build -b nrf52840dk/nrf52840
+west flash
+```
 
-src/
-core/
-core_modules/
-hal/
-intelligence/
-telemetry/
+### Run unit tests (host, no hardware needed)
 
-docs/
-tests/
+```bash
+cmake -B build_tests tests
+cmake --build build_tests
+ctest --test-dir build_tests --output-on-failure
+```
 
+### Serial output
+
+```
+Battery SDK initialized OK
+[v1 t=250]  V=3017 mV T=25.00 C SOC=100.00% PWR=1 flags=0x00000000
+[v1 t=2259] V=3016 mV T=25.00 C SOC=100.00% PWR=1 flags=0x00000000
+[v1 t=4269] V=3015 mV T=25.00 C SOC=100.00% PWR=1 flags=0x00000000
+```
 
 ---
 
-# Development Roadmap
+## Telemetry Packet Format
 
-See:
-docs/DEVELOPMENT_ROADMAP.md
-
+| Field | Type | Description |
+|-------|------|-------------|
+| `telemetry_version` | `uint8_t` | Protocol version (currently 1) |
+| `timestamp_ms` | `uint32_t` | Uptime in milliseconds |
+| `voltage_mv` | `int32_t` | Filtered battery voltage in mV |
+| `temperature_c_x100` | `int32_t` | Temperature in 0.01 C units |
+| `soc_pct_x100` | `uint16_t` | State of charge in 0.01% units |
+| `power_state` | `uint8_t` | Power state enum |
+| `status_flags` | `uint32_t` | Per-field error bits |
 
 ---
 
-# License
+## Repository Structure
+
+```
+ibattery-sdk/
+  app/                          Zephyr application (main.c, CMake, overlay)
+  include/battery_sdk/          Public SDK headers
+  src/
+    core/                       SDK init, internal state
+    core_modules/               Voltage, temperature, ADC, filter
+    hal/                        Hardware abstraction (Zephyr/nRF)
+    intelligence/               SoC estimation, LUT
+    telemetry/                  Telemetry collection
+  tests/                        Host-based unit tests (Unity)
+    mocks/                      Configurable test doubles
+  docs/                         Documentation
+```
+
+---
+
+## Documentation
+
+- [SDK API Reference](docs/SDK_API.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Testing Guide](docs/TESTING.md)
+- [Release Notes](docs/RELEASE_NOTES.md)
+
+---
+
+## License
 
 TBD

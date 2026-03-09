@@ -1,42 +1,43 @@
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 
-#include <battery_sdk/battery_voltage.h>
-#include <battery_sdk/battery_temperature.h>
-#include <battery_sdk/battery_soc_estimator.h>
+#include <battery_sdk/battery_sdk.h>
+#include <battery_sdk/battery_status.h>
+#include <battery_sdk/battery_telemetry.h>
 
 #include <stdint.h>
 
 int main(void)
 {
-    uint16_t voltage_mv;
-    int32_t temperature_c_x100;
-    uint16_t soc_pct_x100;
+    struct battery_telemetry_packet pkt;
+    int rc;
+
+    rc = battery_sdk_init();
+    if (rc != BATTERY_STATUS_OK) {
+        printk("Battery SDK init failed: %d\n", rc);
+    } else {
+        printk("Battery SDK initialized OK\n");
+    }
 
     while (1) {
-        if (battery_voltage_get_mv(&voltage_mv) < 0) {
-            printk("Voltage read failed\n");
+        rc = battery_telemetry_collect(&pkt);
+        if (rc != BATTERY_STATUS_OK) {
+            printk("Telemetry collect failed: %d\n", rc);
         } else {
-            printk("Voltage: %u mV\n", voltage_mv);
+            printk("[v%u t=%u] V=%d mV T=%d.%02d C SOC=%u.%02u%% PWR=%u flags=0x%08x\n",
+                   pkt.telemetry_version,
+                   pkt.timestamp_ms,
+                   pkt.voltage_mv,
+                   pkt.temperature_c_x100 / 100,
+                   (pkt.temperature_c_x100 >= 0)
+                       ? (pkt.temperature_c_x100 % 100)
+                       : -(pkt.temperature_c_x100 % 100),
+                   pkt.soc_pct_x100 / 100U,
+                   pkt.soc_pct_x100 % 100U,
+                   pkt.power_state,
+                   pkt.status_flags);
         }
 
-        if (battery_temperature_get_c_x100(&temperature_c_x100) < 0) {
-            printk("Temperature read failed\n");
-        } else {
-            printk("Temperature: %d.%02d C\n",
-                   temperature_c_x100 / 100,
-                   (temperature_c_x100 >= 0) ? (temperature_c_x100 % 100) : -(temperature_c_x100 % 100));
-        }
-
-        if (battery_soc_estimator_get_pct_x100(&soc_pct_x100) < 0) {
-            printk("SOC read failed\n");
-        } else {
-            printk("SOC: %u.%02u %%\n",
-                   soc_pct_x100 / 100U,
-                   soc_pct_x100 % 100U);
-        }
-
-        printk("Battery SDK skeleton alive...\n");
         k_sleep(K_SECONDS(2));
     }
 

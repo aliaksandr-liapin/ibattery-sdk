@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <errno.h>
 
 #include <zephyr/kernel.h>
 
@@ -14,9 +13,9 @@ int battery_hal_init(void)
 int battery_hal_get_uptime_ms(uint32_t *uptime_ms_out)
 {
     if (uptime_ms_out == NULL) {
-        return -EINVAL;
+        return BATTERY_STATUS_INVALID_ARG;
     }
 
     *uptime_ms_out = (uint32_t)k_uptime_get();
-    return 0;
+    return BATTERY_STATUS_OK;
 }

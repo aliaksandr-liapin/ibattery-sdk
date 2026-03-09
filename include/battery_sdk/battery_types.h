@@ -30,6 +30,14 @@ struct battery_telemetry_packet {
     uint32_t status_flags;
 };
 
+/* Telemetry status_flags bit definitions.
+ * A set bit indicates the corresponding reading failed during collection. */
+#define BATTERY_TELEMETRY_FLAG_VOLTAGE_ERR     (1U << 0)
+#define BATTERY_TELEMETRY_FLAG_TEMP_ERR        (1U << 1)
+#define BATTERY_TELEMETRY_FLAG_SOC_ERR         (1U << 2)
+#define BATTERY_TELEMETRY_FLAG_POWER_STATE_ERR (1U << 3)
+#define BATTERY_TELEMETRY_FLAG_TIMESTAMP_ERR   (1U << 4)
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,7 +1,8 @@
 #include "battery_voltage_filter.h"
 
+#include <battery_sdk/battery_status.h>
+
 #include <string.h>
-#include <errno.h>
 
 static size_t battery_voltage_filter_sanitize_window_size(size_t window_size)
 {
@@ -15,7 +16,7 @@ static size_t battery_voltage_filter_sanitize_window_size(size_t window_size)
 int battery_voltage_filter_init(battery_voltage_filter_t *filter, size_t window_size)
 {
     if (filter == NULL) {
-        return -EINVAL;
+        return BATTERY_STATUS_INVALID_ARG;
     }
 
     memset(filter, 0, sizeof(*filter));
@@ -23,7 +24,7 @@ int battery_voltage_filter_init(battery_voltage_filter_t *filter, size_t window_
     filter->window_size = battery_voltage_filter_sanitize_window_size(window_size);
     filter->initialized = true;
 
-    return 0;
+    return BATTERY_STATUS_OK;
 }
 
 int battery_voltage_filter_reset(battery_voltage_filter_t *filter)
@@ -31,7 +32,7 @@ int battery_voltage_filter_reset(battery_voltage_filter_t *filter)
     size_t preserved_window_size;
 
     if ((filter == NULL) || (filter->initialized == false)) {
-        return -EINVAL;
+        return BATTERY_STATUS_INVALID_ARG;
     }
 
     preserved_window_size = filter->window_size;
@@ -43,7 +44,7 @@ int battery_voltage_filter_reset(battery_voltage_filter_t *filter)
     filter->window_size = preserved_window_size;
     filter->initialized = true;
 
-    return 0;
+    return BATTERY_STATUS_OK;
 }
 
 int battery_voltage_filter_update(battery_voltage_filter_t *filter,
@@ -54,7 +55,7 @@ int battery_voltage_filter_update(battery_voltage_filter_t *filter,
     uint32_t average;
 
     if ((filter == NULL) || (filtered_mv_out == NULL) || (filter->initialized == false)) {
-        return -EINVAL;
+        return BATTERY_STATUS_INVALID_ARG;
     }
 
     if (filter->count < filter->window_size) {
@@ -76,7 +77,7 @@ int battery_voltage_filter_update(battery_voltage_filter_t *filter,
     average = filter->sum / (uint32_t)filter->count;
     *filtered_mv_out = (uint16_t)average;
 
-    return 0;
+    return BATTERY_STATUS_OK;
 }
 
 int battery_voltage_filter_get(const battery_voltage_filter_t *filter,
@@ -85,16 +86,16 @@ int battery_voltage_filter_get(const battery_voltage_filter_t *filter,
     uint32_t average;
 
     if ((filter == NULL) || (filtered_mv_out == NULL) || (filter->initialized == false)) {
-        return -EINVAL;
+        return BATTERY_STATUS_INVALID_ARG;
     }
 
     if (filter->count == 0U) {
         *filtered_mv_out = 0U;
-        return 0;
+        return BATTERY_STATUS_OK;
     }
 
     average = filter->sum / (uint32_t)filter->count;
     *filtered_mv_out = (uint16_t)average;
 
-    return 0;
+    return BATTERY_STATUS_OK;
 }
