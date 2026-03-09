@@ -6,7 +6,19 @@
 
 int battery_hal_init(void)
 {
-    return battery_hal_adc_init();
+    int rc;
+
+    rc = battery_hal_adc_init();
+    if (rc != BATTERY_STATUS_OK) {
+        return rc;
+    }
+
+    rc = battery_hal_temp_init();
+    if (rc != BATTERY_STATUS_OK) {
+        return rc;
+    }
+
+    return BATTERY_STATUS_OK;
 }
 
 int battery_hal_get_uptime_ms(uint32_t *uptime_ms_out)

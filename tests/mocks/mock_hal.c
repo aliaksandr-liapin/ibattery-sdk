@@ -10,6 +10,9 @@ static int g_mock_adc_read_rc = BATTERY_STATUS_OK;
 static int16_t g_mock_adc_raw = 2048;
 static int g_mock_adc_to_mv_rc = BATTERY_STATUS_OK;
 static int32_t g_mock_adc_mv = 3000;
+static int g_mock_temp_init_rc = BATTERY_STATUS_OK;
+static int g_mock_temp_read_rc = BATTERY_STATUS_OK;
+static int32_t g_mock_hal_temp_c_x100 = 2500;
 
 /* ── Control functions ───────────────────────────────────────────────────── */
 
@@ -20,6 +23,9 @@ void mock_hal_set_adc_read_rc(int rc) { g_mock_adc_read_rc = rc; }
 void mock_hal_set_adc_raw(int16_t raw) { g_mock_adc_raw = raw; }
 void mock_hal_set_adc_to_mv_rc(int rc) { g_mock_adc_to_mv_rc = rc; }
 void mock_hal_set_adc_mv(int32_t mv) { g_mock_adc_mv = mv; }
+void mock_hal_set_temp_init_rc(int rc) { g_mock_temp_init_rc = rc; }
+void mock_hal_set_temp_read_rc(int rc) { g_mock_temp_read_rc = rc; }
+void mock_hal_set_temp_c_x100(int32_t val) { g_mock_hal_temp_c_x100 = val; }
 
 /* ── HAL stub implementations ────────────────────────────────────────────── */
 
@@ -45,5 +51,14 @@ int battery_hal_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out)
     (void)raw;
     if (g_mock_adc_to_mv_rc != BATTERY_STATUS_OK) return g_mock_adc_to_mv_rc;
     if (mv_out) *mv_out = g_mock_adc_mv;
+    return BATTERY_STATUS_OK;
+}
+
+int battery_hal_temp_init(void) { return g_mock_temp_init_rc; }
+
+int battery_hal_temp_read_c_x100(int32_t *temp_c_x100_out)
+{
+    if (g_mock_temp_read_rc != BATTERY_STATUS_OK) return g_mock_temp_read_rc;
+    if (temp_c_x100_out) *temp_c_x100_out = g_mock_hal_temp_c_x100;
     return BATTERY_STATUS_OK;
 }

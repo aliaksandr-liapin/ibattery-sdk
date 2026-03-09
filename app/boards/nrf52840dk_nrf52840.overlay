@@ -15,3 +15,7 @@
 &adc {
     status = "okay";
 };
+
+&temp {
+    status = "okay";
+};

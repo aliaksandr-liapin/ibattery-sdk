@@ -6,13 +6,13 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 
 ---
 
-## Current Status: Phase 1 Complete
+## Current Status: Phase 2 Complete
 
 | Phase | Description | Status |
 |-------|-------------|--------|
 | Phase 0 | Hardware setup, firmware skeleton | Done |
-| Phase 1 | Core battery intelligence (voltage, SoC, telemetry) | **Done** |
-| Phase 2 | Advanced diagnostics and health monitoring | Planned |
+| Phase 1 | Core battery intelligence (voltage, SoC, telemetry) | Done |
+| Phase 2 | Real temperature sensor + power state machine | **Done** |
 | Phase 3 | Telemetry protocol and transport | Planned |
 | Phase 4 | Cloud platform integration | Planned |
 | Phase 5 | AI-driven battery analytics | Planned |
@@ -34,12 +34,13 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 - Real voltage measurement via nRF52840 SAADC (VDD input)
 - Moving average voltage filter (window=12, O(1), 28 bytes RAM)
 - CR2032 voltage-to-SoC lookup table with linear interpolation (integer math only)
-- Temperature monitoring (die temperature)
-- Power state tracking
+- Real die temperature sensor via nRF52840 TEMP peripheral (±2 °C accuracy)
+- Voltage-threshold power state detection with 100 mV hysteresis (CRITICAL below 2100 mV)
 - Resilient telemetry collection with per-field error flags
+- Graceful degradation — power state survives voltage read failures
 - Unified error codes (`battery_status.h`)
 - Centralized SDK initialization (`battery_sdk_init()`)
-- Host-based unit tests (Unity framework, 32 tests, no Zephyr required)
+- Host-based unit tests (Unity framework, 51 tests across 5 suites, no Zephyr required)
 
 ---
 
@@ -65,8 +66,8 @@ ctest --test-dir build_tests --output-on-failure
 
 ```
 Battery SDK initialized OK
-[v1 t=250]  V=3017 mV T=25.00 C SOC=100.00% PWR=1 flags=0x00000000
-[v1 t=2259] V=3016 mV T=25.00 C SOC=100.00% PWR=1 flags=0x00000000
+[v1 t=250]  V=3017 mV T=24.50 C SOC=100.00% PWR=1 flags=0x00000000
+[v1 t=2259] V=3016 mV T=24.50 C SOC=100.00% PWR=1 flags=0x00000000
 [v1 t=4269] V=3015 mV T=25.00 C SOC=100.00% PWR=1 flags=0x00000000
 ```
 

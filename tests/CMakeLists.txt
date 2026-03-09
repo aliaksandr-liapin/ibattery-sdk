@@ -68,8 +68,46 @@ target_include_directories(test_telemetry PRIVATE
 
 target_link_libraries(test_telemetry PRIVATE unity)
 
+# ── Temperature test ─────────────────────────────────────────────────────────
+add_executable(test_temperature
+    test_temperature.c
+    ${SDK_SRC}/core_modules/battery_temperature.c
+    mocks/mock_hal.c
+    mocks/mock_sdk_state.c
+)
+
+target_include_directories(test_temperature PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/core
+    ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_temperature PRIVATE unity)
+
+# ── Power manager test ───────────────────────────────────────────────────────
+add_executable(test_power_manager
+    test_power_manager.c
+    ${SDK_SRC}/core_modules/battery_power_manager.c
+    mocks/mock_voltage.c
+    mocks/mock_sdk_state.c
+)
+
+target_include_directories(test_power_manager PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/core
+    ${SDK_SRC}/core_modules
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_power_manager PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
 add_test(NAME soc_lut COMMAND test_soc_lut)
 add_test(NAME telemetry COMMAND test_telemetry)
+add_test(NAME temperature COMMAND test_temperature)
+add_test(NAME power_manager COMMAND test_power_manager)

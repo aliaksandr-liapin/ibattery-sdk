@@ -107,15 +107,23 @@ int battery_temperature_init(void);
 int battery_temperature_get_c_x100(int32_t *temperature_c_x100);
 ```
 
+### `battery_temperature_init`
+
+Initialize the temperature measurement subsystem. Configures the nRF52840 on-chip die temperature sensor via the HAL. Called automatically by `battery_sdk_init()`.
+
+**Returns:** `BATTERY_STATUS_OK` or `BATTERY_STATUS_IO` if the sensor is not ready.
+
 ### `battery_temperature_get_c_x100`
 
-Read the current temperature.
+Read the current temperature from the nRF52840 die temperature sensor.
 
 | Parameter | Direction | Description |
 |-----------|-----------|-------------|
-| `temperature_c_x100` | out | Temperature in 0.01 C units (e.g., 2500 = 25.00 C) |
+| `temperature_c_x100` | out | Temperature in 0.01 C units (e.g., 2350 = 23.50 C) |
 
-**Note:** Current implementation returns a fixed 25.00 C stub. Real sensor integration is planned for Phase 2.
+Uses the nRF52840 TEMP peripheral (±2 °C accuracy). The HAL abstraction allows a future swap to an external NTC thermistor without changing the module interface.
+
+**Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer), `BATTERY_STATUS_NOT_INITIALIZED`, or `BATTERY_STATUS_IO`.
 
 ---
 
@@ -177,13 +185,34 @@ enum battery_power_state {
 };
 ```
 
+### `battery_power_manager_init`
+
+Initialize the power state monitor. Sets the initial state to ACTIVE. Called automatically by `battery_sdk_init()`.
+
+**Returns:** `BATTERY_STATUS_OK`.
+
 ### `battery_power_manager_get_state`
+
+Get the current power state based on voltage thresholds with hysteresis.
 
 | Parameter | Direction | Description |
 |-----------|-----------|-------------|
 | `state` | out | Current power state |
 
-**Note:** Current implementation always returns `BATTERY_POWER_STATE_ACTIVE`. Dynamic power state transitions are planned for Phase 2.
+The power manager reads the current voltage via `battery_voltage_get_mv()` and applies a hysteresis state machine:
+
+| Transition | Condition |
+|------------|-----------|
+| ACTIVE → CRITICAL | Voltage drops below 2100 mV |
+| CRITICAL → ACTIVE | Voltage rises above 2200 mV |
+
+The 100 mV dead band between enter (2100 mV) and exit (2200 mV) thresholds prevents oscillation when voltage hovers near the boundary.
+
+**Graceful degradation:** If the voltage read fails, the last known state is returned with `BATTERY_STATUS_OK` (the failure is not propagated).
+
+**Note:** IDLE and SLEEP states are defined in the enum but not yet implemented (require Zephyr power management integration).
+
+**Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer), or `BATTERY_STATUS_NOT_INITIALIZED`.
 
 ---
 

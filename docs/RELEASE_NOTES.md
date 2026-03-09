@@ -1,5 +1,44 @@
 # Release Notes
 
+## v0.2.0 — Phase 2: Real Temperature + Power State Machine (2026-03-09)
+
+Replaces the two remaining stubs from Phase 1 with real implementations: die temperature sensor readings and voltage-based power state detection with hysteresis.
+
+### What's New
+
+**Real Temperature Measurement**
+- nRF52840 on-chip die temperature sensor via Zephyr sensor API (±2 °C accuracy)
+- New HAL driver: `battery_hal_temp_zephyr.c` using `SENSOR_CHAN_DIE_TEMP`
+- Temperature module now delegates to HAL instead of returning fixed 25.00 °C
+- HAL abstraction enables future swap to external NTC thermistor without touching modules above
+
+**Voltage-Based Power State Machine**
+- Threshold-based state detection: enters CRITICAL when voltage drops below 2100 mV
+- Hysteresis dead band: exits CRITICAL only when voltage rises above 2200 mV (100 mV band prevents oscillation)
+- Graceful degradation: returns last known state if voltage read fails
+- Uses existing `battery_voltage_get_mv()` (lateral dependency, init-order safe)
+
+**Expanded Test Coverage**
+- 51 tests across 5 suites (up from 32 tests across 3 suites)
+- New: Temperature suite (7 tests) — HAL delegation, negative temps, error propagation
+- New: Power manager suite (12 tests) — thresholds, hysteresis boundary conditions, graceful degradation
+- Updated mock_hal.c with temperature HAL stubs
+
+**Build Configuration**
+- Added `CONFIG_SENSOR=y` and `CONFIG_TEMP_NRF5=y` to Kconfig
+- Added `&temp { status = "okay"; }` to devicetree overlay
+- +1 byte static RAM (power state hysteresis memory)
+
+### Known Limitations
+
+- Die temperature measures chip temperature, not ambient or battery temperature
+- IDLE and SLEEP power states defined but not implemented (require Zephyr PM integration)
+- SoC lookup table is static; coulomb counting / adaptive estimation planned for future phases
+- No persistent storage of calibration data
+- No wireless telemetry transport (serial only)
+
+---
+
 ## v0.1.0 — Phase 1 Complete (2026-03-09)
 
 First functional release of the Battery SDK. All Phase 1 objectives are met: the firmware reads real battery voltage from a CR2032 coin cell, estimates state-of-charge, and outputs structured telemetry packets over serial.

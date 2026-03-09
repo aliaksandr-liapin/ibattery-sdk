@@ -6,7 +6,7 @@ The Battery SDK uses **host-based unit tests** that compile and run on the devel
 
 **Framework:** [Unity](https://github.com/ThrowTheSwitch/Unity) v2.6.0 (fetched automatically via CMake FetchContent)
 
-**Test count:** 32 tests across 3 suites
+**Test count:** 51 tests across 5 suites
 
 ---
 
@@ -27,13 +27,17 @@ Expected output:
 ```
 Test project /path/to/ibattery-sdk/build_tests
     Start 1: voltage_filter
-1/3 Test #1: voltage_filter ...................   Passed    0.00 sec
+1/5 Test #1: voltage_filter ...................   Passed    0.00 sec
     Start 2: soc_lut
-2/3 Test #2: soc_lut ..........................   Passed    0.00 sec
+2/5 Test #2: soc_lut ..........................   Passed    0.00 sec
     Start 3: telemetry
-3/3 Test #3: telemetry ........................   Passed    0.00 sec
+3/5 Test #3: telemetry ........................   Passed    0.00 sec
+    Start 4: temperature
+4/5 Test #4: temperature ......................   Passed    0.00 sec
+    Start 5: power_manager
+5/5 Test #5: power_manager ....................   Passed    0.00 sec
 
-100% tests passed, 0 tests failed out of 3
+100% tests passed, 0 tests failed out of 5
 
 Total Test time (real) =   0.02 sec
 ```
@@ -44,6 +48,8 @@ Total Test time (real) =   0.02 sec
 ./build_tests/test_voltage_filter
 ./build_tests/test_soc_lut
 ./build_tests/test_telemetry
+./build_tests/test_temperature
+./build_tests/test_power_manager
 ```
 
 ---
@@ -103,6 +109,39 @@ Tests the telemetry collection logic with configurable mocks for all dependencie
 | `test_collect_multiple_failures` | Multiple subsystems fail — correct flags accumulated, good fields intact |
 | `test_init_returns_ok` | `battery_telemetry_init()` returns OK |
 
+### 4. Temperature (`test_temperature.c`) — 7 tests
+
+Tests the temperature module with mock HAL. Verifies HAL delegation, error propagation, and edge cases.
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_get_null_pointer` | NULL output returns INVALID_ARG |
+| `test_get_returns_hal_value` | Normal read returns HAL value (23.50 C) |
+| `test_get_negative_temperature` | Handles negative values (-10.50 C) |
+| `test_get_zero_temperature` | Handles exactly 0.00 C |
+| `test_get_hal_io_error` | HAL IO error propagates correctly |
+| `test_init_hal_failure` | Init failure from HAL propagates |
+| `test_init_success` | Successful init returns OK |
+
+### 5. Power Manager (`test_power_manager.c`) — 12 tests
+
+Tests the voltage-threshold state machine with hysteresis. Uses mock voltage to simulate battery conditions.
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_get_state_null_pointer` | NULL output returns INVALID_ARG |
+| `test_healthy_voltage_returns_active` | 2950 mV → ACTIVE |
+| `test_below_critical_threshold_returns_critical` | 2050 mV → CRITICAL |
+| `test_at_critical_enter_boundary` | 2100 mV stays ACTIVE (strict less-than) |
+| `test_one_below_critical_enter` | 2099 mV → CRITICAL |
+| `test_hysteresis_stays_critical_in_deadband` | CRITICAL at 2150 mV stays CRITICAL |
+| `test_hysteresis_exits_critical_above_exit` | CRITICAL → 2201 mV → ACTIVE |
+| `test_hysteresis_at_exit_boundary` | CRITICAL at 2200 mV stays CRITICAL (strict greater-than) |
+| `test_voltage_error_returns_last_known_active` | Voltage fail after ACTIVE → still ACTIVE |
+| `test_voltage_error_returns_last_known_critical` | Voltage fail after CRITICAL → still CRITICAL |
+| `test_init_returns_ok` | Init succeeds with OK |
+| `test_init_sets_active` | Post-init state is ACTIVE |
+
 ---
 
 ## Mock Architecture
@@ -116,7 +155,7 @@ Mock files are in `tests/mocks/`. Each mock provides:
 
 | Mock | Replaces | Configurable state |
 |------|----------|-------------------|
-| `mock_hal.c` | `battery_hal_zephyr.c` + `battery_hal_adc_zephyr.c` | uptime_ms, adc_raw, adc_mv, return codes |
+| `mock_hal.c` | `battery_hal_zephyr.c` + `battery_hal_adc_zephyr.c` + `battery_hal_temp_zephyr.c` | uptime_ms, adc_raw, adc_mv, temp_c_x100, return codes |
 | `mock_voltage.c` | `battery_voltage.c` | voltage_mv, return code |
 | `mock_temperature.c` | `battery_temperature.c` | temperature_c_x100, return code |
 | `mock_soc.c` | `battery_soc_estimator.c` | soc_pct_x100, return code |

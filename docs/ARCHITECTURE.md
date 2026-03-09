@@ -52,19 +52,21 @@
 |              Hardware Abstraction Layer                |
 |                   (src/hal/)                           |
 |                                                       |
-|  battery_hal.h            Interface (portable)        |
-|  battery_hal_zephyr.c     Platform init + uptime      |
-|  battery_hal_adc_zephyr.c ADC channel setup + read    |
+|  battery_hal.h              Interface (portable)       |
+|  battery_hal_zephyr.c       Platform init + uptime     |
+|  battery_hal_adc_zephyr.c   ADC channel setup + read   |
+|  battery_hal_temp_zephyr.c  Die temperature sensor     |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
 |                Platform Drivers                       |
-|           (Zephyr ADC API + nRF SAADC)                |
+|      Zephyr ADC API + nRF SAADC + Zephyr Sensor API  |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
 |                   Hardware                            |
-|        nRF52840 SAADC -> VDD rail -> CR2032           |
+|   nRF52840 SAADC -> VDD rail -> CR2032               |
+|   nRF52840 TEMP peripheral (die temperature)         |
 +------------------------------------------------------+
 ```
 
@@ -88,6 +90,21 @@
 - O(1) update: maintains running sum, circular buffer index
 - Memory: `4 + 2*window + 2 + 4 + 4 = 28` bytes for window=12
 - No heap allocation, no floating point
+
+### core_modules/battery_temperature.c
+- Reads die temperature through the temperature HAL
+- `battery_temperature_init()` calls `battery_hal_temp_init()` to configure the sensor
+- `battery_temperature_get_c_x100()` delegates to `battery_hal_temp_read_c_x100()`
+- Returns temperature in 0.01 °C units (e.g., 2350 = 23.50 °C)
+
+### core_modules/battery_power_manager.c
+- Voltage-threshold state machine with hysteresis for power state detection
+- Uses `battery_voltage_get_mv()` to read current voltage (lateral dependency, init-order safe)
+- Enter CRITICAL when voltage drops below 2100 mV; exit CRITICAL when voltage rises above 2200 mV
+- 100 mV hysteresis dead band prevents oscillation near threshold
+- Graceful degradation: returns last known state if voltage read fails
+- Static `g_current_state` maintains hysteresis memory across calls (+1 byte RAM)
+- IDLE/SLEEP states deferred (require Zephyr power management integration)
 
 ### core_modules/battery_adc.c
 - Thin wrapper around HAL ADC functions
@@ -116,8 +133,16 @@
 - 16x hardware oversampling for noise reduction
 - Auto-calibration before each read
 
+### hal/battery_hal_temp_zephyr.c
+- Reads nRF52840 on-chip die temperature sensor via Zephyr sensor API
+- Uses `DEVICE_DT_GET(DT_NODELABEL(temp))` to obtain the TEMP peripheral device
+- `sensor_sample_fetch()` + `sensor_channel_get(SENSOR_CHAN_DIE_TEMP)` for each read
+- Converts `sensor_value` to 0.01 °C: `val1 * 100 + val2 / 10000`
+- Accuracy: ±2 °C (nRF52840 TEMP peripheral specification)
+- HAL abstraction allows future swap to external NTC thermistor without touching modules above
+
 ### hal/battery_hal_zephyr.c
-- `battery_hal_init()` delegates to ADC init
+- `battery_hal_init()` calls ADC init then temperature init in sequence
 - `battery_hal_get_uptime_ms()` wraps Zephyr `k_uptime_get()`
 
 ---
@@ -136,14 +161,19 @@ battery_telemetry_collect(&pkt)
   |     +-> battery_voltage_filter_update()       [moving avg]
   |     +-> pkt.voltage_mv
   |
-  +-> battery_temperature_get_c_x100() -> pkt.temperature_c_x100
+  +-> battery_temperature_get_c_x100()
+  |     +-> battery_hal_temp_read_c_x100()  [die TEMP sensor]
+  |     +-> pkt.temperature_c_x100
   |
   +-> battery_soc_estimator_get_pct_x100()
   |     +-> battery_voltage_get_mv()
   |     +-> battery_soc_lut_interpolate() [LUT + lerp]
   |     +-> pkt.soc_pct_x100
   |
-  +-> battery_power_manager_get_state() -> pkt.power_state
+  +-> battery_power_manager_get_state()
+  |     +-> battery_voltage_get_mv()        [threshold check]
+  |     +-> hysteresis state machine         [2100/2200 mV]
+  |     +-> pkt.power_state
   |
   +-> status_flags: OR of any per-field error bits
 ```
@@ -155,7 +185,7 @@ battery_telemetry_collect(&pkt)
 `battery_sdk_init()` calls subsystems in this order. If any step fails, initialization stops and the error is returned.
 
 ```
-1. battery_hal_init()           -> ADC hardware ready
+1. battery_hal_init()           -> ADC + temperature sensor ready
 2. battery_voltage_init()       -> ADC wrapper + filter ready
 3. battery_temperature_init()   -> Temperature sensor ready
 4. battery_power_manager_init() -> Power state monitor ready
@@ -173,16 +203,17 @@ battery_telemetry_collect(&pkt)
 
 ---
 
-## Memory Budget (Phase 1)
+## Memory Budget
 
 | Component | RAM (bytes) | Notes |
 |-----------|-------------|-------|
 | Voltage filter | 28 | Window=12, circular buffer |
 | ADC sample buffer | 2 | Single int16_t |
+| Power state | 1 | Hysteresis memory (g_current_state) |
 | SDK runtime state | 6 | 6 booleans |
 | Telemetry packet | 20 | Stack-allocated per call |
 | SoC LUT | 0 (const) | 36 bytes in flash |
-| **Total static RAM** | **~36** | Excluding Zephyr overhead |
+| **Total static RAM** | **~37** | Excluding Zephyr overhead |
 
 ---
 
@@ -191,6 +222,7 @@ battery_telemetry_collect(&pkt)
 To port to a new platform:
 
 1. Implement `battery_hal_adc_init()`, `battery_hal_adc_read_raw()`, `battery_hal_adc_raw_to_pin_mv()` for the target ADC
-2. Implement `battery_hal_init()` and `battery_hal_get_uptime_ms()` for the target OS
-3. Add a new SoC LUT in `battery_soc_lut.c` for the target battery chemistry
-4. Everything above the HAL layer compiles unchanged
+2. Implement `battery_hal_temp_init()` and `battery_hal_temp_read_c_x100()` for the target temperature sensor
+3. Implement `battery_hal_init()` and `battery_hal_get_uptime_ms()` for the target OS
+4. Add a new SoC LUT in `battery_soc_lut.c` for the target battery chemistry
+5. Everything above the HAL layer compiles unchanged

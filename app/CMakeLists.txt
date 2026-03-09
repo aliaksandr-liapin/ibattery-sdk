@@ -19,6 +19,7 @@ target_sources(app PRIVATE
     ../src/telemetry/battery_telemetry.c
     ../src/hal/battery_hal_zephyr.c
     ../src/hal/battery_hal_adc_zephyr.c
+    ../src/hal/battery_hal_temp_zephyr.c
     ../src/core_modules/battery_voltage_filter.c
 )
 
