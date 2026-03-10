@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure tests
+        run: cmake -B build_tests tests
+
+      - name: Build tests
+        run: cmake --build build_tests
+
+      - name: Run tests
+        run: ctest --test-dir build_tests --output-on-failure

@@ -1,0 +1,50 @@
+name: Bug Report
+description: Report a bug in the Battery SDK
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please fill out the sections below so we can reproduce and fix it.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened? What did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to trigger the bug.
+      placeholder: |
+        1. Build with `west build -b nrf52840dk/nrf52840`
+        2. Flash and open serial monitor
+        3. Observe incorrect voltage reading
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Board, SDK version, OS, toolchain.
+      placeholder: |
+        - Board: nRF52840-DK (PCA10056)
+        - NCS: v3.2.2
+        - OS: macOS 15.3
+        - Battery: CR2032
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or serial output
+      description: Paste any error messages or serial output.
+      render: text
+    validations:
+      required: false

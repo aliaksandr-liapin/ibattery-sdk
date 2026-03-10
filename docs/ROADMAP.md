@@ -136,7 +136,7 @@ Lower scale but immediate revenue with zero infrastructure cost.
 
 ## Key Decision Points
 
-1. **License choice** — MIT (maximum adoption) vs Apache 2.0 (patent protection) vs dual license (open core)
+1. **License choice** — ✅ Apache 2.0 (patent protection + permissive, compatible with open-core model)
 2. **Lead differentiation** — simplicity, portability, or intelligence? Pick one and lean into it.
 3. **First paid offering** — consulting (immediate) vs commercial license (requires feature gap) vs SaaS (requires infrastructure)
 4. **Chemistry priority** — LiPo single-cell is the biggest market; LiFePO4 is growing in IoT/solar

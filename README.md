@@ -1,5 +1,8 @@
 # Battery SDK
 
+[![CI](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 Embedded firmware library providing a **standardized battery intelligence layer** for battery-powered IoT devices. Measures voltage, estimates state-of-charge, monitors temperature and power state, and packages everything into structured telemetry packets.
 
 Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. Designed to scale to other MCUs and battery chemistries.
@@ -114,9 +117,18 @@ ibattery-sdk/
 - [Battery Profiles](docs/BATTERY_PROFILES.md)
 - [Testing Guide](docs/TESTING.md)
 - [Release Notes](docs/RELEASE_NOTES.md)
+- [Roadmap & Strategy](docs/ROADMAP.md)
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style, and how to submit changes.
 
 ---
 
 ## License
 
-TBD
+Licensed under the [Apache License 2.0](LICENSE).
+
+Copyright 2026 Aliaksandr Liapin
