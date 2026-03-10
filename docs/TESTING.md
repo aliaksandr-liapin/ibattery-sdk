@@ -6,7 +6,7 @@ The Battery SDK uses **host-based unit tests** that compile and run on the devel
 
 **Framework:** [Unity](https://github.com/ThrowTheSwitch/Unity) v2.6.0 (fetched automatically via CMake FetchContent)
 
-**Test count:** 51 tests across 5 suites
+**Test count:** 59 tests across 5 suites
 
 ---
 
@@ -75,23 +75,38 @@ Tests the moving average filter in isolation. No mocks needed — the filter is 
 | `test_init_window_over_max_clamps` | Window above max clamps to max (64) |
 | `test_get_without_update` | Get after init (no samples) returns INVALID_ARG |
 
-### 2. SoC LUT (`test_soc_lut.c`) — 11 tests
+### 2. SoC LUT (`test_soc_lut.c`) — 19 tests
 
-Tests the voltage-to-SoC lookup table interpolation. Pure integer math, no mocks.
+Tests the voltage-to-SoC lookup table interpolation for both CR2032 and LiPo chemistries. Pure integer math, no mocks.
+
+**CR2032 (11 tests)**
 
 | Test | What it verifies |
 |------|-----------------|
 | `test_null_lut` | NULL LUT pointer returns INVALID_ARG |
 | `test_null_output` | NULL output pointer returns INVALID_ARG |
-| `test_exact_100_pct` | 3000 mV returns exactly 10000 (100.00%) |
-| `test_exact_0_pct` | 2000 mV returns exactly 0 (0.00%) |
-| `test_exact_mid_point` | 2700 mV returns exactly 5000 (50.00%) |
-| `test_above_max_clamps` | 3200 mV clamps to 10000 (100.00%) |
-| `test_below_min_clamps` | 1800 mV clamps to 0 (0.00%) |
-| `test_interpolation_between_90_and_70` | 2850 mV interpolates to 8000 (80.00%) |
-| `test_interpolation_between_50_and_30` | 2650 mV interpolates to 4000 (40.00%) |
-| `test_interpolation_between_5_and_0` | 2100 mV interpolates to 250 (2.50%) |
-| `test_at_boundary_2900` | 2900 mV returns exactly 9000 (90.00%) |
+| `test_empty_lut` | Empty LUT (count=0) returns INVALID_ARG |
+| `test_exact_3000mv_is_100pct` | 3000 mV returns exactly 10000 (100.00%) |
+| `test_exact_2000mv_is_0pct` | 2000 mV returns exactly 0 (0.00%) |
+| `test_exact_2700mv_is_50pct` | 2700 mV returns exactly 5000 (50.00%) |
+| `test_above_max_clamps_to_100pct` | 3300 mV clamps to 10000 (100.00%) |
+| `test_below_min_clamps_to_0pct` | 1800 mV clamps to 0 (0.00%) |
+| `test_interpolation_midpoint_2950mv` | 2950 mV interpolates to 9500 (95.00%) |
+| `test_interpolation_2850mv` | 2850 mV interpolates to 8000 (80.00%) |
+| `test_interpolation_2300mv` | 2300 mV interpolates to 750 (7.50%) |
+
+**LiPo 1S (8 tests)**
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_lipo_4200mv_is_100pct` | 4200 mV returns exactly 10000 (100.00%) |
+| `test_lipo_3000mv_is_0pct` | 3000 mV returns exactly 0 (0.00%) |
+| `test_lipo_3870mv_is_55pct` | 3870 mV returns exactly 5500 (55.00%) |
+| `test_lipo_above_max_clamps` | 4500 mV clamps to 10000 (100.00%) |
+| `test_lipo_below_min_clamps` | 2500 mV clamps to 0 (0.00%) |
+| `test_lipo_interpolation_3950mv` | Plateau region: 3950 mV interpolates to 7000 (70.00%) |
+| `test_lipo_interpolation_3745mv` | Knee region: 3745 mV interpolates to 2000 (20.00%) |
+| `test_lipo_interpolation_3600mv` | Steep cliff: 3600 mV interpolates to 650 (6.50%) |
 
 ### 3. Telemetry (`test_telemetry.c`) — 9 tests
 

@@ -18,10 +18,17 @@ Replaces the two remaining stubs from Phase 1 with real implementations: die tem
 - Graceful degradation: returns last known state if voltage read fails
 - Uses existing `battery_voltage_get_mv()` (lateral dependency, init-order safe)
 
+**LiPo Single-Cell Discharge Curve**
+- 11-point voltage-to-SoC lookup table for 3.7 V nominal LiPo cells (4200 mV → 3000 mV)
+- Extra density in knee/cliff regions below 3700 mV to minimise interpolation error
+- Data synthesised from multiple sources (Grepow, Adafruit, RC community measurements)
+- Shared interpolation engine — no code duplication, just data
+
 **Expanded Test Coverage**
-- 51 tests across 5 suites (up from 32 tests across 3 suites)
+- 59 tests across 5 suites (up from 32 tests across 3 suites)
 - New: Temperature suite (7 tests) — HAL delegation, negative temps, error propagation
 - New: Power manager suite (12 tests) — thresholds, hysteresis boundary conditions, graceful degradation
+- New: LiPo LUT tests (8 tests) — exact points, clamping, interpolation across plateau/knee/cliff regions
 - Updated mock_hal.c with temperature HAL stubs
 
 **Build Configuration**

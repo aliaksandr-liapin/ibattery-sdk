@@ -11,7 +11,7 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 - Voltage-threshold power state machine with 100 mV hysteresis
 - ~37 bytes static RAM, integer-only math, no heap allocation
 - HAL abstraction layer — core logic is platform-independent portable C
-- 51 host-based unit tests across 5 suites (Unity), zero hardware required to run
+- 59 host-based unit tests across 5 suites (Unity), zero hardware required to run
 - Zephyr RTOS integration with clean layered architecture
 - Production-quality codebase: no layer violations, consistent conventions, full documentation
 

@@ -29,6 +29,9 @@ typedef struct {
 /** CR2032 primary lithium cell discharge curve. */
 extern const battery_soc_lut_t battery_soc_lut_cr2032;
 
+/** LiPo single-cell (3.7 V nominal) discharge curve. */
+extern const battery_soc_lut_t battery_soc_lut_lipo_1s;
+
 /**
  * Interpolate SoC from a voltage-to-SoC lookup table.
  *

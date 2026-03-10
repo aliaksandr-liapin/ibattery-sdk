@@ -40,7 +40,8 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 - Graceful degradation — power state survives voltage read failures
 - Unified error codes (`battery_status.h`)
 - Centralized SDK initialization (`battery_sdk_init()`)
-- Host-based unit tests (Unity framework, 51 tests across 5 suites, no Zephyr required)
+- LiPo single-cell (3.7 V nominal) discharge curve LUT (11-point, extra density in knee region)
+- Host-based unit tests (Unity framework, 59 tests across 5 suites, no Zephyr required)
 
 ---
 
