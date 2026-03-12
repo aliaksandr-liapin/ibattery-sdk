@@ -1,0 +1,29 @@
+# Battery SDK application configuration
+
+menu "Battery SDK"
+
+choice BATTERY_TEMP_SOURCE
+    prompt "Temperature sensor source"
+    default BATTERY_TEMP_NTC
+
+config BATTERY_TEMP_NTC
+    bool "External NTC thermistor (10K B3950 on AIN1)"
+    help
+      Use an external NTC thermistor in a voltage divider on SAADC AIN1
+      (P0.03) for temperature measurement. Requires a 10K pull-up resistor
+      to VDD and a 10K NTC (B=3950) to GND.
+
+config BATTERY_TEMP_DIE
+    bool "Internal die temperature sensor"
+    select SENSOR
+    select TEMP_NRF5
+    help
+      Use the nRF52840 internal die temperature sensor via the Zephyr
+      sensor API. No external components needed, but measures chip
+      temperature rather than ambient/battery temperature.
+
+endchoice
+
+endmenu
+
+source "Kconfig.zephyr"

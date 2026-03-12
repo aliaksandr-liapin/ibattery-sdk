@@ -39,8 +39,8 @@
 |    battery_        battery_adc.c       estimator.c    |
 |    internal.h      battery_voltage_    battery_soc_   |
 |                    filter.c            lut.c          |
-|                    battery_            battery_soc_   |
-|                    temperature.c       lut.h          |
+|                    battery_            battery_ntc_   |
+|                    temperature.c       lut.c          |
 |                    battery_power_                     |
 |                    manager.c                          |
 |                                                       |
@@ -52,10 +52,11 @@
 |              Hardware Abstraction Layer                |
 |                   (src/hal/)                           |
 |                                                       |
-|  battery_hal.h              Interface (portable)       |
-|  battery_hal_zephyr.c       Platform init + uptime     |
-|  battery_hal_adc_zephyr.c   ADC channel setup + read   |
-|  battery_hal_temp_zephyr.c  Die temperature sensor     |
+|  battery_hal.h                  Interface (portable)     |
+|  battery_hal_zephyr.c           Platform init + uptime   |
+|  battery_hal_adc_zephyr.c       ADC channel setup + read |
+|  battery_hal_temp_zephyr.c      Die temperature sensor   |
+|  battery_hal_temp_ntc_zephyr.c  NTC thermistor (default) |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
@@ -65,8 +66,9 @@
                          |
 +------------------------------------------------------+
 |                   Hardware                            |
-|   nRF52840 SAADC -> VDD rail -> CR2032               |
-|   nRF52840 TEMP peripheral (die temperature)         |
+|   nRF52840 SAADC Ch0 -> VDD rail -> CR2032/LiPo      |
+|   nRF52840 SAADC Ch1 -> AIN1 (P0.03) -> NTC divider  |
+|   nRF52840 TEMP peripheral (die temperature, opt.)    |
 +------------------------------------------------------+
 ```
 
@@ -117,9 +119,18 @@
 
 ### intelligence/battery_soc_lut.c
 - CR2032 9-point voltage-to-SoC lookup table
+- LiPo 1S 11-point voltage-to-SoC lookup table
 - Linear interpolation between adjacent points
 - Integer-only math: `soc = soc_high - (soc_high - soc_low) * (v_high - v) / (v_high - v_low)`
 - Clamps at boundaries
+
+### intelligence/battery_ntc_lut.c
+- 16-point resistance-to-temperature LUT for 10K NTC (B=3950), covering -40 °C to +125 °C
+- Resistance values computed from B-parameter equation: `R(T) = R0 * exp(B * (1/T - 1/T0))`
+- `battery_ntc_resistance_from_mv()` — converts voltage divider ADC reading to NTC resistance
+- `battery_ntc_lut_interpolate()` — linear interpolation between resistance-temperature entries
+- Integer-only math using int64_t for negative temperature handling and uint64_t for overflow safety
+- Table sorted descending by resistance (highest R / coldest first)
 
 ### telemetry/battery_telemetry.c
 - Reads all subsystems in sequence: timestamp, voltage, temperature, SoC, power state
@@ -133,13 +144,21 @@
 - 16x hardware oversampling for noise reduction
 - Auto-calibration before each read
 
-### hal/battery_hal_temp_zephyr.c
+### hal/battery_hal_temp_zephyr.c (CONFIG_BATTERY_TEMP_DIE)
 - Reads nRF52840 on-chip die temperature sensor via Zephyr sensor API
 - Uses `DEVICE_DT_GET(DT_NODELABEL(temp))` to obtain the TEMP peripheral device
 - `sensor_sample_fetch()` + `sensor_channel_get(SENSOR_CHAN_DIE_TEMP)` for each read
 - Converts `sensor_value` to 0.01 °C: `val1 * 100 + val2 / 10000`
 - Accuracy: ±2 °C (nRF52840 TEMP peripheral specification)
-- HAL abstraction allows future swap to external NTC thermistor without touching modules above
+
+### hal/battery_hal_temp_ntc_zephyr.c (CONFIG_BATTERY_TEMP_NTC, default)
+- Reads external 10K NTC thermistor (B=3950) via nRF52840 SAADC channel 1 (AIN1 / P0.03)
+- Circuit: VDD → 10K pullup → ADC pin → NTC → GND
+- 4-step pipeline: ADC read → raw to mV → mV to resistance → LUT interpolation
+- ADC config: 12-bit, 1/6 gain, 0.6V internal reference, 40µs acquisition, 4x oversampling
+- Uses `battery_ntc_lut.c` for resistance-to-temperature conversion
+- Selected at compile time via `CONFIG_BATTERY_TEMP_NTC=y` in `app/Kconfig`
+- Same interface as die sensor HAL — modules above are unchanged
 
 ### hal/battery_hal_zephyr.c
 - `battery_hal_init()` calls ADC init then temperature init in sequence
@@ -162,7 +181,9 @@ battery_telemetry_collect(&pkt)
   |     +-> pkt.voltage_mv
   |
   +-> battery_temperature_get_c_x100()
-  |     +-> battery_hal_temp_read_c_x100()  [die TEMP sensor]
+  |     +-> battery_hal_temp_read_c_x100()
+  |     |     [NTC: SAADC AIN1 -> mV -> R -> LUT interpolate]
+  |     |     [Die: sensor_fetch -> SENSOR_CHAN_DIE_TEMP]
   |     +-> pkt.temperature_c_x100
   |
   +-> battery_soc_estimator_get_pct_x100()
@@ -208,12 +229,15 @@ battery_telemetry_collect(&pkt)
 | Component | RAM (bytes) | Notes |
 |-----------|-------------|-------|
 | Voltage filter | 28 | Window=12, circular buffer |
-| ADC sample buffer | 2 | Single int16_t |
+| ADC sample buffer (VDD) | 2 | Single int16_t |
+| ADC sample buffer (NTC) | 2 | Single int16_t (NTC mode only) |
 | Power state | 1 | Hysteresis memory (g_current_state) |
 | SDK runtime state | 6 | 6 booleans |
 | Telemetry packet | 20 | Stack-allocated per call |
-| SoC LUT | 0 (const) | 36 bytes in flash |
-| **Total static RAM** | **~37** | Excluding Zephyr overhead |
+| SoC LUT (CR2032) | 0 (const) | 36 bytes in flash |
+| SoC LUT (LiPo) | 0 (const) | 44 bytes in flash |
+| NTC LUT (10K B3950) | 0 (const) | 128 bytes in flash (16 entries × 8 bytes) |
+| **Total static RAM** | **~39** | NTC mode; excluding Zephyr overhead |
 
 ---
 

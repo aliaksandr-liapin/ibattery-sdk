@@ -104,6 +104,20 @@ target_include_directories(test_power_manager PRIVATE
 
 target_link_libraries(test_power_manager PRIVATE unity)
 
+# ── NTC LUT test ─────────────────────────────────────────────────────────────
+add_executable(test_ntc_lut
+    test_ntc_lut.c
+    ${SDK_SRC}/intelligence/battery_ntc_lut.c
+)
+
+target_include_directories(test_ntc_lut PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}/intelligence
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_ntc_lut PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
@@ -111,3 +125,4 @@ add_test(NAME soc_lut COMMAND test_soc_lut)
 add_test(NAME telemetry COMMAND test_telemetry)
 add_test(NAME temperature COMMAND test_temperature)
 add_test(NAME power_manager COMMAND test_power_manager)
+add_test(NAME ntc_lut COMMAND test_ntc_lut)

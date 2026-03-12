@@ -6,7 +6,7 @@ The Battery SDK uses **host-based unit tests** that compile and run on the devel
 
 **Framework:** [Unity](https://github.com/ThrowTheSwitch/Unity) v2.6.0 (fetched automatically via CMake FetchContent)
 
-**Test count:** 59 tests across 5 suites
+**Test count:** 80 tests across 6 suites
 
 ---
 
@@ -27,19 +27,21 @@ Expected output:
 ```
 Test project /path/to/ibattery-sdk/build_tests
     Start 1: voltage_filter
-1/5 Test #1: voltage_filter ...................   Passed    0.00 sec
+1/6 Test #1: voltage_filter ...................   Passed    0.00 sec
     Start 2: soc_lut
-2/5 Test #2: soc_lut ..........................   Passed    0.00 sec
+2/6 Test #2: soc_lut ..........................   Passed    0.00 sec
     Start 3: telemetry
-3/5 Test #3: telemetry ........................   Passed    0.00 sec
+3/6 Test #3: telemetry ........................   Passed    0.00 sec
     Start 4: temperature
-4/5 Test #4: temperature ......................   Passed    0.00 sec
+4/6 Test #4: temperature ......................   Passed    0.00 sec
     Start 5: power_manager
-5/5 Test #5: power_manager ....................   Passed    0.00 sec
+5/6 Test #5: power_manager ....................   Passed    0.00 sec
+    Start 6: ntc_lut
+6/6 Test #6: ntc_lut ..........................   Passed    0.00 sec
 
-100% tests passed, 0 tests failed out of 5
+100% tests passed, 0 tests failed out of 6
 
-Total Test time (real) =   0.02 sec
+Total Test time (real) =   0.03 sec
 ```
 
 ### Running a single suite
@@ -50,6 +52,7 @@ Total Test time (real) =   0.02 sec
 ./build_tests/test_telemetry
 ./build_tests/test_temperature
 ./build_tests/test_power_manager
+./build_tests/test_ntc_lut
 ```
 
 ---
@@ -138,7 +141,42 @@ Tests the temperature module with mock HAL. Verifies HAL delegation, error propa
 | `test_init_hal_failure` | Init failure from HAL propagates |
 | `test_init_success` | Successful init returns OK |
 
-### 5. Power Manager (`test_power_manager.c`) — 12 tests
+### 5. NTC LUT (`test_ntc_lut.c`) — 21 tests
+
+Tests the NTC thermistor resistance-to-temperature conversion pipeline: voltage divider math and LUT interpolation. Pure integer math, no mocks.
+
+**Resistance Conversion (8 tests)**
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_resistance_null_output` | NULL output returns INVALID_ARG |
+| `test_resistance_zero_vdd` | Zero VDD returns INVALID_ARG |
+| `test_resistance_adc_equals_vdd_open_circuit` | ADC = VDD (open circuit NTC) returns IO error |
+| `test_resistance_adc_above_vdd_open_circuit` | ADC > VDD returns IO error |
+| `test_resistance_adc_zero_shorted` | ADC = 0 (shorted NTC) returns resistance = 0 |
+| `test_resistance_half_vdd_equals_pullup` | ADC = VDD/2 → R = pullup (balanced divider) |
+| `test_resistance_low_voltage_high_resistance` | Low ADC → high resistance (cold NTC) |
+| `test_resistance_high_voltage_low_resistance` | High ADC → low resistance (hot NTC) |
+
+**LUT Interpolation (13 tests)**
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_interpolate_null_lut` | NULL LUT returns INVALID_ARG |
+| `test_interpolate_null_output` | NULL output returns INVALID_ARG |
+| `test_interpolate_empty_lut` | Empty LUT returns INVALID_ARG |
+| `test_interpolate_exact_25c_reference` | 10000 Ω = 25.00 °C (reference point) |
+| `test_interpolate_exact_0c` | 33640 Ω = 0.00 °C |
+| `test_interpolate_exact_negative_40c` | 401600 Ω = -40.00 °C (coldest entry) |
+| `test_interpolate_exact_125c` | 359 Ω = 125.00 °C (hottest entry) |
+| `test_interpolate_above_max_resistance_clamps_cold` | Very high R clamps to -40 °C |
+| `test_interpolate_below_min_resistance_clamps_hot` | Very low R clamps to 125 °C |
+| `test_interpolate_midpoint_20c_25c` | 11260 Ω → 22.50 °C (room temp interpolation) |
+| `test_interpolate_negative_range` | 152900 Ω → -25.00 °C (negative temp interpolation) |
+| `test_interpolate_across_zero` | 26920 Ω → 5.00 °C (crosses 0 °C boundary) |
+| `test_interpolate_hot_range` | 983 Ω → 90.01 °C (high temp interpolation) |
+
+### 6. Power Manager (`test_power_manager.c`) — 12 tests
 
 Tests the voltage-threshold state machine with hysteresis. Uses mock voltage to simulate battery conditions.
 

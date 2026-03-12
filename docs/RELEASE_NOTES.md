@@ -2,7 +2,7 @@
 
 ## v0.2.0 — Phase 2: Real Temperature + Power State Machine (2026-03-09)
 
-Replaces the two remaining stubs from Phase 1 with real implementations: die temperature sensor readings and voltage-based power state detection with hysteresis.
+Replaces the two remaining stubs from Phase 1 with real implementations: die temperature sensor readings, external NTC thermistor support, and voltage-based power state detection with hysteresis.
 
 ### What's New
 
@@ -10,7 +10,13 @@ Replaces the two remaining stubs from Phase 1 with real implementations: die tem
 - nRF52840 on-chip die temperature sensor via Zephyr sensor API (±2 °C accuracy)
 - New HAL driver: `battery_hal_temp_zephyr.c` using `SENSOR_CHAN_DIE_TEMP`
 - Temperature module now delegates to HAL instead of returning fixed 25.00 °C
-- HAL abstraction enables future swap to external NTC thermistor without touching modules above
+
+**External NTC Thermistor Support**
+- New HAL driver: `battery_hal_temp_ntc_zephyr.c` for 10K NTC (B=3950) on SAADC AIN1 (P0.03)
+- New intelligence module: `battery_ntc_lut.c` with 16-point resistance-to-temperature LUT (-40 °C to +125 °C)
+- Voltage divider math: ADC → millivolts → resistance → temperature, all integer math
+- Compile-time selection via Kconfig: `CONFIG_BATTERY_TEMP_NTC` (default) or `CONFIG_BATTERY_TEMP_DIE`
+- Same HAL interface (`battery_hal_temp_read_c_x100`) — modules above HAL are unchanged
 
 **Voltage-Based Power State Machine**
 - Threshold-based state detection: enters CRITICAL when voltage drops below 2100 mV
@@ -25,14 +31,16 @@ Replaces the two remaining stubs from Phase 1 with real implementations: die tem
 - Shared interpolation engine — no code duplication, just data
 
 **Expanded Test Coverage**
-- 59 tests across 5 suites (up from 32 tests across 3 suites)
+- 80 tests across 6 suites (up from 32 tests across 3 suites)
+- New: NTC LUT suite (21 tests) — resistance conversion edge cases, LUT interpolation across full temperature range, negative temps, clamping
 - New: Temperature suite (7 tests) — HAL delegation, negative temps, error propagation
 - New: Power manager suite (12 tests) — thresholds, hysteresis boundary conditions, graceful degradation
 - New: LiPo LUT tests (8 tests) — exact points, clamping, interpolation across plateau/knee/cliff regions
 - Updated mock_hal.c with temperature HAL stubs
 
 **Build Configuration**
-- Added `CONFIG_SENSOR=y` and `CONFIG_TEMP_NRF5=y` to Kconfig
+- New `app/Kconfig` with temperature source selection (NTC vs die sensor)
+- Conditional compilation in CMake: NTC HAL + NTC LUT or die sensor HAL
 - Added `&temp { status = "okay"; }` to devicetree overlay
 - +1 byte static RAM (power state hysteresis memory)
 

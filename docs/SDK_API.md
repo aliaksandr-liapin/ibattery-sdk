@@ -109,19 +109,30 @@ int battery_temperature_get_c_x100(int32_t *temperature_c_x100);
 
 ### `battery_temperature_init`
 
-Initialize the temperature measurement subsystem. Configures the nRF52840 on-chip die temperature sensor via the HAL. Called automatically by `battery_sdk_init()`.
+Initialize the temperature measurement subsystem. Configures the selected temperature sensor via the HAL. Called automatically by `battery_sdk_init()`.
+
+The sensor source is selected at compile time via Kconfig:
+
+| Config | Sensor | Description |
+|--------|--------|-------------|
+| `CONFIG_BATTERY_TEMP_NTC=y` (default) | External 10K NTC thermistor (B=3950) | SAADC AIN1 (P0.03), voltage divider with 10K pullup |
+| `CONFIG_BATTERY_TEMP_DIE=y` | nRF52840 on-chip die sensor | TEMP peripheral via Zephyr sensor API (±2 °C) |
+
+Both sensors use the same HAL interface — modules above the HAL are unchanged regardless of which sensor is selected.
 
 **Returns:** `BATTERY_STATUS_OK` or `BATTERY_STATUS_IO` if the sensor is not ready.
 
 ### `battery_temperature_get_c_x100`
 
-Read the current temperature from the nRF52840 die temperature sensor.
+Read the current temperature.
 
 | Parameter | Direction | Description |
 |-----------|-----------|-------------|
 | `temperature_c_x100` | out | Temperature in 0.01 C units (e.g., 2350 = 23.50 C) |
 
-Uses the nRF52840 TEMP peripheral (±2 °C accuracy). The HAL abstraction allows a future swap to an external NTC thermistor without changing the module interface.
+**NTC mode** (default): Reads SAADC channel 1, converts ADC millivolts to NTC resistance via voltage divider math, then interpolates through a 16-point resistance-to-temperature lookup table (-40 °C to +125 °C). All integer math.
+
+**Die sensor mode**: Reads the nRF52840 TEMP peripheral (±2 °C accuracy). Note: measures chip temperature, not ambient or battery temperature.
 
 **Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer), `BATTERY_STATUS_NOT_INITIALIZED`, or `BATTERY_STATUS_IO`.
 
@@ -144,7 +155,7 @@ Get the current estimated state of charge.
 |-----------|-----------|-------------|
 | `soc_pct_x100` | out | SoC in 0.01% units (0 = 0.00%, 10000 = 100.00%) |
 
-Internally reads the current voltage via `battery_voltage_get_mv()` and interpolates through the CR2032 lookup table.
+Internally reads the current voltage via `battery_voltage_get_mv()` and interpolates through the active lookup table.
 
 **CR2032 discharge curve (9 points):**
 
@@ -161,6 +172,24 @@ Internally reads the current voltage via `battery_voltage_get_mv()` and interpol
 | 2000 | 0 |
 
 Voltages above 3000 mV clamp to 100%. Voltages below 2000 mV clamp to 0%.
+
+**LiPo 1S discharge curve (11 points):**
+
+| Voltage (mV) | SoC (%) |
+|---------------|---------|
+| 4200 | 100 |
+| 4100 | 90 |
+| 4000 | 80 |
+| 3950 | 70 |
+| 3870 | 55 |
+| 3820 | 40 |
+| 3780 | 30 |
+| 3745 | 20 |
+| 3700 | 15 |
+| 3600 | 6.5 |
+| 3000 | 0 |
+
+Voltages above 4200 mV clamp to 100%. Voltages below 3000 mV clamp to 0%. Extra density in the knee/cliff regions below 3700 mV minimises interpolation error.
 
 ---
 

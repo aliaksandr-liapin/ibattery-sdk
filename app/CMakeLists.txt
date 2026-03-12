@@ -19,9 +19,20 @@ target_sources(app PRIVATE
     ../src/telemetry/battery_telemetry.c
     ../src/hal/battery_hal_zephyr.c
     ../src/hal/battery_hal_adc_zephyr.c
-    ../src/hal/battery_hal_temp_zephyr.c
     ../src/core_modules/battery_voltage_filter.c
 )
+
+# Temperature HAL: NTC thermistor or internal die sensor
+if(CONFIG_BATTERY_TEMP_NTC)
+    target_sources(app PRIVATE
+        ../src/hal/battery_hal_temp_ntc_zephyr.c
+        ../src/intelligence/battery_ntc_lut.c
+    )
+else()
+    target_sources(app PRIVATE
+        ../src/hal/battery_hal_temp_zephyr.c
+    )
+endif()
 
 target_include_directories(app PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../include

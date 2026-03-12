@@ -28,7 +28,7 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 - **Battery**: CR2032 Energizer (3V primary lithium)
 - **Power switch**: VDD position
 - **SDK**: nRF Connect SDK v3.2.2 / Zephyr OS v4.2.99
-- **ADC**: SAADC measuring VDD rail, 12-bit, 1/6 gain, 0.6V internal reference (3.6V full-scale)
+- **ADC**: SAADC Ch0 measuring VDD rail, Ch1 measuring NTC thermistor (AIN1/P0.03); 12-bit, 1/6 gain, 0.6V internal reference
 
 ---
 
@@ -37,14 +37,16 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 - Real voltage measurement via nRF52840 SAADC (VDD input)
 - Moving average voltage filter (window=12, O(1), 28 bytes RAM)
 - CR2032 voltage-to-SoC lookup table with linear interpolation (integer math only)
-- Real die temperature sensor via nRF52840 TEMP peripheral (±2 °C accuracy)
+- External NTC thermistor support (10K B3950 on AIN1) with 16-point resistance-to-temperature LUT (-40 °C to +125 °C)
+- On-chip die temperature sensor via nRF52840 TEMP peripheral (±2 °C accuracy, alternative)
+- Compile-time temperature source selection via Kconfig (`CONFIG_BATTERY_TEMP_NTC` default, `CONFIG_BATTERY_TEMP_DIE` alternative)
 - Voltage-threshold power state detection with 100 mV hysteresis (CRITICAL below 2100 mV)
 - Resilient telemetry collection with per-field error flags
 - Graceful degradation — power state survives voltage read failures
 - Unified error codes (`battery_status.h`)
 - Centralized SDK initialization (`battery_sdk_init()`)
 - LiPo single-cell (3.7 V nominal) discharge curve LUT (11-point, extra density in knee region)
-- Host-based unit tests (Unity framework, 59 tests across 5 suites, no Zephyr required)
+- Host-based unit tests (Unity framework, 80 tests across 6 suites, no Zephyr required)
 
 ---
 
