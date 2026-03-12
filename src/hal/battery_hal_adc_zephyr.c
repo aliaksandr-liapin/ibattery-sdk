@@ -24,23 +24,29 @@
 static const struct device *g_adc_dev = DEVICE_DT_GET(BATTERY_ADC_NODE);
 static int16_t g_adc_sample_buffer;
 
+/*
+ * Channel config is kept at file scope so it can be re-applied before
+ * every read.  The nRF SAADC driver does not preserve per-channel
+ * input-mux settings when other channels are read (e.g. the NTC
+ * channel on AIN1), so we must restore ours each time.
+ */
+static const struct adc_channel_cfg g_vdd_channel_cfg = {
+    .gain             = BATTERY_ADC_GAIN,
+    .reference        = BATTERY_ADC_REFERENCE,
+    .acquisition_time = BATTERY_ADC_ACQ_TIME,
+    .channel_id       = BATTERY_ADC_CHANNEL_ID,
+#if defined(CONFIG_ADC_CONFIGURABLE_INPUTS)
+    .input_positive   = BATTERY_ADC_INPUT_POSITIVE,
+#endif
+};
+
 int battery_hal_adc_init(void)
 {
-    struct adc_channel_cfg channel_cfg = {
-        .gain             = BATTERY_ADC_GAIN,
-        .reference        = BATTERY_ADC_REFERENCE,
-        .acquisition_time = BATTERY_ADC_ACQ_TIME,
-        .channel_id       = BATTERY_ADC_CHANNEL_ID,
-#if defined(CONFIG_ADC_CONFIGURABLE_INPUTS)
-        .input_positive   = BATTERY_ADC_INPUT_POSITIVE,
-#endif
-    };
-
     if (!device_is_ready(g_adc_dev)) {
         return BATTERY_STATUS_IO;
     }
 
-    if (adc_channel_setup(g_adc_dev, &channel_cfg) < 0) {
+    if (adc_channel_setup(g_adc_dev, &g_vdd_channel_cfg) < 0) {
         return BATTERY_STATUS_IO;
     }
 
@@ -60,6 +66,11 @@ int battery_hal_adc_read_raw(int16_t *raw_out)
 
     if (raw_out == NULL) {
         return BATTERY_STATUS_INVALID_ARG;
+    }
+
+    /* Re-setup channel before every read (see comment on g_vdd_channel_cfg). */
+    if (adc_channel_setup(g_adc_dev, &g_vdd_channel_cfg) < 0) {
+        return BATTERY_STATUS_IO;
     }
 
     if (adc_read(g_adc_dev, &sequence) < 0) {

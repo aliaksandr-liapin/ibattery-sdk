@@ -13,6 +13,11 @@
  * Replaces battery_hal_temp_zephyr.c (die sensor) when
  * CONFIG_BATTERY_TEMP_NTC=y.  The interface is identical:
  * battery_hal_temp_init() and battery_hal_temp_read_c_x100().
+ *
+ * NOTE: The nRF SAADC driver does not preserve per-channel input
+ * mux settings across reads of different channels (e.g. internal
+ * VDD on channel 0 clobbers channel 1's AIN selection).  We work
+ * around this by calling adc_channel_setup() before every read.
  */
 
 #include "battery_hal.h"
@@ -25,7 +30,7 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/adc.h>
 
-#include <hal/nrf_saadc.h>
+#include <helpers/nrfx_analog_common.h>
 
 /* ── ADC configuration for NTC channel ──────────────────────────── */
 
@@ -35,7 +40,7 @@
 #define NTC_ADC_GAIN          ADC_GAIN_1_6
 #define NTC_ADC_REFERENCE     ADC_REF_INTERNAL
 #define NTC_ADC_ACQ_TIME      ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 40)
-#define NTC_ADC_INPUT         NRF_SAADC_INPUT_AIN1    /* P0.03 */
+#define NTC_ADC_INPUT         NRFX_ANALOG_EXTERNAL_AIN1    /* P0.03 */
 
 /* ── Circuit parameters ─────────────────────────────────────────── */
 
@@ -47,23 +52,23 @@
 static const struct device *g_adc_dev = DEVICE_DT_GET(NTC_ADC_NODE);
 static int16_t g_ntc_sample_buffer;
 
+static const struct adc_channel_cfg g_ntc_channel_cfg = {
+    .gain             = NTC_ADC_GAIN,
+    .reference        = NTC_ADC_REFERENCE,
+    .acquisition_time = NTC_ADC_ACQ_TIME,
+    .channel_id       = NTC_ADC_CHANNEL_ID,
+#if defined(CONFIG_ADC_CONFIGURABLE_INPUTS)
+    .input_positive   = NTC_ADC_INPUT,
+#endif
+};
+
 int battery_hal_temp_init(void)
 {
-    struct adc_channel_cfg channel_cfg = {
-        .gain             = NTC_ADC_GAIN,
-        .reference        = NTC_ADC_REFERENCE,
-        .acquisition_time = NTC_ADC_ACQ_TIME,
-        .channel_id       = NTC_ADC_CHANNEL_ID,
-#if defined(CONFIG_ADC_CONFIGURABLE_INPUTS)
-        .input_positive   = NTC_ADC_INPUT,
-#endif
-    };
-
     if (!device_is_ready(g_adc_dev)) {
         return BATTERY_STATUS_IO;
     }
 
-    if (adc_channel_setup(g_adc_dev, &channel_cfg) < 0) {
+    if (adc_channel_setup(g_adc_dev, &g_ntc_channel_cfg) < 0) {
         return BATTERY_STATUS_IO;
     }
 
@@ -86,6 +91,15 @@ int battery_hal_temp_read_c_x100(int32_t *temp_c_x100_out)
 
     if (temp_c_x100_out == NULL) {
         return BATTERY_STATUS_INVALID_ARG;
+    }
+
+    /*
+     * Re-setup the channel before every read.  The VDD channel (ch 0)
+     * uses an internal input that clobbers ch 1's AIN mux in the nRF
+     * SAADC driver.  Re-calling adc_channel_setup() restores AIN1.
+     */
+    if (adc_channel_setup(g_adc_dev, &g_ntc_channel_cfg) < 0) {
+        return BATTERY_STATUS_IO;
     }
 
     /* Step 1: Read ADC */

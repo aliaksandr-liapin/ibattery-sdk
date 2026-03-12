@@ -1,5 +1,30 @@
 # Release Notes
 
+## v0.2.1 — SAADC ADC Enum Fix & Channel Re-setup Workaround (2026-03-12)
+
+Fixes incorrect NTC temperature readings caused by an analog input enum mismatch and an nRF SAADC driver quirk.
+
+### Bug Fixes
+
+**NTC reading wrong ADC pin (off-by-one)**
+- Root cause: `NRF_SAADC_INPUT_AIN1` (from legacy `<hal/nrf_saadc.h>`) has value 2, but the Zephyr ADC driver interprets the `input_positive` field using the nrfx v3.x 0-based scheme where value 2 = AIN2 (P0.04), not AIN1 (P0.03)
+- Fix: switched to `NRFX_ANALOG_EXTERNAL_AIN1` (value 1) from `<helpers/nrfx_analog_common.h>`
+- Symptom: NTC reads ~87 mV instead of ~1500 mV at room temperature; LUT clamped to 125 °C
+
+**SAADC channel input-mux clobbering across channels**
+- Root cause: the nRF SAADC driver does not preserve per-channel input-mux (`PSELP`) settings when a different channel is read; reading internal VDD on channel 0 overwrites channel 1's AIN1 selection
+- Fix: both HAL ADC drivers (`battery_hal_adc_zephyr.c` and `battery_hal_temp_ntc_zephyr.c`) now call `adc_channel_setup()` before every `adc_read()` to restore the correct input configuration
+- Channel configs moved from local variables in init functions to file-scope `static const` structs so they are available in read functions
+- Symptom: first NTC read after boot was correct, but subsequent reads returned ~3020 mV (VDD value) after a VDD channel read
+
+### Hardware Verified
+
+- nRF52840-DK (PCA10056 rev 3.0.3)
+- 10K NTC (B=3950) on AIN1 (P0.03) with 10K pullup to VDD
+- Stable ~29.5 °C readings at room temperature, surviving multiple reboots
+
+---
+
 ## v0.2.0 — Phase 2: Real Temperature + Power State Machine (2026-03-09)
 
 Replaces the two remaining stubs from Phase 1 with real implementations: die temperature sensor readings, external NTC thermistor support, and voltage-based power state detection with hysteresis.

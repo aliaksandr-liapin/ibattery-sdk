@@ -143,6 +143,7 @@
 - Config: 12-bit resolution, 1/6 gain, 0.6V internal reference, 40us acquisition time
 - 16x hardware oversampling for noise reduction
 - Auto-calibration before each read
+- Channel config stored at file scope; `adc_channel_setup()` re-called before every read to work around nRF SAADC driver clobbering per-channel input-mux settings when other channels are read
 
 ### hal/battery_hal_temp_zephyr.c (CONFIG_BATTERY_TEMP_DIE)
 - Reads nRF52840 on-chip die temperature sensor via Zephyr sensor API
@@ -156,6 +157,8 @@
 - Circuit: VDD → 10K pullup → ADC pin → NTC → GND
 - 4-step pipeline: ADC read → raw to mV → mV to resistance → LUT interpolation
 - ADC config: 12-bit, 1/6 gain, 0.6V internal reference, 40µs acquisition, 4x oversampling
+- Analog input selected via `NRFX_ANALOG_EXTERNAL_AIN1` from `<helpers/nrfx_analog_common.h>` (nrfx v3.x 0-based enum; the legacy `NRF_SAADC_INPUT_AINx` enum is 1-based and causes an off-by-one pin selection)
+- Channel config stored at file scope; `adc_channel_setup()` re-called before every read to restore AIN1 after the VDD channel clobbers the input mux
 - Uses `battery_ntc_lut.c` for resistance-to-temperature conversion
 - Selected at compile time via `CONFIG_BATTERY_TEMP_NTC=y` in `app/Kconfig`
 - Same interface as die sensor HAL — modules above are unchanged
@@ -250,3 +253,5 @@ To port to a new platform:
 3. Implement `battery_hal_init()` and `battery_hal_get_uptime_ms()` for the target OS
 4. Add a new SoC LUT in `battery_soc_lut.c` for the target battery chemistry
 5. Everything above the HAL layer compiles unchanged
+
+**nRF-specific note:** Use `NRFX_ANALOG_EXTERNAL_AINx` from `<helpers/nrfx_analog_common.h>` for external analog inputs — the legacy `NRF_SAADC_INPUT_AINx` enum from `<hal/nrf_saadc.h>` is 1-based and causes an off-by-one pin selection with the Zephyr ADC driver. Both ADC HAL drivers must also re-call `adc_channel_setup()` before every read because the nRF SAADC driver does not preserve per-channel input-mux settings.

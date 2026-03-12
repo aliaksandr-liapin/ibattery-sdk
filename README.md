@@ -28,7 +28,7 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 - **Battery**: CR2032 Energizer (3V primary lithium)
 - **Power switch**: VDD position
 - **SDK**: nRF Connect SDK v3.2.2 / Zephyr OS v4.2.99
-- **ADC**: SAADC Ch0 measuring VDD rail, Ch1 measuring NTC thermistor (AIN1/P0.03); 12-bit, 1/6 gain, 0.6V internal reference
+- **ADC**: SAADC Ch0 measuring VDD rail, Ch1 measuring NTC thermistor (AIN1/P0.03); 12-bit, 1/6 gain, 0.6V internal reference. Uses `NRFX_ANALOG_EXTERNAL_AINx` enums (nrfx v3.x); channel setup re-applied before every read to work around SAADC driver input-mux clobbering
 
 ---
 
