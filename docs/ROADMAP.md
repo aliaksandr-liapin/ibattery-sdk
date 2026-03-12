@@ -1,17 +1,21 @@
 # Roadmap & Business Strategy
 
-## Current State (Phase 2 Complete)
+## Current State (Phase 3 Complete)
 
 ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 
 **What exists today:**
 - Targets nRF52840 + CR2032 coin cells
 - Voltage reading (SAADC) → SoC estimation (LUT interpolation) → telemetry collection
-- Real die temperature sensor via nRF52840 TEMP peripheral (±2 °C)
+- Real die temperature sensor via nRF52840 TEMP peripheral (±2 °C) or external 10K NTC thermistor (B=3950) on SAADC AIN1
 - Voltage-threshold power state machine with 100 mV hysteresis
-- ~37 bytes static RAM, integer-only math, no heap allocation
+- LiPo single-cell (3.7 V nominal) discharge curve LUT
+- BLE telemetry transport with custom GATT service + notification characteristic
+- 20-byte LE wire serialization fitting BLE default ATT MTU
+- Compile-time transport backend selection via Kconfig
+- ~39 bytes static RAM (core), integer-only math, no heap allocation
 - HAL abstraction layer — core logic is platform-independent portable C
-- 59 host-based unit tests across 5 suites (Unity), zero hardware required to run
+- 106 host-based unit tests across 8 suites (Unity), zero hardware required to run
 - Zephyr RTOS integration with clean layered architecture
 - Production-quality codebase: no layer violations, consistent conventions, full documentation
 
@@ -30,7 +34,6 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 **Gaps to address before monetizing:**
 - CR2032-only is too niche — LiPo support is table stakes for broader adoption
 - No charging detection limits to primary (non-rechargeable) cells
-- No BLE/transport example — can't demonstrate end-to-end value
 - Single platform (nRF52840) limits reach — STM32 port would be highest-impact addition
 
 **Competitive landscape:**
@@ -94,11 +97,11 @@ Lower scale but immediate revenue with zero infrastructure cost.
 
 | Priority | Task | Impact |
 |----------|------|--------|
-| 1 | Multi-chemistry LUTs — add LiPo single-cell (3.7V nominal) | Biggest use case by volume |
-| 2 | Complete Phase 2 stubs — real temperature + dynamic power states | Half-stubbed SDK doesn't inspire adoption |
-| 3 | STM32 HAL port | Huge market, multiplies addressable audience |
-| 4 | ESP32 HAL port | Huge community, drives open-source adoption |
-| 5 | BLE telemetry example | Shows data flowing off the device end-to-end |
+| ~~1~~ | ~~Multi-chemistry LUTs — LiPo single-cell (3.7V nominal)~~ | ✅ Done (v0.2.0) |
+| ~~2~~ | ~~Real temperature + dynamic power states~~ | ✅ Done (v0.2.0 + v0.2.1) |
+| ~~3~~ | ~~Phase 3 — BLE telemetry transport~~ | ✅ Done (v0.3.0) |
+| 4 | STM32 HAL port | Huge market, multiplies addressable audience |
+| 5 | ESP32 HAL port | Huge community, drives open-source adoption |
 | 6 | Zephyr module registry submission | Discoverability via `west manifest` |
 
 ### Mid-term (3-6 months)

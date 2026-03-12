@@ -14,6 +14,7 @@ struct battery_sdk_runtime_state {
     bool soc_initialized;
     bool power_manager_initialized;
     bool telemetry_initialized;
+    bool transport_initialized;
 };
 
 struct battery_sdk_runtime_state *battery_sdk_state(void);

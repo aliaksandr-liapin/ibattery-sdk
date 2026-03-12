@@ -6,7 +6,7 @@ The Battery SDK uses **host-based unit tests** that compile and run on the devel
 
 **Framework:** [Unity](https://github.com/ThrowTheSwitch/Unity) v2.6.0 (fetched automatically via CMake FetchContent)
 
-**Test count:** 80 tests across 6 suites
+**Test count:** 106 tests across 8 suites
 
 ---
 
@@ -27,21 +27,25 @@ Expected output:
 ```
 Test project /path/to/ibattery-sdk/build_tests
     Start 1: voltage_filter
-1/6 Test #1: voltage_filter ...................   Passed    0.00 sec
+1/8 Test #1: voltage_filter ...................   Passed    0.00 sec
     Start 2: soc_lut
-2/6 Test #2: soc_lut ..........................   Passed    0.00 sec
+2/8 Test #2: soc_lut ..........................   Passed    0.00 sec
     Start 3: telemetry
-3/6 Test #3: telemetry ........................   Passed    0.00 sec
+3/8 Test #3: telemetry ........................   Passed    0.00 sec
     Start 4: temperature
-4/6 Test #4: temperature ......................   Passed    0.00 sec
+4/8 Test #4: temperature ......................   Passed    0.00 sec
     Start 5: power_manager
-5/6 Test #5: power_manager ....................   Passed    0.00 sec
+5/8 Test #5: power_manager ....................   Passed    0.00 sec
     Start 6: ntc_lut
-6/6 Test #6: ntc_lut ..........................   Passed    0.00 sec
+6/8 Test #6: ntc_lut ..........................   Passed    0.00 sec
+    Start 7: serialize
+7/8 Test #7: serialize ........................   Passed    0.00 sec
+    Start 8: transport
+8/8 Test #8: transport ........................   Passed    0.00 sec
 
-100% tests passed, 0 tests failed out of 6
+100% tests passed, 0 tests failed out of 8
 
-Total Test time (real) =   0.03 sec
+Total Test time (real) =   0.05 sec
 ```
 
 ### Running a single suite
@@ -53,6 +57,8 @@ Total Test time (real) =   0.03 sec
 ./build_tests/test_temperature
 ./build_tests/test_power_manager
 ./build_tests/test_ntc_lut
+./build_tests/test_serialize
+./build_tests/test_transport
 ```
 
 ---
@@ -195,6 +201,46 @@ Tests the voltage-threshold state machine with hysteresis. Uses mock voltage to 
 | `test_init_returns_ok` | Init succeeds with OK |
 | `test_init_sets_active` | Post-init state is ACTIVE |
 
+### 7. Serialization (`test_serialize.c`) — 15 tests
+
+Tests the telemetry packet wire serialization (pack/unpack). Pure logic, no mocks.
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_pack_null_pkt` | NULL packet returns INVALID_ARG |
+| `test_pack_null_buf` | NULL buffer returns INVALID_ARG |
+| `test_pack_short_buf` | Buffer < 20 bytes returns INVALID_ARG |
+| `test_unpack_null_buf` | NULL buffer returns INVALID_ARG |
+| `test_unpack_null_pkt` | NULL packet returns INVALID_ARG |
+| `test_unpack_short_buf` | Buffer < 20 bytes returns INVALID_ARG |
+| `test_roundtrip_typical` | Pack → unpack with typical values matches original |
+| `test_roundtrip_zeroes` | All-zero packet survives round-trip |
+| `test_roundtrip_max_values` | Maximum field values survive round-trip |
+| `test_roundtrip_negative_values` | Negative voltage/temperature survive round-trip |
+| `test_roundtrip_all_power_states` | All power state enum values survive round-trip |
+| `test_wire_version_byte` | Version byte at correct offset (0) |
+| `test_wire_timestamp_le` | Timestamp at offset 1, little-endian |
+| `test_wire_voltage_le` | Voltage at offset 5, little-endian |
+| `test_wire_format_total_size` | Pack writes exactly 20 bytes |
+
+### 8. Transport (`test_transport.c`) — 11 tests
+
+Tests the transport abstraction layer with a mock backend. Verifies delegation, error propagation, and wire byte correctness.
+
+| Test | What it verifies |
+|------|-----------------|
+| `test_init_calls_backend` | Init delegates to backend and returns OK |
+| `test_init_error_propagates` | Backend init error propagates to caller |
+| `test_send_null_packet` | NULL packet returns INVALID_ARG |
+| `test_send_happy_path` | Send serializes and delegates, correct wire size |
+| `test_send_captures_correct_wire_bytes` | Captured bytes match independent serialization |
+| `test_send_backend_error_propagates` | Backend send error propagates to caller |
+| `test_deinit_calls_backend` | Deinit delegates to backend |
+| `test_deinit_error_propagates` | Backend deinit error propagates |
+| `test_is_connected_null_pointer` | NULL output returns INVALID_ARG |
+| `test_is_connected_returns_false` | Reports disconnected state correctly |
+| `test_is_connected_returns_true` | Reports connected state correctly |
+
 ---
 
 ## Mock Architecture
@@ -214,6 +260,7 @@ Mock files are in `tests/mocks/`. Each mock provides:
 | `mock_soc.c` | `battery_soc_estimator.c` | soc_pct_x100, return code |
 | `mock_power.c` | `battery_power_manager.c` | power_state, return code |
 | `mock_sdk_state.c` | `battery_sdk.c` (state + uptime) | all-initialized state, uptime_ms, return code |
+| `mock_transport.c` | `battery_transport_ble_zephyr.c` | init/send/deinit return codes, connected state, captured send buffer + count |
 
 ### Example: configuring a mock
 

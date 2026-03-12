@@ -8,7 +8,8 @@ static struct battery_sdk_runtime_state g_mock_state = {
     .temperature_initialized = true,
     .soc_initialized = true,
     .power_manager_initialized = true,
-    .telemetry_initialized = true
+    .telemetry_initialized = true,
+    .transport_initialized = true
 };
 
 struct battery_sdk_runtime_state *battery_sdk_state(void)

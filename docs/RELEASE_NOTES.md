@@ -1,5 +1,56 @@
 # Release Notes
 
+## v0.3.0 — Phase 3: BLE Telemetry Transport (2026-03-12)
+
+Adds wireless telemetry delivery over Bluetooth Low Energy. Telemetry packets now flow off the device via BLE GATT notifications while serial output continues unchanged (dual output).
+
+### What's New
+
+**BLE Transport Layer**
+- Custom BLE GATT service with notification characteristic for 20-byte telemetry wire packets
+- Service UUID: `12340001-5678-9ABC-DEF0-123456789ABC`
+- Characteristic UUID: `12340002-5678-9ABC-DEF0-123456789ABC` (Read + Notify)
+- Connectable advertising with device name "iBattery" (configurable)
+- Drop policy: silently succeeds when no client subscribed
+- Automatic re-advertising on disconnect
+
+**Transport Abstraction**
+- Compile-time vtable pattern (`struct battery_transport_ops`) for pluggable backends
+- Backend selected via Kconfig: `CONFIG_BATTERY_TRANSPORT_BLE` (or mock for testing)
+- `battery_transport_send()` serializes + dispatches in one call
+- Returns `BATTERY_STATUS_UNSUPPORTED` when no backend compiled in
+
+**Wire Serialization**
+- 20-byte little-endian wire format, fits BLE default ATT MTU (23 − 3 = 20)
+- Explicit byte-shift encoding — no struct packing, no memcpy, fully portable
+- Pack/unpack round-trip verified by unit tests
+
+**SDK Integration**
+- `battery_sdk_init()` now calls `battery_transport_init()` as the last step (guarded by `CONFIG_BATTERY_TRANSPORT`)
+- Application main loop calls `battery_transport_send()` after telemetry collection
+- Compile without transport: `CONFIG_BATTERY_TRANSPORT=n` → serial-only, zero BLE overhead
+
+**Expanded Test Coverage**
+- 106 tests across 8 suites (up from 80 tests across 6 suites)
+- New: Serialization suite (15 tests) — round-trip, wire format, null/boundary checks
+- New: Transport suite (11 tests) — backend delegation, error propagation, wire byte verification
+- New mock: `mock_transport.c` with controllable rc, capture buffer, and send counter
+
+**Build Configuration**
+- New Kconfig options: `CONFIG_BATTERY_TRANSPORT`, `CONFIG_BATTERY_TRANSPORT_BLE`, `CONFIG_BATTERY_BLE_DEVICE_NAME`, `CONFIG_BATTERY_BLE_ADV_INTERVAL_MS`
+- Stack sizes increased: main=4096, system workqueue=2048 (BLE stack requirements)
+- BLE stack adds ~62 KB flash, ~12 KB RAM
+
+### Known Limitations
+
+- Single BLE connection only (`CONFIG_BT_MAX_CONN=1`)
+- No authentication or encryption on the GATT characteristic
+- No serial transport backend (BLE only for now)
+- IDLE and SLEEP power states still not implemented
+- No persistent storage of calibration data
+
+---
+
 ## v0.2.1 — SAADC ADC Enum Fix & Channel Re-setup Workaround (2026-03-12)
 
 Fixes incorrect NTC temperature readings caused by an analog input enum mismatch and an nRF SAADC driver quirk.

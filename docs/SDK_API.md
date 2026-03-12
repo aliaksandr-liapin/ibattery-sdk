@@ -294,18 +294,101 @@ A `status_flags` value of `0x00000000` means all fields were collected successfu
 
 ---
 
+## battery_transport.h — Telemetry Transport
+
+```c
+#include <battery_sdk/battery_transport.h>
+
+int battery_transport_init(void);
+int battery_transport_send(const struct battery_telemetry_packet *packet);
+int battery_transport_deinit(void);
+int battery_transport_is_connected(bool *connected_out);
+```
+
+Available when `CONFIG_BATTERY_TRANSPORT=y`. The active backend is selected at compile time via Kconfig.
+
+### `battery_transport_init`
+
+Initialize the transport subsystem. Calls the active backend's init function. For BLE, this enables the Bluetooth stack, registers the GATT service, and starts connectable advertising.
+
+**Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_IO`, or `BATTERY_STATUS_UNSUPPORTED` (no backend compiled in).
+
+### `battery_transport_send`
+
+Serialize and send a telemetry packet. Packs the packet into a 20-byte little-endian wire buffer and forwards it to the active backend.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `packet` | in | Telemetry packet to send (must not be NULL) |
+
+**Wire format (20 bytes, little-endian):**
+
+| Offset | Size | Field | Encoding |
+|--------|------|-------|----------|
+| 0 | 1 | telemetry_version | uint8 |
+| 1 | 4 | timestamp_ms | uint32 LE |
+| 5 | 4 | voltage_mv | int32 LE |
+| 9 | 4 | temperature_c_x100 | int32 LE |
+| 13 | 2 | soc_pct_x100 | uint16 LE |
+| 15 | 1 | power_state | uint8 |
+| 16 | 4 | status_flags | uint32 LE |
+
+20 bytes fits within a single BLE ATT default MTU (23 − 3 overhead = 20).
+
+**BLE behavior:** When no client is subscribed (CCCD not enabled), the send silently succeeds (drop policy). The wire buffer is always updated for the Read characteristic regardless of subscription state.
+
+**Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL packet), `BATTERY_STATUS_UNSUPPORTED`, or `BATTERY_STATUS_IO`.
+
+### `battery_transport_deinit`
+
+Shut down the transport subsystem. For BLE, stops advertising.
+
+**Returns:** `BATTERY_STATUS_OK` or `BATTERY_STATUS_UNSUPPORTED`.
+
+### `battery_transport_is_connected`
+
+Query whether a remote client is connected.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `connected_out` | out | true if a BLE client is connected |
+
+**Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer), or `BATTERY_STATUS_UNSUPPORTED`.
+
+### BLE Configuration (Kconfig)
+
+| Config | Type | Default | Description |
+|--------|------|---------|-------------|
+| `CONFIG_BATTERY_TRANSPORT` | bool | n | Enable transport subsystem |
+| `CONFIG_BATTERY_TRANSPORT_BLE` | bool | — | BLE GATT backend |
+| `CONFIG_BATTERY_BLE_DEVICE_NAME` | string | "iBattery" | Advertised device name |
+| `CONFIG_BATTERY_BLE_ADV_INTERVAL_MS` | int | 1000 | Advertising interval (20-10240 ms) |
+
+### BLE Service Details
+
+| Property | Value |
+|----------|-------|
+| Service UUID | `12340001-5678-9ABC-DEF0-123456789ABC` |
+| Characteristic UUID | `12340002-5678-9ABC-DEF0-123456789ABC` |
+| Properties | Read + Notify |
+| Permissions | Read (no authentication) |
+| Max connections | 1 (configurable via `CONFIG_BT_MAX_CONN`) |
+
+---
+
 ## Usage Example
 
 ```c
 #include <battery_sdk/battery_sdk.h>
 #include <battery_sdk/battery_status.h>
 #include <battery_sdk/battery_telemetry.h>
+#include <battery_sdk/battery_transport.h>  /* if CONFIG_BATTERY_TRANSPORT */
 
 int main(void)
 {
     struct battery_telemetry_packet pkt;
 
-    int rc = battery_sdk_init();
+    int rc = battery_sdk_init();  /* initializes all subsystems incl. transport */
     if (rc != BATTERY_STATUS_OK) {
         /* handle init error */
     }
@@ -316,6 +399,9 @@ int main(void)
         /* pkt.voltage_mv      — battery voltage in mV    */
         /* pkt.soc_pct_x100    — SoC in 0.01% units       */
         /* pkt.status_flags    — 0 if all readings OK      */
+
+        /* Send via BLE (if transport enabled) */
+        battery_transport_send(&pkt);
 
         sleep(2);
     }

@@ -8,6 +8,14 @@
 #include <battery_sdk/battery_soc_estimator.h>
 #include <battery_sdk/battery_telemetry.h>
 
+#if __has_include(<autoconf.h>)
+#include <autoconf.h>
+#endif
+
+#if defined(CONFIG_BATTERY_TRANSPORT)
+#include <battery_sdk/battery_transport.h>
+#endif
+
 #include "../hal/battery_hal.h"
 
 static struct battery_sdk_runtime_state g_battery_sdk_state = {
@@ -16,7 +24,8 @@ static struct battery_sdk_runtime_state g_battery_sdk_state = {
     .temperature_initialized = false,
     .soc_initialized = false,
     .power_manager_initialized = false,
-    .telemetry_initialized = false
+    .telemetry_initialized = false,
+    .transport_initialized = false
 };
 
 struct battery_sdk_runtime_state *battery_sdk_state(void)
@@ -62,6 +71,14 @@ int battery_sdk_init(void)
     if (rc != BATTERY_STATUS_OK) {
         return rc;
     }
+
+#if defined(CONFIG_BATTERY_TRANSPORT)
+    rc = battery_transport_init();
+    if (rc != BATTERY_STATUS_OK) {
+        return rc;
+    }
+    g_battery_sdk_state.transport_initialized = true;
+#endif
 
     return BATTERY_STATUS_OK;
 }

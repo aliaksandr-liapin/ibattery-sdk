@@ -5,6 +5,10 @@
 #include <battery_sdk/battery_status.h>
 #include <battery_sdk/battery_telemetry.h>
 
+#if IS_ENABLED(CONFIG_BATTERY_TRANSPORT)
+#include <battery_sdk/battery_transport.h>
+#endif
+
 #include <stdint.h>
 
 int main(void)
@@ -36,6 +40,13 @@ int main(void)
                    pkt.soc_pct_x100 % 100U,
                    pkt.power_state,
                    pkt.status_flags);
+
+#if IS_ENABLED(CONFIG_BATTERY_TRANSPORT)
+            rc = battery_transport_send(&pkt);
+            if (rc != BATTERY_STATUS_OK) {
+                printk("Transport send failed: %d\n", rc);
+            }
+#endif
         }
 
         k_sleep(K_SECONDS(2));

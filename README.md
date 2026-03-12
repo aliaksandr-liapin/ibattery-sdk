@@ -9,14 +9,14 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 
 ---
 
-## Current Status: Phase 2 Complete
+## Current Status: Phase 3 Complete
 
 | Phase | Description | Status |
 |-------|-------------|--------|
 | Phase 0 | Hardware setup, firmware skeleton | Done |
 | Phase 1 | Core battery intelligence (voltage, SoC, telemetry) | Done |
-| Phase 2 | Real temperature sensor + power state machine | **Done** |
-| Phase 3 | Telemetry protocol and transport | Planned |
+| Phase 2 | Real temperature sensor + power state machine | Done |
+| Phase 3 | BLE telemetry transport | **Done** |
 | Phase 4 | Cloud platform integration | Planned |
 | Phase 5 | AI-driven battery analytics | Planned |
 
@@ -46,7 +46,11 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 - Unified error codes (`battery_status.h`)
 - Centralized SDK initialization (`battery_sdk_init()`)
 - LiPo single-cell (3.7 V nominal) discharge curve LUT (11-point, extra density in knee region)
-- Host-based unit tests (Unity framework, 80 tests across 6 suites, no Zephyr required)
+- BLE telemetry transport with custom GATT service and notification characteristic
+- 20-byte little-endian wire format fitting BLE default ATT MTU
+- Compile-time transport backend selection via Kconfig (BLE or mock)
+- Dual output: serial printk + BLE notifications (when `CONFIG_BATTERY_TRANSPORT=y`)
+- Host-based unit tests (Unity framework, 106 tests across 8 suites, no Zephyr required)
 
 ---
 
@@ -105,6 +109,7 @@ ibattery-sdk/
     hal/                        Hardware abstraction (Zephyr/nRF)
     intelligence/               SoC estimation, LUT
     telemetry/                  Telemetry collection
+    transport/                  Wire serialization + BLE backend
   tests/                        Host-based unit tests (Unity)
     mocks/                      Configurable test doubles
   docs/                         Documentation

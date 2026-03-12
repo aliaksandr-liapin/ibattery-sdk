@@ -118,6 +118,41 @@ target_include_directories(test_ntc_lut PRIVATE
 
 target_link_libraries(test_ntc_lut PRIVATE unity)
 
+# ── Serialization test ──────────────────────────────────────────────────────
+add_executable(test_serialize
+    test_serialize.c
+    ${SDK_SRC}/transport/battery_serialize.c
+)
+
+target_include_directories(test_serialize PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}/transport
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serialize PRIVATE unity)
+
+# ── Transport test (with mock backend) ─────────────────────────────────────
+add_executable(test_transport
+    test_transport.c
+    ${SDK_SRC}/transport/battery_transport.c
+    ${SDK_SRC}/transport/battery_serialize.c
+    mocks/mock_transport.c
+)
+
+target_include_directories(test_transport PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/transport
+    ${unity_SOURCE_DIR}/src
+)
+
+target_compile_definitions(test_transport PRIVATE
+    CONFIG_BATTERY_TRANSPORT_MOCK=1
+)
+
+target_link_libraries(test_transport PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
@@ -126,3 +161,5 @@ add_test(NAME telemetry COMMAND test_telemetry)
 add_test(NAME temperature COMMAND test_temperature)
 add_test(NAME power_manager COMMAND test_power_manager)
 add_test(NAME ntc_lut COMMAND test_ntc_lut)
+add_test(NAME serialize COMMAND test_serialize)
+add_test(NAME transport COMMAND test_transport)

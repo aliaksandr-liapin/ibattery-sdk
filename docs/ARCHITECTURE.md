@@ -20,6 +20,7 @@
                          |
               battery_sdk_init()
               battery_telemetry_collect()
+              battery_transport_send()        [optional]
                          |
 +------------------------------------------------------+
 |                  Public SDK API                       |
@@ -28,7 +29,8 @@
 |  battery_sdk.h        battery_telemetry.h             |
 |  battery_voltage.h    battery_temperature.h           |
 |  battery_soc_estimator.h  battery_power_manager.h     |
-|  battery_status.h     battery_types.h                 |
+|  battery_transport.h  battery_status.h                |
+|  battery_types.h                                      |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
@@ -46,6 +48,12 @@
 |                                                       |
 |                 telemetry/                             |
 |                   battery_telemetry.c                  |
+|                                                       |
+|                 transport/                             |
+|                   battery_transport.c                  |
+|                   battery_serialize.c/.h               |
+|                   ble/                                 |
+|                     battery_transport_ble_zephyr.c     |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
@@ -137,6 +145,29 @@
 - Best-effort: each read is independent; failures set flag bits, don't abort collection
 - Zeroes failed fields so consumers see deterministic values
 
+### transport/battery_transport.c
+- Compile-time vtable pattern: selects backend via `CONFIG_BATTERY_TRANSPORT_BLE` or `CONFIG_BATTERY_TRANSPORT_MOCK`
+- `battery_transport_send()` serializes packet via `battery_serialize_pack()` then delegates to backend
+- Returns `BATTERY_STATUS_UNSUPPORTED` if no backend compiled in
+- Null-checks packet pointer before serialization
+
+### transport/battery_serialize.c
+- Encodes/decodes `battery_telemetry_packet` to/from 20-byte little-endian wire buffer
+- Explicit byte shifts (`put_u16_le`, `put_u32_le`, etc.) — fully portable, no struct packing
+- 20 bytes fits within a single BLE ATT default MTU (23 − 3 = 20)
+- Wire format: version(1) + timestamp(4) + voltage(4) + temperature(4) + soc(2) + power_state(1) + flags(4)
+
+### transport/ble/battery_transport_ble_zephyr.c
+- Custom BLE GATT service with notification characteristic for telemetry
+- Service UUID: `12340001-5678-9ABC-DEF0-123456789ABC`
+- Characteristic UUID: `12340002-5678-9ABC-DEF0-123456789ABC` (Read + Notify)
+- `BT_GATT_SERVICE_DEFINE()` compile-time GATT table
+- `bt_enable()` with semaphore-based synchronous init, then connectable advertising
+- Drop policy: silently succeeds when no client subscribed (no error on unsubscribed send)
+- Connection callbacks manage ref-counted `bt_conn`, resume advertising on disconnect
+- Device name configurable via `CONFIG_BATTERY_BLE_DEVICE_NAME` (default "iBattery")
+- Resource overhead: ~62 KB flash, ~12 KB RAM (BLE stack)
+
 ### hal/battery_hal_adc_zephyr.c
 - Configures nRF52840 SAADC via Zephyr ADC API
 - Input: `NRFX_ANALOG_INTERNAL_VDD` (measures supply rail, not an external pin)
@@ -200,6 +231,11 @@ battery_telemetry_collect(&pkt)
   |     +-> pkt.power_state
   |
   +-> status_flags: OR of any per-field error bits
+
+battery_transport_send(&pkt)           [optional, CONFIG_BATTERY_TRANSPORT]
+  |
+  +-> battery_serialize_pack()          [pack into 20-byte wire buffer]
+  +-> g_ops->send(buf, 20)             [BLE notify / mock capture]
 ```
 
 ---
@@ -215,6 +251,7 @@ battery_telemetry_collect(&pkt)
 4. battery_power_manager_init() -> Power state monitor ready
 5. battery_soc_estimator_init() -> SoC estimator ready
 6. battery_telemetry_init()     -> Telemetry collector ready
+7. battery_transport_init()     -> BLE transport ready (if CONFIG_BATTERY_TRANSPORT)
 ```
 
 ---
@@ -235,12 +272,14 @@ battery_telemetry_collect(&pkt)
 | ADC sample buffer (VDD) | 2 | Single int16_t |
 | ADC sample buffer (NTC) | 2 | Single int16_t (NTC mode only) |
 | Power state | 1 | Hysteresis memory (g_current_state) |
-| SDK runtime state | 6 | 6 booleans |
+| SDK runtime state | 7 | 7 booleans |
 | Telemetry packet | 20 | Stack-allocated per call |
+| Transport wire buffer | 20 | BLE cached value (if CONFIG_BATTERY_TRANSPORT) |
 | SoC LUT (CR2032) | 0 (const) | 36 bytes in flash |
 | SoC LUT (LiPo) | 0 (const) | 44 bytes in flash |
 | NTC LUT (10K B3950) | 0 (const) | 128 bytes in flash (16 entries × 8 bytes) |
-| **Total static RAM** | **~39** | NTC mode; excluding Zephyr overhead |
+| **Total static RAM** | **~39** | NTC mode; excluding Zephyr/BLE stack overhead |
+| **BLE stack overhead** | **~12 KB** | Additional when CONFIG_BATTERY_TRANSPORT_BLE (Zephyr BLE stack) |
 
 ---
 

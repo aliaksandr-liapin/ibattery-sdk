@@ -24,6 +24,47 @@ config BATTERY_TEMP_DIE
 
 endchoice
 
+config BATTERY_TRANSPORT
+    bool "Enable telemetry transport"
+    default n
+    help
+      Enable the transport abstraction layer for sending telemetry
+      packets off-device (BLE, serial, etc.).
+
+if BATTERY_TRANSPORT
+
+choice BATTERY_TRANSPORT_BACKEND
+    prompt "Transport backend"
+    default BATTERY_TRANSPORT_BLE
+
+config BATTERY_TRANSPORT_BLE
+    bool "Bluetooth Low Energy (BLE)"
+    select BT
+    select BT_PERIPHERAL
+    help
+      Send telemetry via BLE GATT notifications using a custom service.
+      Requires a BLE-capable SoC (nRF52840, etc.).
+
+endchoice
+
+config BATTERY_BLE_DEVICE_NAME
+    string "BLE device name"
+    default "iBattery"
+    depends on BATTERY_TRANSPORT_BLE
+    help
+      The Bluetooth device name advertised by the SDK.
+
+config BATTERY_BLE_ADV_INTERVAL_MS
+    int "BLE advertising interval (ms)"
+    default 1000
+    range 20 10240
+    depends on BATTERY_TRANSPORT_BLE
+    help
+      Advertising interval in milliseconds.  Lower values improve
+      discoverability at the cost of power consumption.
+
+endif # BATTERY_TRANSPORT
+
 endmenu
 
 source "Kconfig.zephyr"

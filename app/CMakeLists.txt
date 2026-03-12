@@ -17,6 +17,9 @@ target_sources(app PRIVATE
     ../src/intelligence/battery_soc_estimator.c
     ../src/intelligence/battery_soc_lut.c
     ../src/telemetry/battery_telemetry.c
+    $<$<BOOL:${CONFIG_BATTERY_TRANSPORT}>:../src/transport/battery_transport.c>
+    $<$<BOOL:${CONFIG_BATTERY_TRANSPORT}>:../src/transport/battery_serialize.c>
+    $<$<BOOL:${CONFIG_BATTERY_TRANSPORT_BLE}>:../src/transport/ble/battery_transport_ble_zephyr.c>
     ../src/hal/battery_hal_zephyr.c
     ../src/hal/battery_hal_adc_zephyr.c
     ../src/core_modules/battery_voltage_filter.c
@@ -42,4 +45,5 @@ target_include_directories(app PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/hal
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/intelligence
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/telemetry
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/transport
 )
