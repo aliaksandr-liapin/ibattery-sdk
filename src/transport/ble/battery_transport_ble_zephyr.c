@@ -23,6 +23,7 @@
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/uuid.h>
 #include <zephyr/bluetooth/gatt.h>
+#include <zephyr/bluetooth/assigned_numbers.h>
 
 #include <string.h>
 
@@ -72,6 +73,22 @@ BT_GATT_SERVICE_DEFINE(battery_telem_svc,
                  BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 );
 
+/* ── Advertising & scan response data ───────────────────────────────── */
+
+static const struct bt_data ad[] = {
+    BT_DATA_BYTES(BT_DATA_FLAGS,
+                  BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
+    BT_DATA_BYTES(BT_DATA_UUID128_ALL,
+                  BT_UUID_128_ENCODE(0x12340001, 0x5678, 0x9ABC,
+                                     0xDEF0, 0x123456789ABC)),
+};
+
+static const struct bt_data sd[] = {
+    BT_DATA(BT_DATA_NAME_COMPLETE,
+            CONFIG_BT_DEVICE_NAME,
+            sizeof(CONFIG_BT_DEVICE_NAME) - 1),
+};
+
 /* ── Connection callbacks ───────────────────────────────────────────── */
 
 static void on_connected(struct bt_conn *conn, uint8_t err)
@@ -92,27 +109,18 @@ static void on_disconnected(struct bt_conn *conn, uint8_t reason)
 
     /* Resume advertising after disconnect */
     struct bt_le_adv_param adv_param = BT_LE_ADV_PARAM_INIT(
-        BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_USE_NAME,
+        BT_LE_ADV_OPT_CONN,
         BT_GAP_ADV_SLOW_INT_MIN,
         BT_GAP_ADV_SLOW_INT_MAX,
         NULL);
 
-    bt_le_adv_start(&adv_param, NULL, 0, NULL, 0);
+    bt_le_adv_start(&adv_param, ad, ARRAY_SIZE(ad),
+                     sd, ARRAY_SIZE(sd));
 }
 
 BT_CONN_CB_DEFINE(conn_cbs) = {
     .connected    = on_connected,
     .disconnected = on_disconnected,
-};
-
-/* ── Advertising data ───────────────────────────────────────────────── */
-
-static const struct bt_data ad[] = {
-    BT_DATA_BYTES(BT_DATA_FLAGS,
-                  BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
-    BT_DATA_BYTES(BT_DATA_UUID128_ALL,
-                  BT_UUID_128_ENCODE(0x12340001, 0x5678, 0x9ABC,
-                                     0xDEF0, 0x123456789ABC)),
 };
 
 /* ── bt_enable() ready callback ─────────────────────────────────────── */
@@ -140,12 +148,13 @@ static int ble_init(void)
 
     /* Start connectable advertising */
     struct bt_le_adv_param adv_param = BT_LE_ADV_PARAM_INIT(
-        BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_USE_NAME,
+        BT_LE_ADV_OPT_CONN,
         BT_GAP_ADV_SLOW_INT_MIN,
         BT_GAP_ADV_SLOW_INT_MAX,
         NULL);
 
-    err = bt_le_adv_start(&adv_param, ad, ARRAY_SIZE(ad), NULL, 0);
+    err = bt_le_adv_start(&adv_param, ad, ARRAY_SIZE(ad),
+                          sd, ARRAY_SIZE(sd));
     if (err && err != -EALREADY) {
         return BATTERY_STATUS_IO;
     }
