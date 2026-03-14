@@ -5,7 +5,7 @@
 
 Embedded firmware library providing a **standardized battery intelligence layer** for battery-powered IoT devices. Measures voltage, estimates state-of-charge, monitors temperature and power state, and packages everything into structured telemetry packets.
 
-Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. Designed to scale to other MCUs and battery chemistries.
+Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. TP4056 LiPo charger support scaffolded and GPIO-verified (pending real hardware). Designed to scale to other MCUs and battery chemistries.
 
 ---
 
@@ -53,7 +53,9 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 - Python BLE gateway with auto-reconnect (bleak) → InfluxDB 2.x → Grafana dashboard
 - Docker Compose cloud stack: InfluxDB time-series storage + 6-panel Grafana dashboard
 - `ibattery-gateway` CLI: scan, stream (terminal), run (full pipeline to InfluxDB)
-- Host-based unit tests (Unity framework, 106 tests across 8 suites, no Zephyr required)
+- Full battery state machine: ACTIVE, IDLE (30s), SLEEP (120s), CRITICAL, CHARGING, DISCHARGING, CHARGED
+- TP4056 charger IC integration via GPIO (Kconfig-gated: `CONFIG_BATTERY_CHARGER_TP4056`)
+- Host-based unit tests (Unity framework, 125+ tests across 9 suites, no Zephyr required)
 
 ---
 

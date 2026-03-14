@@ -280,10 +280,11 @@ battery_transport_send(&pkt)           [optional, CONFIG_BATTERY_TRANSPORT]
 1. battery_hal_init()           -> ADC + temperature sensor ready
 2. battery_voltage_init()       -> ADC wrapper + filter ready
 3. battery_temperature_init()   -> Temperature sensor ready
-4. battery_power_manager_init() -> Power state monitor ready
-5. battery_soc_estimator_init() -> SoC estimator ready
-6. battery_telemetry_init()     -> Telemetry collector ready
-7. battery_transport_init()     -> BLE transport ready (if CONFIG_BATTERY_TRANSPORT)
+4. battery_hal_charger_init()   -> TP4056 GPIO pins ready (if CONFIG_BATTERY_CHARGER_TP4056)
+5. battery_power_manager_init() -> Power state monitor ready
+6. battery_soc_estimator_init() -> SoC estimator ready
+7. battery_telemetry_init()     -> Telemetry collector ready
+8. battery_transport_init()     -> BLE transport ready (if CONFIG_BATTERY_TRANSPORT)
 ```
 
 ---

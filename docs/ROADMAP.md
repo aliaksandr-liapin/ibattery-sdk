@@ -15,7 +15,8 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 - Compile-time transport backend selection via Kconfig
 - ~39 bytes static RAM (core), integer-only math, no heap allocation
 - HAL abstraction layer — core logic is platform-independent portable C
-- 106 host-based unit tests across 8 suites (Unity), zero hardware required to run
+- Full battery state machine: IDLE/SLEEP inactivity timers + TP4056 CHARGING/DISCHARGING/CHARGED (GPIO-verified with jumper wires, real charger hardware pending)
+- 125+ host-based unit tests across 9 suites (Unity), zero hardware required to run
 - Zephyr RTOS integration with clean layered architecture
 - Production-quality codebase: no layer violations, consistent conventions, full documentation
 
@@ -110,7 +111,7 @@ Lower scale but immediate revenue with zero infrastructure cost.
 | Priority | Task | Impact |
 |----------|------|--------|
 | 7 | Advanced SoC — coulomb counting or voltage+temperature compensation | Simple LUT insufficient for rechargeable cells |
-| 8 | Charging support — detect charging state, track charge cycles | Most battery products are rechargeable |
+| ~~8~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 — TP4056 GPIO driver, simulated with jumper wires, pending real hardware validation) |
 | 9 | PlatformIO library publication | Major distribution channel for Arduino/ESP32 community |
 | 10 | Documentation site — GitHub Pages with guides and API reference | Lowers barrier to adoption |
 | 11 | Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo) | Hardware reference designs drive SDK adoption |

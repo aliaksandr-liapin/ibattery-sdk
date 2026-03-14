@@ -39,6 +39,21 @@ Adds full battery state machine with IDLE/SLEEP inactivity timers, CHARGING/DISC
 - Serialize suite: roundtrip for all 8 power states (was 5)
 - **Total: 9 suites, 125+ tests** (was 8 suites, 106 tests)
 
+### Hardware Verification
+
+All 6 active power states verified end-to-end on nRF52840-DK (PCA10056 rev 3.0.3) via BLE gateway and Grafana dashboard:
+
+| State | PWR | Verified | Method |
+|-------|-----|----------|--------|
+| IDLE | 2 | Yes | 30s inactivity timeout |
+| SLEEP | 3 | Yes | 120s inactivity timeout |
+| CRITICAL | 4 | Yes | Voltage < 2100 mV |
+| CHARGING | 5 | Yes | Jumper wire P0.28 → GND |
+| DISCHARGING | 6 | Yes | Both pins floating (pull-up → HIGH) |
+| CHARGED | 7 | Yes | Jumper wire P0.29 → GND |
+
+> **Note:** Charger states (CHARGING, CHARGED, DISCHARGING) were simulated using jumper wires on the GPIO pins — no real TP4056 charger IC or LiPo battery was connected. Real hardware validation is pending battery arrival.
+
 ### Enabling TP4056 (when hardware arrives)
 
 ```
