@@ -16,6 +16,10 @@
 #include <battery_sdk/battery_transport.h>
 #endif
 
+#if defined(CONFIG_BATTERY_CHARGER_TP4056)
+#include "../hal/battery_hal_charger.h"
+#endif
+
 #include "../hal/battery_hal.h"
 
 static struct battery_sdk_runtime_state g_battery_sdk_state = {
@@ -56,6 +60,13 @@ int battery_sdk_init(void)
     if (rc != BATTERY_STATUS_OK) {
         return rc;
     }
+
+#if defined(CONFIG_BATTERY_CHARGER_TP4056)
+    rc = battery_hal_charger_init();
+    if (rc != BATTERY_STATUS_OK) {
+        return rc;
+    }
+#endif
 
     rc = battery_power_manager_init();
     if (rc != BATTERY_STATUS_OK) {
