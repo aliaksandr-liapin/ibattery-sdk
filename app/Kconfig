@@ -65,6 +65,15 @@ config BATTERY_BLE_ADV_INTERVAL_MS
 
 endif # BATTERY_TRANSPORT
 
+config BATTERY_SOC_TEMP_COMP
+    bool "Temperature-compensated SoC estimation"
+    default y if BATTERY_TEMP_NTC
+    help
+      Enable temperature-compensated SoC estimation by blending between
+      cold (0 deg C), room (25 deg C), and hot (45 deg C) LiPo LUT tables.
+      Requires a working temperature sensor.  Falls back to room-temperature
+      LUT if the temperature read fails at runtime.
+
 config BATTERY_CHARGER_TP4056
     bool "TP4056 charger IC GPIO status detection"
     default n

@@ -5,6 +5,11 @@
 #include "../core/battery_internal.h"
 #include "battery_soc_lut.h"
 
+#if defined(CONFIG_BATTERY_SOC_TEMP_COMP)
+#include <battery_sdk/battery_temperature.h>
+#include "battery_soc_temp_comp.h"
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -28,6 +33,19 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
     if (rc != BATTERY_STATUS_OK) {
         return rc;
     }
+
+#if defined(CONFIG_BATTERY_SOC_TEMP_COMP)
+    {
+        int32_t temp_c_x100;
+        rc = battery_temperature_get_c_x100(&temp_c_x100);
+        if (rc == BATTERY_STATUS_OK) {
+            return battery_soc_temp_compensated(voltage_mv,
+                                                temp_c_x100,
+                                                soc_pct_x100);
+        }
+        /* Temperature read failed — fall through to room-temp LUT */
+    }
+#endif
 
     rc = battery_soc_lut_interpolate(&battery_soc_lut_cr2032,
                                      voltage_mv,

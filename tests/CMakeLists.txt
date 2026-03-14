@@ -180,10 +180,26 @@ target_compile_definitions(test_transport PRIVATE
 
 target_link_libraries(test_transport PRIVATE unity)
 
+# ── SoC temperature compensation test ────────────────────────────────────────
+add_executable(test_soc_temp_comp
+    test_soc_temp_comp.c
+    ${SDK_SRC}/intelligence/battery_soc_lut.c
+    ${SDK_SRC}/intelligence/battery_soc_temp_comp.c
+)
+
+target_include_directories(test_soc_temp_comp PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}/intelligence
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_soc_temp_comp PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
 add_test(NAME soc_lut COMMAND test_soc_lut)
+add_test(NAME soc_temp_comp COMMAND test_soc_temp_comp)
 add_test(NAME telemetry COMMAND test_telemetry)
 add_test(NAME temperature COMMAND test_temperature)
 add_test(NAME power_manager COMMAND test_power_manager)

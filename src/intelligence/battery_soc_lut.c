@@ -89,6 +89,64 @@ const battery_soc_lut_t battery_soc_lut_lipo_1s = {
     .count   = sizeof(lipo_1s_entries) / sizeof(lipo_1s_entries[0]),
 };
 
+/*
+ * LiPo single-cell discharge curve at 0 deg C (cold).
+ *
+ * At low temperature, internal resistance increases and available
+ * capacity drops by 10-20%.  Voltages shift down ~100-150 mV compared
+ * to room temperature at the same SoC.
+ *
+ * Data synthesised from LiPo cold-weather discharge profiles
+ * (Grepow, Battery University, RC community measurements at 0 deg C).
+ */
+static const battery_soc_lut_entry_t lipo_1s_cold_entries[] = {
+    { 4100, 10000 },  /* 100% — lower charged voltage at cold */
+    { 4020,  9500 },  /*  95% */
+    { 3920,  8500 },  /*  85% */
+    { 3830,  7500 },  /*  75% */
+    { 3770,  6500 },  /*  65% */
+    { 3720,  5500 },  /*  55% */
+    { 3680,  4500 },  /*  45% */
+    { 3640,  3000 },  /*  30% */
+    { 3550,  1000 },  /*  10% — knee earlier at cold */
+    { 3350,   300 },  /*   3% */
+    { 2850,     0 },  /*   0% — lower cutoff at cold */
+};
+
+const battery_soc_lut_t battery_soc_lut_lipo_1s_cold = {
+    .entries = lipo_1s_cold_entries,
+    .count   = sizeof(lipo_1s_cold_entries) / sizeof(lipo_1s_cold_entries[0]),
+};
+
+/*
+ * LiPo single-cell discharge curve at 45 deg C (hot).
+ *
+ * At elevated temperature, internal resistance decreases and voltages
+ * shift up ~30-50 mV.  Effective capacity is slightly higher but
+ * long-term degradation is accelerated.
+ *
+ * Data synthesised from LiPo hot-weather discharge profiles
+ * (Grepow, Battery University, RC community measurements at 45 deg C).
+ */
+static const battery_soc_lut_entry_t lipo_1s_hot_entries[] = {
+    { 4250, 10000 },  /* 100% — slightly higher at hot */
+    { 4190,  9500 },  /*  95% */
+    { 4100,  8500 },  /*  85% */
+    { 4020,  7500 },  /*  75% */
+    { 3960,  6500 },  /*  65% */
+    { 3910,  5500 },  /*  55% */
+    { 3870,  4500 },  /*  45% */
+    { 3830,  3000 },  /*  30% */
+    { 3740,  1000 },  /*  10% */
+    { 3540,   300 },  /*   3% */
+    { 3050,     0 },  /*   0% — slightly higher cutoff at hot */
+};
+
+const battery_soc_lut_t battery_soc_lut_lipo_1s_hot = {
+    .entries = lipo_1s_hot_entries,
+    .count   = sizeof(lipo_1s_hot_entries) / sizeof(lipo_1s_hot_entries[0]),
+};
+
 int battery_soc_lut_interpolate(const battery_soc_lut_t *lut,
                                 uint16_t voltage_mv,
                                 uint16_t *soc_pct_x100)

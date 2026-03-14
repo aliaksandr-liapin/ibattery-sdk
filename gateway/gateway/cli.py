@@ -102,10 +102,12 @@ def run(
     influxdb_bucket: str,
 ) -> None:
     """Connect to iBattery, decode telemetry, and write to InfluxDB."""
+    from .analytics.realtime import check_realtime
     from .influxdb_writer import TelemetryWriter
     from .scanner import connect_and_stream, scan_for_device
 
     packet_count = 0
+    anomaly_count = 0
     writer = TelemetryWriter(
         url=influxdb_url,
         token=influxdb_token,
@@ -114,12 +116,22 @@ def run(
     )
 
     def on_packet(data: bytes) -> None:
-        nonlocal packet_count
+        nonlocal packet_count, anomaly_count
         try:
             decoded = decode_packet(data)
             packet_count += 1
             writer.write(decoded, device_name=device_name)
             click.echo(f"[{packet_count:>5}] {format_packet(decoded)}")
+
+            # Real-time anomaly checks
+            alerts = check_realtime(decoded)
+            for alert in alerts:
+                anomaly_count += 1
+                severity = alert["severity"].upper()
+                click.echo(
+                    click.style(f"  [{severity}] {alert['message']}", fg="red" if severity == "CRITICAL" else "yellow"),
+                    err=True,
+                )
         except Exception as e:
             click.echo(f"[ERROR] {e}", err=True)
 
@@ -129,7 +141,7 @@ def run(
             click.echo(f"Device '{device_name}' not found. Is it advertising?", err=True)
             sys.exit(1)
 
-        click.echo(f"\nStreaming from {device.name} ({device.address}) → InfluxDB")
+        click.echo(f"\nStreaming from {device.name} ({device.address}) -> InfluxDB")
         click.echo("Press Ctrl+C to stop.\n")
 
         await connect_and_stream(device.address, on_packet)
@@ -137,9 +149,84 @@ def run(
     try:
         asyncio.run(_run())
     except KeyboardInterrupt:
-        click.echo(f"\nStopped. Wrote {packet_count} packets to InfluxDB.")
+        click.echo(f"\nStopped. Wrote {packet_count} packets to InfluxDB. {anomaly_count} anomalies detected.")
     finally:
         writer.close()
+
+
+# ── Analytics commands ───────────────────────────────────────────────────────
+
+@main.group()
+def analytics() -> None:
+    """Battery analytics — health scoring and anomaly detection."""
+    pass
+
+
+@analytics.command()
+@click.option("--device", default=config.DEVICE_NAME, help="Device name")
+@click.option("--window", default=30, help="Analysis window in days")
+@click.option("--influxdb-url", default=config.INFLUXDB_URL, help="InfluxDB URL")
+@click.option("--influxdb-token", default=config.INFLUXDB_TOKEN, help="InfluxDB token")
+@click.option("--influxdb-org", default=config.INFLUXDB_ORG, help="InfluxDB org")
+@click.option("--influxdb-bucket", default=config.INFLUXDB_BUCKET, help="InfluxDB bucket")
+def health(device: str, window: int, influxdb_url: str, influxdb_token: str, influxdb_org: str, influxdb_bucket: str) -> None:
+    """Compute battery health score from voltage history."""
+    from .analytics.health_score import BatteryHealthScorer
+
+    with BatteryHealthScorer(url=influxdb_url, token=influxdb_token, org=influxdb_org, bucket=influxdb_bucket) as scorer:
+        result = scorer.compute_health_score(device=device, window_days=window)
+
+    if result is None:
+        click.echo("Insufficient data for health scoring. Run the gateway longer to collect data.")
+        return
+
+    score = result["score"]
+    if score >= 80:
+        color = "green"
+    elif score >= 60:
+        color = "yellow"
+    else:
+        color = "red"
+
+    click.echo("\n  Battery Health Report")
+    click.echo("  " + "=" * 40)
+    click.echo(f"  Health Score:    {click.style(str(score), fg=color, bold=True)} / 100")
+    click.echo(f"  Trend:           {result['trend']}")
+    click.echo(f"  Baseline V:      {result['baseline_v']:.4f} V")
+    click.echo(f"  Current V:       {result['current_v']:.4f} V")
+    click.echo(f"  Variance Ratio:  {result['variance_ratio']:.3f}")
+    click.echo(f"  Data Points:     {result['data_points']}")
+    click.echo(f"  Computed At:     {result['computed_at']}")
+    click.echo()
+
+
+@analytics.command()
+@click.option("--device", default=config.DEVICE_NAME, help="Device name")
+@click.option("--window", default=60, help="Analysis window in minutes")
+@click.option("--influxdb-url", default=config.INFLUXDB_URL, help="InfluxDB URL")
+@click.option("--influxdb-token", default=config.INFLUXDB_TOKEN, help="InfluxDB token")
+@click.option("--influxdb-org", default=config.INFLUXDB_ORG, help="InfluxDB org")
+@click.option("--influxdb-bucket", default=config.INFLUXDB_BUCKET, help="InfluxDB bucket")
+def anomalies(device: str, window: int, influxdb_url: str, influxdb_token: str, influxdb_org: str, influxdb_bucket: str) -> None:
+    """Detect anomalies in recent telemetry data."""
+    from .analytics.anomaly_detector import AnomalyDetector
+
+    with AnomalyDetector(url=influxdb_url, token=influxdb_token, org=influxdb_org, bucket=influxdb_bucket) as detector:
+        voltage_anomalies = detector.detect_voltage_anomalies(device=device, window_minutes=window)
+        temp_anomalies = detector.detect_temperature_anomalies(device=device, window_minutes=window)
+
+    all_anomalies = voltage_anomalies + temp_anomalies
+
+    if not all_anomalies:
+        click.echo(f"\nNo anomalies detected in the last {window} minutes.")
+        return
+
+    click.echo(f"\n  Found {len(all_anomalies)} anomalie(s) in the last {window} minutes:\n")
+    for a in all_anomalies:
+        severity = a["severity"].upper()
+        color = "red" if severity == "CRITICAL" else "yellow"
+        click.echo(f"  [{click.style(severity, fg=color)}] {a['timestamp']}: {a['message']}")
+    click.echo()
 
 
 if __name__ == "__main__":
