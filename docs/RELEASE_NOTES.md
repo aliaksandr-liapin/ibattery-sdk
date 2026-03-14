@@ -45,14 +45,20 @@ All 6 active power states verified end-to-end on nRF52840-DK (PCA10056 rev 3.0.3
 
 | State | PWR | Verified | Method |
 |-------|-----|----------|--------|
-| IDLE | 2 | Yes | 30s inactivity timeout |
-| SLEEP | 3 | Yes | 120s inactivity timeout |
-| CRITICAL | 4 | Yes | Voltage < 2100 mV |
-| CHARGING | 5 | Yes | Jumper wire P0.28 → GND |
-| DISCHARGING | 6 | Yes | Both pins floating (pull-up → HIGH) |
-| CHARGED | 7 | Yes | Jumper wire P0.29 → GND |
+| IDLE | 2 | Yes | 30s inactivity timeout (real LiPo power) |
+| SLEEP | 3 | Yes | 120s inactivity timeout (real LiPo power) |
+| CRITICAL | 4 | Yes | Voltage < 2100 mV threshold |
+| CHARGING | 5 | Yes | Jumper wire P0.28 → GND (simulated) |
+| DISCHARGING | 6 | Yes | Both pins floating, LiPo powering DK via TP4056 OUT+/OUT- |
+| CHARGED | 7 | Yes | Jumper wire P0.29 → GND (simulated) |
 
-> **Note:** Charger states (CHARGING, CHARGED, DISCHARGING) were simulated using jumper wires on the GPIO pins — no real TP4056 charger IC or LiPo battery was connected. Real hardware validation is pending battery arrival.
+**LiPo + TP4056 power delivery verified:**
+- LiPo 500mAh (PL 602535, 3.7V) connected to TP4056 HW-373 (USB-C) via B+/B- pads
+- TP4056 OUT+/OUT- powering nRF52840-DK VDD/GND — board boots and runs on battery
+- USB-C charging confirmed: voltage rises from ~3.01V to ~3.60V when charger connected
+- TP4056 red LED lights during charging
+
+> **Note:** CHARGING/CHARGED state detection was verified using jumper wires on GPIO pins (P0.28/P0.29 → GND), not by reading actual TP4056 CHRG/STDBY LED signals. The LED pad soldering for real charger state readout is pending. Power delivery and actual charging via TP4056 are confirmed working. Confidence level for real CHRG/STDBY signal detection: ~85% (depends on LED pad signal quality on HW-373 module).
 
 ### Enabling TP4056 (when hardware arrives)
 

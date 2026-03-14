@@ -81,6 +81,9 @@
 |   nRF52840 SAADC Ch0 -> VDD rail -> CR2032/LiPo      |
 |   nRF52840 SAADC Ch1 -> AIN1 (P0.03) -> NTC divider  |
 |   nRF52840 TEMP peripheral (die temperature, opt.)    |
+|   nRF52840 GPIO P0.28 -> TP4056 CHRG (active low)    |
+|   nRF52840 GPIO P0.29 -> TP4056 STDBY (active low)   |
+|   TP4056 HW-373 OUT+/OUT- -> VDD/GND (LiPo power)    |
 +------------------------------------------------------+
 ```
 

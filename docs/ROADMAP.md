@@ -1,11 +1,11 @@
 # Roadmap & Business Strategy
 
-## Current State (Phase 3 Complete)
+## Current State (Phase 4 Complete + Battery States)
 
 ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 
 **What exists today:**
-- Targets nRF52840 + CR2032 coin cells
+- Targets nRF52840 + CR2032 coin cells and LiPo single-cell (3.7V)
 - Voltage reading (SAADC) → SoC estimation (LUT interpolation) → telemetry collection
 - Real die temperature sensor via nRF52840 TEMP peripheral (±2 °C) or external 10K NTC thermistor (B=3950) on SAADC AIN1
 - Voltage-threshold power state machine with 100 mV hysteresis
@@ -15,7 +15,10 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 - Compile-time transport backend selection via Kconfig
 - ~39 bytes static RAM (core), integer-only math, no heap allocation
 - HAL abstraction layer — core logic is platform-independent portable C
-- Full battery state machine: IDLE/SLEEP inactivity timers + TP4056 CHARGING/DISCHARGING/CHARGED (GPIO-verified with jumper wires, real charger hardware pending)
+- Full battery state machine: IDLE/SLEEP inactivity timers + TP4056 CHARGING/DISCHARGING/CHARGED
+- LiPo 500mAh powering nRF52840-DK via TP4056 HW-373 (USB-C) — real battery power verified
+- TP4056 charging confirmed (voltage rise on USB-C connect); CHRG/STDBY GPIO signals simulated with jumper wires (LED pad soldering pending)
+- Python BLE gateway (bleak) → InfluxDB 2.x → Grafana 6-panel dashboard (Docker Compose)
 - 125+ host-based unit tests across 9 suites (Unity), zero hardware required to run
 - Zephyr RTOS integration with clean layered architecture
 - Production-quality codebase: no layer violations, consistent conventions, full documentation
@@ -111,7 +114,7 @@ Lower scale but immediate revenue with zero infrastructure cost.
 | Priority | Task | Impact |
 |----------|------|--------|
 | 7 | Advanced SoC — coulomb counting or voltage+temperature compensation | Simple LUT insufficient for rechargeable cells |
-| ~~8~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 — TP4056 GPIO driver, simulated with jumper wires, pending real hardware validation) |
+| ~~8~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 — TP4056 GPIO driver, LiPo power delivery verified, CHRG/STDBY signals simulated with jumper wires, LED pad soldering pending for full signal readout) |
 | 9 | PlatformIO library publication | Major distribution channel for Arduino/ESP32 community |
 | 10 | Documentation site — GitHub Pages with guides and API reference | Lowers barrier to adoption |
 | 11 | Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo) | Hardware reference designs drive SDK adoption |

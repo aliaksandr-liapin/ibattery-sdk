@@ -5,7 +5,7 @@
 
 Embedded firmware library providing a **standardized battery intelligence layer** for battery-powered IoT devices. Measures voltage, estimates state-of-charge, monitors temperature and power state, and packages everything into structured telemetry packets.
 
-Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. TP4056 LiPo charger support scaffolded and GPIO-verified (pending real hardware). Designed to scale to other MCUs and battery chemistries.
+Currently targets the **nRF52840** (Zephyr RTOS) with **CR2032** coin cell and **LiPo 500mAh** (via TP4056 USB-C charger). LiPo power delivery verified on real hardware; charger state GPIO signals validated with jumper-wire simulation. Designed to scale to other MCUs and battery chemistries.
 
 ---
 
@@ -25,7 +25,8 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. TP
 ## Hardware
 
 - **Board**: nRF52840-DK (PCA10056 rev 3.0.3)
-- **Battery**: CR2032 Energizer (3V primary lithium)
+- **Battery**: CR2032 Energizer (3V primary lithium) or LiPo 500mAh PL602535 (3.7V)
+- **Charger**: TP4056 HW-373 V1.2.1 (USB-C, with DW01A battery protection)
 - **Power switch**: VDD position
 - **SDK**: nRF Connect SDK v3.2.2 / Zephyr OS v4.2.99
 - **ADC**: SAADC Ch0 measuring VDD rail, Ch1 measuring NTC thermistor (AIN1/P0.03); 12-bit, 1/6 gain, 0.6V internal reference. Uses `NRFX_ANALOG_EXTERNAL_AINx` enums (nrfx v3.x); channel setup re-applied before every read to work around SAADC driver input-mux clobbering
