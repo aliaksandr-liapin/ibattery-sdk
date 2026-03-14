@@ -10,6 +10,9 @@ extern "C" {
 int battery_power_manager_init(void);
 int battery_power_manager_get_state(enum battery_power_state *state);
 
+/** Reset the inactivity timer.  Call on BLE connection, user activity, etc. */
+int battery_power_manager_report_activity(void);
+
 #ifdef __cplusplus
 }
 #endif

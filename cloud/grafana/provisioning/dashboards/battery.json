@@ -111,11 +111,14 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [
-            { "type": "value", "options": { "0": { "text": "BOOT", "color": "blue" } } },
+            { "type": "value", "options": { "0": { "text": "UNKNOWN", "color": "grey" } } },
             { "type": "value", "options": { "1": { "text": "ACTIVE", "color": "green" } } },
-            { "type": "value", "options": { "2": { "text": "LOW", "color": "orange" } } },
-            { "type": "value", "options": { "3": { "text": "CRITICAL", "color": "red" } } },
-            { "type": "value", "options": { "4": { "text": "SHUTDOWN", "color": "dark-red" } } }
+            { "type": "value", "options": { "2": { "text": "IDLE", "color": "yellow" } } },
+            { "type": "value", "options": { "3": { "text": "SLEEP", "color": "blue" } } },
+            { "type": "value", "options": { "4": { "text": "CRITICAL", "color": "red" } } },
+            { "type": "value", "options": { "5": { "text": "CHARGING", "color": "super-light-green" } } },
+            { "type": "value", "options": { "6": { "text": "DISCHARGING", "color": "orange" } } },
+            { "type": "value", "options": { "7": { "text": "CHARGED", "color": "dark-green" } } }
           ],
           "thresholds": {
             "mode": "absolute",

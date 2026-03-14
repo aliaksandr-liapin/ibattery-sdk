@@ -230,7 +230,10 @@ void test_roundtrip_all_power_states(void)
         BATTERY_POWER_STATE_ACTIVE,
         BATTERY_POWER_STATE_IDLE,
         BATTERY_POWER_STATE_SLEEP,
-        BATTERY_POWER_STATE_CRITICAL
+        BATTERY_POWER_STATE_CRITICAL,
+        BATTERY_POWER_STATE_CHARGING,
+        BATTERY_POWER_STATE_DISCHARGING,
+        BATTERY_POWER_STATE_CHARGED
     };
 
     for (int i = 0; i < (int)(sizeof(states) / sizeof(states[0])); i++) {

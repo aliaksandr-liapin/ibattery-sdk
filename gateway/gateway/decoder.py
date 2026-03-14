@@ -32,11 +32,14 @@ _WIRE_FMT = "<BIiiHBI"
 _WIRE_STRUCT = struct.Struct(_WIRE_FMT)
 
 POWER_STATES = {
-    0: "BOOT",
+    0: "UNKNOWN",
     1: "ACTIVE",
-    2: "LOW",
-    3: "CRITICAL",
-    4: "SHUTDOWN",
+    2: "IDLE",
+    3: "SLEEP",
+    4: "CRITICAL",
+    5: "CHARGING",
+    6: "DISCHARGING",
+    7: "CHARGED",
 }
 
 

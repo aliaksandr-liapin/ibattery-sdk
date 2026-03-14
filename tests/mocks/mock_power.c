@@ -16,3 +16,5 @@ int battery_power_manager_get_state(enum battery_power_state *state)
     if (state) *state = g_mock_power_state;
     return BATTERY_STATUS_OK;
 }
+
+int battery_power_manager_report_activity(void) { return BATTERY_STATUS_OK; }

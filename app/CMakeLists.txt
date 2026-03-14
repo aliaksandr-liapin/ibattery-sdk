@@ -23,6 +23,7 @@ target_sources(app PRIVATE
     ../src/hal/battery_hal_zephyr.c
     ../src/hal/battery_hal_adc_zephyr.c
     ../src/core_modules/battery_voltage_filter.c
+    $<$<BOOL:${CONFIG_BATTERY_CHARGER_TP4056}>:../src/hal/battery_hal_charger_tp4056_zephyr.c>
 )
 
 # Temperature HAL: NTC thermistor or internal die sensor

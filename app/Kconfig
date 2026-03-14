@@ -65,6 +65,33 @@ config BATTERY_BLE_ADV_INTERVAL_MS
 
 endif # BATTERY_TRANSPORT
 
+config BATTERY_CHARGER_TP4056
+    bool "TP4056 charger IC GPIO status detection"
+    default n
+    select GPIO
+    help
+      Enable detection of charging state via TP4056 CHRG and STDBY
+      GPIO pins.  CHRG (active low) indicates charging in progress.
+      STDBY (active low) indicates charge complete.
+
+if BATTERY_CHARGER_TP4056
+
+config BATTERY_CHARGER_TP4056_CHRG_PIN
+    int "TP4056 CHRG GPIO pin number"
+    default 28
+    help
+      GPIO pin connected to TP4056 CHRG output (P0.28 by default).
+      Active low: LOW = charging, HIGH = not charging.
+
+config BATTERY_CHARGER_TP4056_STDBY_PIN
+    int "TP4056 STDBY GPIO pin number"
+    default 29
+    help
+      GPIO pin connected to TP4056 STDBY output (P0.29 by default).
+      Active low: LOW = charge complete, HIGH = not complete.
+
+endif # BATTERY_CHARGER_TP4056
+
 endmenu
 
 source "Kconfig.zephyr"

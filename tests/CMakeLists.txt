@@ -86,11 +86,12 @@ target_include_directories(test_temperature PRIVATE
 
 target_link_libraries(test_temperature PRIVATE unity)
 
-# ── Power manager test ───────────────────────────────────────────────────────
+# ── Power manager test (without charger) ─────────────────────────────────────
 add_executable(test_power_manager
     test_power_manager.c
     ${SDK_SRC}/core_modules/battery_power_manager.c
     mocks/mock_voltage.c
+    mocks/mock_hal.c
     mocks/mock_sdk_state.c
 )
 
@@ -99,10 +100,36 @@ target_include_directories(test_power_manager PRIVATE
     ${SDK_SRC}
     ${SDK_SRC}/core
     ${SDK_SRC}/core_modules
+    ${SDK_SRC}/hal
     ${unity_SOURCE_DIR}/src
 )
 
 target_link_libraries(test_power_manager PRIVATE unity)
+
+# ── Power manager test (with TP4056 charger) ─────────────────────────────────
+add_executable(test_power_manager_charger
+    test_power_manager.c
+    ${SDK_SRC}/core_modules/battery_power_manager.c
+    mocks/mock_voltage.c
+    mocks/mock_hal.c
+    mocks/mock_sdk_state.c
+    mocks/mock_charger.c
+)
+
+target_include_directories(test_power_manager_charger PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/core
+    ${SDK_SRC}/core_modules
+    ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+
+target_compile_definitions(test_power_manager_charger PRIVATE
+    CONFIG_BATTERY_CHARGER_TP4056=1
+)
+
+target_link_libraries(test_power_manager_charger PRIVATE unity)
 
 # ── NTC LUT test ─────────────────────────────────────────────────────────────
 add_executable(test_ntc_lut
@@ -160,6 +187,7 @@ add_test(NAME soc_lut COMMAND test_soc_lut)
 add_test(NAME telemetry COMMAND test_telemetry)
 add_test(NAME temperature COMMAND test_temperature)
 add_test(NAME power_manager COMMAND test_power_manager)
+add_test(NAME power_manager_charger COMMAND test_power_manager_charger)
 add_test(NAME ntc_lut COMMAND test_ntc_lut)
 add_test(NAME serialize COMMAND test_serialize)
 add_test(NAME transport COMMAND test_transport)

@@ -1,5 +1,57 @@
 # Release Notes
 
+## v0.4.1 — Expanded Battery Power States + TP4056 Charger Scaffold (2026-03-13)
+
+Adds full battery state machine with IDLE/SLEEP inactivity timers, CHARGING/DISCHARGING/CHARGED states, and a scaffolded TP4056 GPIO charger driver (Kconfig-gated, ready for hardware integration).
+
+### What's New
+
+**Expanded Power State Enum**
+- New states: `CHARGING` (5), `DISCHARGING` (6), `CHARGED` (7) — appended for backward compatibility
+- Existing `IDLE` (2) and `SLEEP` (3) states now wired into the state machine
+- 8 total states: UNKNOWN, ACTIVE, IDLE, SLEEP, CRITICAL, CHARGING, DISCHARGING, CHARGED
+
+**Inactivity Timer State Machine**
+- `ACTIVE → IDLE` after 30 seconds of inactivity
+- `IDLE → SLEEP` after 120 seconds of inactivity
+- `battery_power_manager_report_activity()` resets the timer on BLE connections or user events
+- CRITICAL always overrides IDLE/SLEEP (voltage safety takes priority)
+- Graceful degradation: uptime read failure skips inactivity logic, stays ACTIVE
+
+**TP4056 Charger Driver (scaffolded behind Kconfig)**
+- `CONFIG_BATTERY_CHARGER_TP4056` — disabled by default, flip on when hardware arrives
+- Reads CHRG and STDBY GPIO pins (active-low, pull-up configured)
+- Truth table: CHRG=LOW → charging, STDBY=LOW → charge complete
+- Configurable pin numbers: `CONFIG_BATTERY_CHARGER_TP4056_CHRG_PIN` (default P0.28), `_STDBY_PIN` (default P0.29)
+- Charger state overrides inactivity logic (CHARGING > IDLE/SLEEP)
+- CRITICAL → CHARGING recovery when charger connected at low voltage
+
+**Gateway + Dashboard Alignment**
+- Fixed gateway decoder: state names now match firmware enum exactly (was BOOT/LOW/SHUTDOWN, now UNKNOWN/IDLE/CRITICAL)
+- Grafana Power State panel updated with 8-state color mapping
+- 22 Python tests (was 20): new `test_charging_states`, `test_idle_sleep_states`
+
+**Expanded Firmware Tests**
+- New test suite: `test_power_manager_charger` — 23 tests with `CONFIG_BATTERY_CHARGER_TP4056=1`
+- Tests cover: CHARGING, CHARGED, DISCHARGING, critical-to-charging recovery, charger error fallback, charging-overrides-idle
+- Base `test_power_manager` suite: 17 tests (was 12) — adds IDLE/SLEEP inactivity, activity reset, critical-overrides-idle, uptime error
+- Telemetry suite: 14 tests (was 9) — adds CHARGING, DISCHARGING, CHARGED, IDLE, SLEEP state collection
+- Serialize suite: roundtrip for all 8 power states (was 5)
+- **Total: 9 suites, 125+ tests** (was 8 suites, 106 tests)
+
+### Enabling TP4056 (when hardware arrives)
+
+```
+# app/prj.conf
+CONFIG_BATTERY_CHARGER_TP4056=y
+CONFIG_BATTERY_CHARGER_TP4056_CHRG_PIN=28
+CONFIG_BATTERY_CHARGER_TP4056_STDBY_PIN=29
+```
+
+Wire TP4056 CHRG → P0.28, STDBY → P0.29 on nRF52840-DK. Flash — charging states appear automatically.
+
+---
+
 ## v0.4.0 — Phase 4: Cloud Telemetry Pipeline (2026-03-12)
 
 Adds a Python BLE gateway and Docker-based cloud stack (InfluxDB + Grafana) for real-time battery telemetry visualization. Closes the loop from sensor to dashboard.
@@ -20,7 +72,7 @@ Adds a Python BLE gateway and Docker-based cloud stack (InfluxDB + Grafana) for 
   - Voltage (V) — time series, 30min window
   - Temperature (°C) — time series, 30min window
   - State of Charge — gauge, 0–100% with color thresholds
-  - Power State — stat with value mappings (BOOT/ACTIVE/LOW/CRITICAL/SHUTDOWN)
+  - Power State — stat with 8-state color-coded value mappings
   - Raw Voltage (mV) — time series, 1h window
   - Status Flags — stat with error threshold coloring
 - Anonymous viewer access enabled for local development
@@ -87,7 +139,7 @@ Adds wireless telemetry delivery over Bluetooth Low Energy. Telemetry packets no
 - Single BLE connection only (`CONFIG_BT_MAX_CONN=1`)
 - No authentication or encryption on the GATT characteristic
 - No serial transport backend (BLE only for now)
-- IDLE and SLEEP power states still not implemented
+- IDLE and SLEEP power states now implemented (see v0.4.1)
 - No persistent storage of calibration data
 
 ---

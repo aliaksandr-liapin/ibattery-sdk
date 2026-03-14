@@ -86,7 +86,7 @@ class TestDecodePacket:
         assert result["voltage_v"] == 0.0
         assert result["temperature_c"] == 0.0
         assert result["soc_pct"] == 0.0
-        assert result["power_state"] == "BOOT"
+        assert result["power_state"] == "UNKNOWN"
 
     def test_max_values(self):
         data = _pack_packet(
@@ -103,7 +103,7 @@ class TestDecodePacket:
         assert result["version"] == 255
         assert result["timestamp_ms"] == 0xFFFFFFFF
         assert result["soc_pct"] == pytest.approx(655.35)
-        assert result["power_state"] == "SHUTDOWN"
+        assert result["power_state"] == "CRITICAL"
         assert result["status_flags"] == 0xFFFFFFFF
 
     def test_negative_temperature(self):
@@ -141,6 +141,21 @@ class TestDecodePacket:
     def test_empty_buffer_raises(self):
         with pytest.raises(ValueError, match="Expected 20 bytes"):
             decode_packet(b"")
+
+    def test_charging_states(self):
+        """New charging/discharging/charged states decode correctly."""
+        for raw, name in [(5, "CHARGING"), (6, "DISCHARGING"), (7, "CHARGED")]:
+            data = _pack_packet(power_state=raw)
+            result = decode_packet(data)
+            assert result["power_state"] == name
+            assert result["power_state_raw"] == raw
+
+    def test_idle_sleep_states(self):
+        """IDLE and SLEEP states decode correctly."""
+        data = _pack_packet(power_state=2)
+        assert decode_packet(data)["power_state"] == "IDLE"
+        data = _pack_packet(power_state=3)
+        assert decode_packet(data)["power_state"] == "SLEEP"
 
     def test_status_flags_bits(self):
         """Individual flag bits survive roundtrip."""

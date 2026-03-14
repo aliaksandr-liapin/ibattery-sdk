@@ -60,11 +60,15 @@
 |              Hardware Abstraction Layer                |
 |                   (src/hal/)                           |
 |                                                       |
-|  battery_hal.h                  Interface (portable)     |
-|  battery_hal_zephyr.c           Platform init + uptime   |
-|  battery_hal_adc_zephyr.c       ADC channel setup + read |
-|  battery_hal_temp_zephyr.c      Die temperature sensor   |
-|  battery_hal_temp_ntc_zephyr.c  NTC thermistor (default) |
+|  battery_hal.h                  Interface (portable)       |
+|  battery_hal_zephyr.c           Platform init + uptime     |
+|  battery_hal_adc_zephyr.c       ADC channel setup + read   |
+|  battery_hal_temp_zephyr.c      Die temperature sensor     |
+|  battery_hal_temp_ntc_zephyr.c  NTC thermistor (default)   |
+|  battery_hal_charger.h          Charger interface           |
+|  battery_hal_charger_tp4056_    TP4056 CHRG/STDBY GPIO     |
+|    zephyr.c                     (CONFIG_BATTERY_CHARGER_   |
+|                                  TP4056)                    |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
@@ -108,13 +112,14 @@
 - Returns temperature in 0.01 °C units (e.g., 2350 = 23.50 °C)
 
 ### core_modules/battery_power_manager.c
-- Voltage-threshold state machine with hysteresis for power state detection
-- Uses `battery_voltage_get_mv()` to read current voltage (lateral dependency, init-order safe)
-- Enter CRITICAL when voltage drops below 2100 mV; exit CRITICAL when voltage rises above 2200 mV
-- 100 mV hysteresis dead band prevents oscillation near threshold
-- Graceful degradation: returns last known state if voltage read fails
-- Static `g_current_state` maintains hysteresis memory across calls (+1 byte RAM)
-- IDLE/SLEEP states deferred (require Zephyr power management integration)
+- Full state machine with 8 states: UNKNOWN, ACTIVE, IDLE, SLEEP, CRITICAL, CHARGING, DISCHARGING, CHARGED
+- Priority-ordered evaluation: CRITICAL > charger state > inactivity > default
+- Voltage hysteresis: enter CRITICAL below 2100 mV, exit above 2200 mV (100 mV dead band)
+- Inactivity timers: ACTIVE → IDLE (30s), IDLE → SLEEP (120s), reset via `report_activity()`
+- TP4056 charger integration (Kconfig-gated): reads CHRG/STDBY GPIOs for CHARGING/CHARGED states
+- CRITICAL → CHARGING recovery when charger connected at low voltage
+- Graceful degradation: voltage read failure → last known state; uptime failure → skip inactivity; charger failure → fall through
+- Without charger driver: default state is ACTIVE; with charger: default is DISCHARGING
 
 ### core_modules/battery_adc.c
 - Thin wrapper around HAL ADC functions

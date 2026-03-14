@@ -161,6 +161,48 @@ void test_collect_multiple_failures(void)
     TEST_ASSERT_EQUAL_UINT8(BATTERY_POWER_STATE_ACTIVE, pkt.power_state);
 }
 
+/* ── New power states ────────────────────────────────────────────────────── */
+
+void test_collect_charging_state(void)
+{
+    struct battery_telemetry_packet pkt;
+    mock_power_set_state(BATTERY_POWER_STATE_CHARGING);
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK, battery_telemetry_collect(&pkt));
+    TEST_ASSERT_EQUAL_UINT8(BATTERY_POWER_STATE_CHARGING, pkt.power_state);
+}
+
+void test_collect_discharging_state(void)
+{
+    struct battery_telemetry_packet pkt;
+    mock_power_set_state(BATTERY_POWER_STATE_DISCHARGING);
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK, battery_telemetry_collect(&pkt));
+    TEST_ASSERT_EQUAL_UINT8(BATTERY_POWER_STATE_DISCHARGING, pkt.power_state);
+}
+
+void test_collect_charged_state(void)
+{
+    struct battery_telemetry_packet pkt;
+    mock_power_set_state(BATTERY_POWER_STATE_CHARGED);
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK, battery_telemetry_collect(&pkt));
+    TEST_ASSERT_EQUAL_UINT8(BATTERY_POWER_STATE_CHARGED, pkt.power_state);
+}
+
+void test_collect_idle_state(void)
+{
+    struct battery_telemetry_packet pkt;
+    mock_power_set_state(BATTERY_POWER_STATE_IDLE);
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK, battery_telemetry_collect(&pkt));
+    TEST_ASSERT_EQUAL_UINT8(BATTERY_POWER_STATE_IDLE, pkt.power_state);
+}
+
+void test_collect_sleep_state(void)
+{
+    struct battery_telemetry_packet pkt;
+    mock_power_set_state(BATTERY_POWER_STATE_SLEEP);
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK, battery_telemetry_collect(&pkt));
+    TEST_ASSERT_EQUAL_UINT8(BATTERY_POWER_STATE_SLEEP, pkt.power_state);
+}
+
 /* ── Init sets flag ───────────────────────────────────────────────────────── */
 
 void test_init_returns_ok(void)
@@ -183,6 +225,11 @@ int main(void)
     RUN_TEST(test_collect_power_error_sets_flag);
     RUN_TEST(test_collect_timestamp_error_sets_flag);
     RUN_TEST(test_collect_multiple_failures);
+    RUN_TEST(test_collect_charging_state);
+    RUN_TEST(test_collect_discharging_state);
+    RUN_TEST(test_collect_charged_state);
+    RUN_TEST(test_collect_idle_state);
+    RUN_TEST(test_collect_sleep_state);
     RUN_TEST(test_init_returns_ok);
 
     return UNITY_END();

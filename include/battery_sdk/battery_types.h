@@ -11,10 +11,13 @@ extern "C" {
 
 enum battery_power_state {
     BATTERY_POWER_STATE_UNKNOWN = 0,
-    BATTERY_POWER_STATE_ACTIVE,
-    BATTERY_POWER_STATE_IDLE,
-    BATTERY_POWER_STATE_SLEEP,
-    BATTERY_POWER_STATE_CRITICAL
+    BATTERY_POWER_STATE_ACTIVE,       /* 1 */
+    BATTERY_POWER_STATE_IDLE,         /* 2 — inactivity timeout (30 s) */
+    BATTERY_POWER_STATE_SLEEP,        /* 3 — deep inactivity timeout (120 s) */
+    BATTERY_POWER_STATE_CRITICAL,     /* 4 — voltage below critical threshold */
+    BATTERY_POWER_STATE_CHARGING,     /* 5 — charger connected, charging */
+    BATTERY_POWER_STATE_DISCHARGING,  /* 6 — on battery, charger not connected */
+    BATTERY_POWER_STATE_CHARGED,      /* 7 — charger connected, charge complete */
 };
 
 struct battery_telemetry_packet {
