@@ -9,15 +9,15 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 
 ---
 
-## Current Status: Phase 3 Complete
+## Current Status: Phase 4 Complete
 
 | Phase | Description | Status |
 |-------|-------------|--------|
 | Phase 0 | Hardware setup, firmware skeleton | Done |
 | Phase 1 | Core battery intelligence (voltage, SoC, telemetry) | Done |
 | Phase 2 | Real temperature sensor + power state machine | Done |
-| Phase 3 | BLE telemetry transport | **Done** |
-| Phase 4 | Cloud platform integration | Planned |
+| Phase 3 | BLE telemetry transport | Done |
+| Phase 4 | Cloud telemetry (BLE gateway + InfluxDB + Grafana) | **Done** |
 | Phase 5 | AI-driven battery analytics | Planned |
 
 ---
@@ -50,6 +50,9 @@ Currently targets the **nRF52840** (Zephyr RTOS) with a **CR2032** coin cell. De
 - 20-byte little-endian wire format fitting BLE default ATT MTU
 - Compile-time transport backend selection via Kconfig (BLE or mock)
 - Dual output: serial printk + BLE notifications (when `CONFIG_BATTERY_TRANSPORT=y`)
+- Python BLE gateway with auto-reconnect (bleak) → InfluxDB 2.x → Grafana dashboard
+- Docker Compose cloud stack: InfluxDB time-series storage + 6-panel Grafana dashboard
+- `ibattery-gateway` CLI: scan, stream (terminal), run (full pipeline to InfluxDB)
 - Host-based unit tests (Unity framework, 106 tests across 8 suites, no Zephyr required)
 
 ---
@@ -71,6 +74,16 @@ cmake -B build_tests tests
 cmake --build build_tests
 ctest --test-dir build_tests --output-on-failure
 ```
+
+### Cloud telemetry (BLE → InfluxDB → Grafana)
+
+```bash
+cd cloud && docker compose up -d          # Start InfluxDB + Grafana
+cd gateway && pip install -e .            # Install Python gateway
+ibattery-gateway run                      # Connect to nRF52840 → write to InfluxDB
+```
+
+Open http://localhost:3000 → "iBattery Telemetry" dashboard with live voltage, temperature, SoC, and power state panels.
 
 ### Serial output
 
@@ -112,6 +125,8 @@ ibattery-sdk/
     transport/                  Wire serialization + BLE backend
   tests/                        Host-based unit tests (Unity)
     mocks/                      Configurable test doubles
+  gateway/                      Python BLE gateway (bleak → InfluxDB)
+  cloud/                        Docker Compose (InfluxDB + Grafana)
   docs/                         Documentation
 ```
 

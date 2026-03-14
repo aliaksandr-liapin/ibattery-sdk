@@ -42,3 +42,10 @@ venv/
 *.gcov
 lcov.info
 coverage/
+
+# Gateway Python package
+*.egg-info/
+
+# Docker Compose persistent data (named volumes, not typically on disk, but just in case)
+cloud/influxdb-data/
+cloud/grafana-data/

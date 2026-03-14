@@ -1,0 +1,47 @@
+# iBattery Cloud Stack — InfluxDB 2.x + Grafana
+#
+# Usage:
+#   cd cloud && docker compose up -d
+#
+# Endpoints:
+#   InfluxDB UI:  http://localhost:8086  (admin / ibattery-admin)
+#   Grafana:      http://localhost:3000  (admin / admin)
+
+services:
+  influxdb:
+    image: influxdb:2
+    container_name: ibattery-influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: ibattery-admin
+      DOCKER_INFLUXDB_INIT_ORG: ibattery
+      DOCKER_INFLUXDB_INIT_BUCKET: telemetry
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ibattery-dev-token
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ibattery-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+
+volumes:
+  influxdb-data:
+  grafana-data:

@@ -1,5 +1,46 @@
 # Release Notes
 
+## v0.4.0 — Phase 4: Cloud Telemetry Pipeline (2026-03-12)
+
+Adds a Python BLE gateway and Docker-based cloud stack (InfluxDB + Grafana) for real-time battery telemetry visualization. Closes the loop from sensor to dashboard.
+
+### What's New
+
+**Python BLE Gateway (`gateway/`)**
+- `ibattery-gateway` CLI tool with three commands: `scan`, `stream`, `run`
+- BLE connection via bleak library with auto-reconnect and exponential backoff
+- Decodes the same 20-byte LE wire format as the firmware serializer
+- Writes telemetry to InfluxDB 2.x as `battery_telemetry` measurement points
+- Installable Python package with `pip install -e .`
+
+**Docker Cloud Stack (`cloud/`)**
+- Docker Compose with InfluxDB 2.x (time-series storage) and Grafana (visualization)
+- Auto-provisioned InfluxDB datasource and Grafana dashboard
+- "iBattery Telemetry" dashboard with 6 panels:
+  - Voltage (V) — time series, 30min window
+  - Temperature (°C) — time series, 30min window
+  - State of Charge — gauge, 0–100% with color thresholds
+  - Power State — stat with value mappings (BOOT/ACTIVE/LOW/CRITICAL/SHUTDOWN)
+  - Raw Voltage (mV) — time series, 1h window
+  - Status Flags — stat with error threshold coloring
+- Anonymous viewer access enabled for local development
+
+**Gateway Tests**
+- Decoder tests: known wire bytes, mobile app packet, all power states, edge cases
+- Writer tests: mock InfluxDB client, Point field verification, error resilience
+
+### Quick Start
+
+```bash
+cd cloud && docker compose up -d          # Start InfluxDB + Grafana
+cd gateway && pip install -e .            # Install gateway
+ibattery-gateway run                      # BLE → InfluxDB → Grafana
+```
+
+Open http://localhost:3000 → "iBattery Telemetry" dashboard.
+
+---
+
 ## v0.3.0 — Phase 3: BLE Telemetry Transport (2026-03-12)
 
 Adds wireless telemetry delivery over Bluetooth Low Energy. Telemetry packets now flow off the device via BLE GATT notifications while serial output continues unchanged (dual output).

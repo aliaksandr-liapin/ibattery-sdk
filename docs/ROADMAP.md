@@ -100,6 +100,7 @@ Lower scale but immediate revenue with zero infrastructure cost.
 | ~~1~~ | ~~Multi-chemistry LUTs — LiPo single-cell (3.7V nominal)~~ | ✅ Done (v0.2.0) |
 | ~~2~~ | ~~Real temperature + dynamic power states~~ | ✅ Done (v0.2.0 + v0.2.1) |
 | ~~3~~ | ~~Phase 3 — BLE telemetry transport~~ | ✅ Done (v0.3.0) |
+| ~~3.5~~ | ~~Phase 4 — Cloud telemetry (BLE gateway + InfluxDB + Grafana)~~ | ✅ Done (v0.4.0) |
 | 4 | STM32 HAL port | Huge market, multiplies addressable audience |
 | 5 | ESP32 HAL port | Huge community, drives open-source adoption |
 | 6 | Zephyr module registry submission | Discoverability via `west manifest` |
@@ -118,7 +119,7 @@ Lower scale but immediate revenue with zero infrastructure cost.
 
 | Priority | Task | Impact |
 |----------|------|--------|
-| 12 | Cloud backend + dashboard (if pursuing Path B) | Platform revenue model |
+| ~~12~~ | ~~Cloud backend + dashboard~~ | ✅ Done (v0.4.0 — local InfluxDB + Grafana) |
 | 13 | Certification-ready battery profiles with lab-validated data | Enterprise/industrial customers |
 | 14 | Partner integrations — Nordic DevZone, AWS IoT, Zephyr ecosystem | Distribution and credibility |
 

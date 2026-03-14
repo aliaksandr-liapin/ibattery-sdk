@@ -168,6 +168,33 @@
 - Device name configurable via `CONFIG_BATTERY_BLE_DEVICE_NAME` (default "iBattery")
 - Resource overhead: ~62 KB flash, ~12 KB RAM (BLE stack)
 
+---
+
+## Cloud Telemetry Pipeline (Phase 4)
+
+```
+nRF52840-DK (BLE notifications, 20-byte packets every 2s)
+    │
+    ▼
+ibattery-gateway (Python / bleak)        gateway/
+    ├── scanner.py        BLE scan + connect + subscribe
+    ├── decoder.py        struct.unpack 20-byte LE wire format
+    ├── influxdb_writer   write Points to InfluxDB 2.x
+    └── cli.py            click CLI (scan / stream / run)
+    │
+    ▼
+Docker Compose stack                     cloud/
+    ├── InfluxDB 2.x      time-series storage (port 8086)
+    └── Grafana            6-panel dashboard (port 3000)
+```
+
+The gateway connects to the nRF52840 via BLE, decodes the same 20-byte wire format
+defined in `battery_serialize.c`, and writes measurement points to InfluxDB. Grafana
+auto-provisions the "iBattery Telemetry" dashboard with voltage, temperature, SoC gauge,
+power state, raw voltage, and status flags panels.
+
+---
+
 ### hal/battery_hal_adc_zephyr.c
 - Configures nRF52840 SAADC via Zephyr ADC API
 - Input: `NRFX_ANALOG_INTERNAL_VDD` (measures supply rail, not an external pin)

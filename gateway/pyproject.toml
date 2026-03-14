@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ibattery-gateway"
+version = "0.4.0"
+description = "BLE gateway for iBattery SDK — receives telemetry and writes to InfluxDB"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "bleak>=0.21",
+    "influxdb-client>=1.36",
+    "click>=8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+ibattery-gateway = "gateway.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["gateway*"]
