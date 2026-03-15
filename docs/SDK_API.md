@@ -23,9 +23,12 @@ Initializes subsystems in dependency order:
 1. HAL (ADC hardware)
 2. Voltage (ADC wrapper + filter)
 3. Temperature
-4. Power manager
-5. SoC estimator
-6. Telemetry
+4. Charger (if `CONFIG_BATTERY_CHARGER_TP4056`)
+5. Power manager
+6. SoC estimator
+7. Cycle counter (loads NVS count)
+8. Telemetry
+9. Transport (if `CONFIG_BATTERY_TRANSPORT`)
 
 **Returns:** `BATTERY_STATUS_OK` on success, or the first error encountered (initialization stops at the first failure).
 
@@ -206,11 +209,14 @@ int battery_power_manager_get_state(enum battery_power_state *state);
 
 ```c
 enum battery_power_state {
-    BATTERY_POWER_STATE_UNKNOWN  = 0,
-    BATTERY_POWER_STATE_ACTIVE   = 1,
-    BATTERY_POWER_STATE_IDLE     = 2,
-    BATTERY_POWER_STATE_SLEEP    = 3,
-    BATTERY_POWER_STATE_CRITICAL = 4
+    BATTERY_POWER_STATE_UNKNOWN     = 0,
+    BATTERY_POWER_STATE_ACTIVE      = 1,
+    BATTERY_POWER_STATE_IDLE        = 2,  // Inactivity timeout (30s)
+    BATTERY_POWER_STATE_SLEEP       = 3,  // Deep inactivity timeout (120s)
+    BATTERY_POWER_STATE_CRITICAL    = 4,  // Voltage below critical threshold
+    BATTERY_POWER_STATE_CHARGING    = 5,  // Charger connected, charging
+    BATTERY_POWER_STATE_DISCHARGING = 6,  // On battery, charger not connected
+    BATTERY_POWER_STATE_CHARGED     = 7,  // Charger connected, charge complete
 };
 ```
 
@@ -239,7 +245,11 @@ The 100 mV dead band between enter (2100 mV) and exit (2200 mV) thresholds preve
 
 **Graceful degradation:** If the voltage read fails, the last known state is returned with `BATTERY_STATUS_OK` (the failure is not propagated).
 
-**Note:** IDLE and SLEEP states are defined in the enum but not yet implemented (require Zephyr power management integration).
+**Inactivity timers:** ACTIVE → IDLE after 30s, IDLE → SLEEP after 120s. Reset via `battery_power_manager_report_activity()`.
+
+**Charger integration:** When `CONFIG_BATTERY_CHARGER_TP4056=y`, reads CHRG/STDBY GPIO pins to detect CHARGING/CHARGED states. Charger state overrides inactivity logic. CRITICAL → CHARGING recovery when charger connected at low voltage.
+
+**Priority order:** CRITICAL > charger state > inactivity > default (ACTIVE or DISCHARGING).
 
 **Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer), or `BATTERY_STATUS_NOT_INITIALIZED`.
 
@@ -270,13 +280,14 @@ Failed fields are zeroed and their corresponding flag bit is set.
 
 ```c
 struct battery_telemetry_packet {
-    uint8_t  telemetry_version;     // BATTERY_TELEMETRY_VERSION (1)
+    uint8_t  telemetry_version;     // BATTERY_TELEMETRY_VERSION (2)
     uint32_t timestamp_ms;          // Uptime in ms
     int32_t  voltage_mv;            // Filtered voltage in mV
     int32_t  temperature_c_x100;    // Temperature in 0.01 C
     uint16_t soc_pct_x100;          // SoC in 0.01%
     uint8_t  power_state;           // battery_power_state enum
     uint32_t status_flags;          // Error flag bits
+    uint32_t cycle_count;           // Charge cycle count (v2, NVS-persisted)
 };
 ```
 
@@ -315,13 +326,13 @@ Initialize the transport subsystem. Calls the active backend's init function. Fo
 
 ### `battery_transport_send`
 
-Serialize and send a telemetry packet. Packs the packet into a 20-byte little-endian wire buffer and forwards it to the active backend.
+Serialize and send a telemetry packet. Packs the packet into a wire buffer (v1: 20 bytes, v2: 24 bytes) and forwards it to the active backend.
 
 | Parameter | Direction | Description |
 |-----------|-----------|-------------|
 | `packet` | in | Telemetry packet to send (must not be NULL) |
 
-**Wire format (20 bytes, little-endian):**
+**Wire format v1 (20 bytes, little-endian):**
 
 | Offset | Size | Field | Encoding |
 |--------|------|-------|----------|
@@ -333,7 +344,13 @@ Serialize and send a telemetry packet. Packs the packet into a 20-byte little-en
 | 15 | 1 | power_state | uint8 |
 | 16 | 4 | status_flags | uint32 LE |
 
-20 bytes fits within a single BLE ATT default MTU (23 − 3 overhead = 20).
+**Wire format v2 (24 bytes, extends v1):**
+
+| Offset | Size | Field | Encoding |
+|--------|------|-------|----------|
+| 20 | 4 | cycle_count | uint32 LE |
+
+v2 is the current default (`BATTERY_TELEMETRY_VERSION=2`). The decoder accepts both v1 and v2 for backward compatibility.
 
 **BLE behavior:** When no client is subscribed (CCCD not enabled), the send silently succeeds (drop policy). The wire buffer is always updated for the Read characteristic regardless of subscription state.
 
@@ -373,6 +390,44 @@ Query whether a remote client is connected.
 | Properties | Read + Notify |
 | Permissions | Read (no authentication) |
 | Max connections | 1 (configurable via `CONFIG_BT_MAX_CONN`) |
+
+---
+
+## battery_cycle_counter.h — Charge Cycle Counter
+
+```c
+#include <battery_sdk/battery_cycle_counter.h>
+
+int battery_cycle_counter_init(void);
+int battery_cycle_counter_update(uint8_t power_state);
+int battery_cycle_counter_get(uint32_t *count_out);
+```
+
+### `battery_cycle_counter_init`
+
+Initialize the cycle counter. Loads the persisted cycle count from NVS flash storage (starts at 0 if no stored value exists). Called automatically by `battery_sdk_init()`.
+
+**Returns:** `BATTERY_STATUS_OK` on success.
+
+### `battery_cycle_counter_update`
+
+Notify the cycle counter of a power state change. Call this every telemetry loop. The counter internally tracks the previous state and increments when a CHARGING → CHARGED transition is detected. The new count is persisted to NVS flash.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `power_state` | in | Current power state (enum `battery_power_state` value) |
+
+**Returns:** `BATTERY_STATUS_OK` on success.
+
+### `battery_cycle_counter_get`
+
+Get the current charge cycle count.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `count_out` | out | Number of completed charge cycles |
+
+**Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer).
 
 ---
 

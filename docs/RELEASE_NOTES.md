@@ -1,5 +1,103 @@
 # Release Notes
 
+## v0.5.1 — Phase 5b: Cycle Counter, Wire v2, RUL & Cycle Analysis (2026-03-14)
+
+Adds charge cycle counting with flash persistence, extends the wire format to 24 bytes (v2), and delivers remaining useful life estimation, cycle analysis, and an 11-panel Grafana dashboard.
+
+### What's New
+
+**Charge Cycle Counter**
+- Tracks CHARGING → CHARGED transitions as completed charge cycles
+- NVS flash persistence via new HAL interface (`battery_hal_nvs.h`) — count survives reboots
+- `battery_cycle_counter_init()` loads stored count (or starts at 0)
+- `battery_cycle_counter_update(power_state)` called each telemetry loop; increments on state transition
+- `battery_cycle_counter_get(&count)` reads current count
+
+**Wire Format v2 (24 bytes)**
+- Extends v1 (20 bytes) with `cycle_count` field at offset 20 (uint32 LE)
+- `BATTERY_TELEMETRY_VERSION` bumped from 1 to 2
+- `battery_serialize_pack()` writes 24 bytes for v2, 20 bytes for v1
+- `battery_serialize_unpack()` accepts both 20-byte and 24-byte buffers — backward compatible
+- `BATTERY_TRANSPORT_WIRE_SIZE` updated to 24; BLE MTU configured accordingly
+
+**Gateway Decoder v2**
+- Python decoder auto-detects v1 (20B) and v2 (24B) packets
+- v2 packets include `cycle_count` field in decoded output and InfluxDB writes
+
+**Cloud Analytics CLI**
+- `ibattery-gateway analytics rul` — remaining useful life estimation (linear regression on health vs cycles)
+- `ibattery-gateway analytics cycles` — charge cycle pattern analysis (duration, capacity fade, temperature stats)
+- Existing commands: `analytics health` (health score) and `analytics anomalies` (anomaly detection)
+
+**Anomaly Detection Tuning**
+- Voltage thresholds tuned for dual-chemistry compatibility (CR2032 ~3.0V + LiPo ~3.7V)
+- Critical voltage: 2.5V (was 3.0V) — safe for any chemistry
+- SoC inconsistency: voltage < 2.8V with SoC > 50% (was 3.2V / 30%)
+- Temperature rate threshold: 15°C/min (was 5°C/min) — filters die sensor noise (~0.3°C/sample jitter)
+- Eliminates false positive warnings on CR2032 hardware
+
+**Grafana Dashboard v2 (11 panels)**
+- Voltage, SoC gauge, Power State, Temperature, Cycle Count, Health Score gauge
+- SoC Over Time, Capacity Fade bar chart, Anomaly Log table, RUL stat, Charge Duration Trend
+- Import via `gateway/grafana/ibattery-dashboard.json`
+
+**Expanded Tests**
+- Firmware: 11 C test suites (was 9) — new: `soc_temp_comp`, `cycle_counter`
+- Gateway: 58 Python tests (was 22) — new: decoder v1/v2, RUL estimator, cycle analyzer, updated realtime anomaly tests
+- New mocks: `mock_nvs.c` (NVS HAL), `mock_cycle_counter.c` (cycle counter)
+
+### SDK Init Order Update
+
+```
+1. battery_hal_init()
+2. battery_voltage_init()
+3. battery_temperature_init()
+4. battery_hal_charger_init()    [if CONFIG_BATTERY_CHARGER_TP4056]
+5. battery_power_manager_init()
+6. battery_soc_estimator_init()
+7. battery_cycle_counter_init()  [NEW — loads NVS count]
+8. battery_telemetry_init()
+9. battery_transport_init()      [if CONFIG_BATTERY_TRANSPORT]
+```
+
+### Hardware Verified
+
+- nRF52840-DK (PCA10056 rev 3.0.3) with CR2032
+- Wire v2 packets (24 bytes) confirmed via gateway stream
+- Gateway → InfluxDB → Grafana pipeline with all 11 panels
+- All 4 analytics CLI commands verified with live data
+- Zero false positive anomaly warnings on CR2032
+
+---
+
+## v0.5.0 — Phase 5a: Temperature-Compensated SoC + Cloud Analytics (2026-03-14)
+
+Adds temperature compensation to the SoC estimator for LiPo cells and introduces cloud-side analytics: battery health scoring, real-time and historical anomaly detection.
+
+### What's New
+
+**Temperature-Compensated SoC (LiPo only)**
+- `battery_soc_temp_comp.c` — applies temperature correction factors to LUT-based SoC
+- Gated by `CONFIG_BATTERY_CHEMISTRY=LIPO` — CR2032 uses raw LUT (temperature compensation is not meaningful for primary cells)
+- `CONFIG_BATTERY_CHEMISTRY` Kconfig: selects CR2032 or LiPo LUT at compile time
+
+**Cloud Analytics**
+- `ibattery-gateway analytics health` — voltage-based battery health score (0-100)
+- `ibattery-gateway analytics anomalies` — historical anomaly detection from InfluxDB data
+- Real-time per-packet anomaly checks during BLE streaming (no InfluxDB query needed)
+- Anomaly types: voltage drop, SoC inconsistency, critical voltage, high/low temperature, temperature spike
+
+**Gateway Analytics Modules**
+- `gateway/analytics/health_score.py` — health scoring from InfluxDB voltage history
+- `gateway/analytics/anomaly_detector.py` — historical anomaly detection (voltage + temperature)
+- `gateway/analytics/realtime.py` — inline per-packet threshold checks
+
+**Expanded Tests**
+- Firmware: new `test_soc_temp_comp` suite (temperature compensation logic)
+- Gateway: new `test_realtime.py` (11 tests for per-packet anomaly detection)
+
+---
+
 ## v0.4.1 — Expanded Battery Power States + TP4056 Charger Scaffold (2026-03-13)
 
 Adds full battery state machine with IDLE/SLEEP inactivity timers, CHARGING/DISCHARGING/CHARGED states, and a scaffolded TP4056 GPIO charger driver (Kconfig-gated, ready for hardware integration).

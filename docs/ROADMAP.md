@@ -1,6 +1,6 @@
 # Roadmap & Business Strategy
 
-## Current State (Phase 4 Complete + Battery States)
+## Current State (Phase 5b Complete)
 
 ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 
@@ -8,18 +8,22 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 - Targets nRF52840 + CR2032 coin cells and LiPo single-cell (3.7V)
 - Voltage reading (SAADC) → SoC estimation (LUT interpolation) → telemetry collection
 - Real die temperature sensor via nRF52840 TEMP peripheral (±2 °C) or external 10K NTC thermistor (B=3950) on SAADC AIN1
+- Temperature-compensated SoC for LiPo cells (`CONFIG_BATTERY_CHEMISTRY` Kconfig)
 - Voltage-threshold power state machine with 100 mV hysteresis
+- Full battery state machine: IDLE/SLEEP inactivity timers + TP4056 CHARGING/DISCHARGING/CHARGED
 - LiPo single-cell (3.7 V nominal) discharge curve LUT
 - BLE telemetry transport with custom GATT service + notification characteristic
-- 20-byte LE wire serialization fitting BLE default ATT MTU
-- Compile-time transport backend selection via Kconfig
-- ~39 bytes static RAM (core), integer-only math, no heap allocation
+- Wire format v1 (20B) and v2 (24B with `cycle_count`) — backward compatible
+- Charge cycle counter with NVS flash persistence (CHARGING → CHARGED transitions)
+- Compile-time transport backend and chemistry selection via Kconfig
+- ~48 bytes static RAM (core), integer-only math, no heap allocation
 - HAL abstraction layer — core logic is platform-independent portable C
-- Full battery state machine: IDLE/SLEEP inactivity timers + TP4056 CHARGING/DISCHARGING/CHARGED
 - LiPo 500mAh powering nRF52840-DK via TP4056 HW-373 (USB-C) — real battery power verified
 - TP4056 charging confirmed (voltage rise on USB-C connect); CHRG/STDBY GPIO signals simulated with jumper wires (LED pad soldering pending)
-- Python BLE gateway (bleak) → InfluxDB 2.x → Grafana 6-panel dashboard (Docker Compose)
-- 125+ host-based unit tests across 9 suites (Unity), zero hardware required to run
+- Python BLE gateway (bleak) → InfluxDB 2.x → Grafana 11-panel dashboard (Docker Compose)
+- `ibattery-gateway` CLI: scan, stream, run, analytics (health, anomalies, rul, cycles)
+- Cloud analytics: battery health scoring, real-time + historical anomaly detection, RUL estimation, cycle analysis
+- 11 C test suites (Unity) + 58 Python tests (pytest), zero hardware required to run
 - Zephyr RTOS integration with clean layered architecture
 - Production-quality codebase: no layer violations, consistent conventions, full documentation
 
@@ -36,8 +40,8 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 - Test infrastructure is solid and runs without hardware
 
 **Gaps to address before monetizing:**
-- CR2032-only is too niche — LiPo support is table stakes for broader adoption
-- No charging detection limits to primary (non-rechargeable) cells
+- ~~CR2032-only is too niche~~ — ✅ LiPo support added (v0.2.0+), dual-chemistry Kconfig
+- ~~No charging detection~~ — ✅ TP4056 charger driver + NVS cycle counter (v0.4.1 + v0.5.1)
 - Single platform (nRF52840) limits reach — STM32 port would be highest-impact addition
 
 **Competitive landscape:**
@@ -105,27 +109,30 @@ Lower scale but immediate revenue with zero infrastructure cost.
 | ~~2~~ | ~~Real temperature + dynamic power states~~ | ✅ Done (v0.2.0 + v0.2.1) |
 | ~~3~~ | ~~Phase 3 — BLE telemetry transport~~ | ✅ Done (v0.3.0) |
 | ~~3.5~~ | ~~Phase 4 — Cloud telemetry (BLE gateway + InfluxDB + Grafana)~~ | ✅ Done (v0.4.0) |
-| 4 | STM32 HAL port | Huge market, multiplies addressable audience |
-| 5 | ESP32 HAL port | Huge community, drives open-source adoption |
-| 6 | Zephyr module registry submission | Discoverability via `west manifest` |
+| ~~4~~ | ~~Phase 5a — Temperature-compensated SoC + cloud analytics~~ | ✅ Done (v0.5.0) |
+| ~~5~~ | ~~Phase 5b — Cycle counter, wire v2, RUL, cycle analysis, Grafana v2~~ | ✅ Done (v0.5.1) |
+| 6 | STM32 HAL port | Huge market, multiplies addressable audience |
+| 7 | ESP32 HAL port | Huge community, drives open-source adoption |
+| 8 | Zephyr module registry submission | Discoverability via `west manifest` |
 
 ### Mid-term (3-6 months)
 
 | Priority | Task | Impact |
 |----------|------|--------|
-| 7 | Advanced SoC — coulomb counting or voltage+temperature compensation | Simple LUT insufficient for rechargeable cells |
-| ~~8~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 — TP4056 GPIO driver, LiPo power delivery verified, CHRG/STDBY signals simulated with jumper wires, LED pad soldering pending for full signal readout) |
-| 9 | PlatformIO library publication | Major distribution channel for Arduino/ESP32 community |
-| 10 | Documentation site — GitHub Pages with guides and API reference | Lowers barrier to adoption |
-| 11 | Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo) | Hardware reference designs drive SDK adoption |
+| ~~9~~ | ~~Advanced SoC — temperature compensation~~ | ✅ Done (v0.5.0 — LiPo temp-compensated SoC) |
+| ~~10~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 + v0.5.1 — TP4056 GPIO driver + NVS cycle counter) |
+| 11 | Advanced SoC — coulomb counting or Kalman filter | Next accuracy improvement beyond temp compensation |
+| 12 | PlatformIO library publication | Major distribution channel for Arduino/ESP32 community |
+| 13 | Documentation site — GitHub Pages with guides and API reference | Lowers barrier to adoption |
+| 14 | Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo) | Hardware reference designs drive SDK adoption |
 
 ### Long-term (6+ months)
 
 | Priority | Task | Impact |
 |----------|------|--------|
-| ~~12~~ | ~~Cloud backend + dashboard~~ | ✅ Done (v0.4.0 — local InfluxDB + Grafana) |
-| 13 | Certification-ready battery profiles with lab-validated data | Enterprise/industrial customers |
-| 14 | Partner integrations — Nordic DevZone, AWS IoT, Zephyr ecosystem | Distribution and credibility |
+| ~~15~~ | ~~Cloud backend + dashboard~~ | ✅ Done (v0.4.0 + v0.5.1 — InfluxDB + 11-panel Grafana + analytics CLI) |
+| 16 | Certification-ready battery profiles with lab-validated data | Enterprise/industrial customers |
+| 17 | Partner integrations — Nordic DevZone, AWS IoT, Zephyr ecosystem | Distribution and credibility |
 
 ---
 

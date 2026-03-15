@@ -6,7 +6,9 @@ The Battery SDK uses **host-based unit tests** that compile and run on the devel
 
 **Framework:** [Unity](https://github.com/ThrowTheSwitch/Unity) v2.6.0 (fetched automatically via CMake FetchContent)
 
-**Test count:** 106 tests across 8 suites
+**Firmware test count:** 11 C test suites (Unity)
+
+**Gateway test count:** 58 Python tests (pytest)
 
 ---
 
@@ -26,24 +28,30 @@ ctest --test-dir build_tests --output-on-failure
 Expected output:
 ```
 Test project /path/to/ibattery-sdk/build_tests
-    Start 1: voltage_filter
-1/8 Test #1: voltage_filter ...................   Passed    0.00 sec
-    Start 2: soc_lut
-2/8 Test #2: soc_lut ..........................   Passed    0.00 sec
-    Start 3: telemetry
-3/8 Test #3: telemetry ........................   Passed    0.00 sec
-    Start 4: temperature
-4/8 Test #4: temperature ......................   Passed    0.00 sec
-    Start 5: power_manager
-5/8 Test #5: power_manager ....................   Passed    0.00 sec
-    Start 6: ntc_lut
-6/8 Test #6: ntc_lut ..........................   Passed    0.00 sec
-    Start 7: serialize
-7/8 Test #7: serialize ........................   Passed    0.00 sec
-    Start 8: transport
-8/8 Test #8: transport ........................   Passed    0.00 sec
+     Start  1: voltage_filter
+ 1/11 Test  #1: voltage_filter ...................   Passed    0.00 sec
+     Start  2: soc_lut
+ 2/11 Test  #2: soc_lut ..........................   Passed    0.00 sec
+     Start  3: soc_temp_comp
+ 3/11 Test  #3: soc_temp_comp ....................   Passed    0.00 sec
+     Start  4: telemetry
+ 4/11 Test  #4: telemetry ........................   Passed    0.00 sec
+     Start  5: temperature
+ 5/11 Test  #5: temperature ......................   Passed    0.00 sec
+     Start  6: power_manager
+ 6/11 Test  #6: power_manager ....................   Passed    0.00 sec
+     Start  7: power_manager_charger
+ 7/11 Test  #7: power_manager_charger ............   Passed    0.00 sec
+     Start  8: ntc_lut
+ 8/11 Test  #8: ntc_lut ..........................   Passed    0.00 sec
+     Start  9: serialize
+ 9/11 Test  #9: serialize ........................   Passed    0.00 sec
+     Start 10: transport
+10/11 Test #10: transport ........................   Passed    0.00 sec
+     Start 11: cycle_counter
+11/11 Test #11: cycle_counter ....................   Passed    0.00 sec
 
-100% tests passed, 0 tests failed out of 8
+100% tests passed, 0 tests failed out of 11
 
 Total Test time (real) =   0.05 sec
 ```
@@ -53,12 +61,15 @@ Total Test time (real) =   0.05 sec
 ```bash
 ./build_tests/test_voltage_filter
 ./build_tests/test_soc_lut
+./build_tests/test_soc_temp_comp
 ./build_tests/test_telemetry
 ./build_tests/test_temperature
 ./build_tests/test_power_manager
+./build_tests/test_power_manager_charger
 ./build_tests/test_ntc_lut
 ./build_tests/test_serialize
 ./build_tests/test_transport
+./build_tests/test_cycle_counter
 ```
 
 ---
@@ -117,7 +128,17 @@ Tests the voltage-to-SoC lookup table interpolation for both CR2032 and LiPo che
 | `test_lipo_interpolation_3745mv` | Knee region: 3745 mV interpolates to 2000 (20.00%) |
 | `test_lipo_interpolation_3600mv` | Steep cliff: 3600 mV interpolates to 650 (6.50%) |
 
-### 3. Telemetry (`test_telemetry.c`) — 9 tests
+### 3. SoC Temperature Compensation (`test_soc_temp_comp.c`)
+
+Tests temperature compensation logic for LiPo SoC estimation. Pure integer math, no mocks.
+
+| Test | What it verifies |
+|------|-----------------|
+| Temperature correction factors | Cold/hot temperature adjustments to SoC |
+| CR2032 passthrough | No compensation applied when chemistry is CR2032 |
+| Boundary conditions | Edge cases at temperature extremes |
+
+### 4. Telemetry (`test_telemetry.c`) — 9 tests
 
 Tests the telemetry collection logic with configurable mocks for all dependencies.
 
@@ -133,7 +154,7 @@ Tests the telemetry collection logic with configurable mocks for all dependencie
 | `test_collect_multiple_failures` | Multiple subsystems fail — correct flags accumulated, good fields intact |
 | `test_init_returns_ok` | `battery_telemetry_init()` returns OK |
 
-### 4. Temperature (`test_temperature.c`) — 7 tests
+### 5. Temperature (`test_temperature.c`) — 7 tests
 
 Tests the temperature module with mock HAL. Verifies HAL delegation, error propagation, and edge cases.
 
@@ -147,7 +168,7 @@ Tests the temperature module with mock HAL. Verifies HAL delegation, error propa
 | `test_init_hal_failure` | Init failure from HAL propagates |
 | `test_init_success` | Successful init returns OK |
 
-### 5. NTC LUT (`test_ntc_lut.c`) — 21 tests
+### 6. NTC LUT (`test_ntc_lut.c`) — 21 tests
 
 Tests the NTC thermistor resistance-to-temperature conversion pipeline: voltage divider math and LUT interpolation. Pure integer math, no mocks.
 
@@ -182,7 +203,7 @@ Tests the NTC thermistor resistance-to-temperature conversion pipeline: voltage 
 | `test_interpolate_across_zero` | 26920 Ω → 5.00 °C (crosses 0 °C boundary) |
 | `test_interpolate_hot_range` | 983 Ω → 90.01 °C (high temp interpolation) |
 
-### 6. Power Manager (`test_power_manager.c`) — 12 tests
+### 7. Power Manager (`test_power_manager.c`) — 12 tests
 
 Tests the voltage-threshold state machine with hysteresis. Uses mock voltage to simulate battery conditions.
 
@@ -201,7 +222,20 @@ Tests the voltage-threshold state machine with hysteresis. Uses mock voltage to 
 | `test_init_returns_ok` | Init succeeds with OK |
 | `test_init_sets_active` | Post-init state is ACTIVE |
 
-### 7. Serialization (`test_serialize.c`) — 15 tests
+### 8. Power Manager + Charger (`test_power_manager_charger`) — 23 tests
+
+Same test file as Power Manager but compiled with `CONFIG_BATTERY_CHARGER_TP4056=1`. Tests charger-specific state transitions.
+
+| Test | What it verifies |
+|------|-----------------|
+| CHARGING state | CHRG=LOW detected correctly |
+| CHARGED state | STDBY=LOW detected correctly |
+| DISCHARGING default | Both pins floating → DISCHARGING |
+| Critical-to-charging recovery | CRITICAL → charger connected → CHARGING |
+| Charger error fallback | Charger read failure → fall through to voltage logic |
+| Charging overrides idle | CHARGING takes priority over inactivity-based IDLE/SLEEP |
+
+### 9. Serialization (`test_serialize.c`) — 15 tests
 
 Tests the telemetry packet wire serialization (pack/unpack). Pure logic, no mocks.
 
@@ -223,7 +257,7 @@ Tests the telemetry packet wire serialization (pack/unpack). Pure logic, no mock
 | `test_wire_voltage_le` | Voltage at offset 5, little-endian |
 | `test_wire_format_total_size` | Pack writes exactly 20 bytes |
 
-### 8. Transport (`test_transport.c`) — 11 tests
+### 10. Transport (`test_transport.c`) — 11 tests
 
 Tests the transport abstraction layer with a mock backend. Verifies delegation, error propagation, and wire byte correctness.
 
@@ -240,6 +274,44 @@ Tests the transport abstraction layer with a mock backend. Verifies delegation, 
 | `test_is_connected_null_pointer` | NULL output returns INVALID_ARG |
 | `test_is_connected_returns_false` | Reports disconnected state correctly |
 | `test_is_connected_returns_true` | Reports connected state correctly |
+
+### 11. Cycle Counter (`test_cycle_counter.c`)
+
+Tests charge cycle counting logic with mock NVS backend.
+
+| Test | What it verifies |
+|------|-----------------|
+| Init loads from NVS | Stored count loaded on init |
+| Init with no stored value | Starts at 0 when NVS is empty |
+| CHARGING → CHARGED increments | Transition detected, count incremented |
+| Non-transition no increment | Other state changes don't increment |
+| Get returns current count | `battery_cycle_counter_get()` returns correct value |
+| NULL pointer check | NULL output returns INVALID_ARG |
+
+---
+
+## Python Gateway Tests
+
+The gateway has **58 pytest tests** across 6 test files.
+
+### Running
+
+```bash
+cd gateway
+pip install -e ".[dev]"
+python -m pytest tests/ -v
+```
+
+### Test Files
+
+| File | Tests | What it covers |
+|------|-------|---------------|
+| `test_decoder.py` | 25 | Wire v1 (20B) and v2 (24B) decoding, error handling, format_packet |
+| `test_influxdb_writer.py` | 5 | InfluxDB point construction, error resilience |
+| `test_realtime.py` | 16 | Per-packet anomaly detection: voltage critical, SoC inconsistency, temperature high/low, multiple anomalies, CR2032 compatibility |
+| `test_rul_estimator.py` | 5 | Linear regression for RUL: positive/negative slope, flat, single point, two points |
+| `test_cycle_analyzer.py` | 2 | CycleAnalyzer instantiation, context manager protocol |
+| `test_health_score.py` | 5 | Health scoring logic |
 
 ---
 
@@ -261,6 +333,9 @@ Mock files are in `tests/mocks/`. Each mock provides:
 | `mock_power.c` | `battery_power_manager.c` | power_state, return code |
 | `mock_sdk_state.c` | `battery_sdk.c` (state + uptime) | all-initialized state, uptime_ms, return code |
 | `mock_transport.c` | `battery_transport_ble_zephyr.c` | init/send/deinit return codes, connected state, captured send buffer + count |
+| `mock_charger.c` | `battery_hal_charger_tp4056_zephyr.c` | charger state (CHRG/STDBY pins), return code |
+| `mock_nvs.c` | `battery_hal_nvs_zephyr.c` | NVS read/write values, return codes (RAM-backed) |
+| `mock_cycle_counter.c` | `battery_cycle_counter.c` | cycle count value, return code |
 
 ### Example: configuring a mock
 

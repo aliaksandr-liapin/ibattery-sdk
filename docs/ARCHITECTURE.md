@@ -29,8 +29,8 @@
 |  battery_sdk.h        battery_telemetry.h             |
 |  battery_voltage.h    battery_temperature.h           |
 |  battery_soc_estimator.h  battery_power_manager.h     |
-|  battery_transport.h  battery_status.h                |
-|  battery_types.h                                      |
+|  battery_transport.h  battery_cycle_counter.h         |
+|  battery_status.h     battery_types.h                 |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
@@ -41,17 +41,20 @@
 |    battery_        battery_adc.c       estimator.c    |
 |    internal.h      battery_voltage_    battery_soc_   |
 |                    filter.c            lut.c          |
-|                    battery_            battery_ntc_   |
-|                    temperature.c       lut.c          |
-|                    battery_power_                     |
-|                    manager.c                          |
+|                    battery_            battery_soc_   |
+|                    temperature.c       temp_comp.c    |
+|                    battery_power_      battery_ntc_   |
+|                    manager.c           lut.c          |
+|                                        battery_cycle_ |
+|                                        counter.c      |
 |                                                       |
 |                 telemetry/                             |
 |                   battery_telemetry.c                  |
 |                                                       |
 |                 transport/                             |
 |                   battery_transport.c                  |
-|                   battery_serialize.c/.h               |
+|                   battery_serialize.c/.h  (v1: 20B,    |
+|                                           v2: 24B)    |
 |                   ble/                                 |
 |                     battery_transport_ble_zephyr.c     |
 +------------------------------------------------------+
@@ -69,6 +72,9 @@
 |  battery_hal_charger_tp4056_    TP4056 CHRG/STDBY GPIO     |
 |    zephyr.c                     (CONFIG_BATTERY_CHARGER_   |
 |                                  TP4056)                    |
+|  battery_hal_nvs.h              NVS flash key-value store  |
+|  battery_hal_nvs_zephyr.c       Zephyr NVS backend         |
+|  battery_hal_nvs_stub.c         Host-test stub (RAM-only)  |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
@@ -140,6 +146,20 @@
 - Integer-only math: `soc = soc_high - (soc_high - soc_low) * (v_high - v) / (v_high - v_low)`
 - Clamps at boundaries
 
+### intelligence/battery_soc_temp_comp.c
+- Temperature compensation for LiPo SoC estimation
+- Applies correction factors to LUT-based SoC based on measured temperature
+- Gated by `CONFIG_BATTERY_CHEMISTRY=LIPO` — CR2032 uses raw LUT (no temp compensation)
+- Cold temperatures reduce effective capacity; hot temperatures slightly increase it
+
+### intelligence/battery_cycle_counter.c
+- Tracks charge cycles by detecting CHARGING → CHARGED power state transitions
+- Persists count to flash via `battery_hal_nvs` interface (survives reboots)
+- `battery_cycle_counter_init()` loads stored count from NVS (starts at 0 if no stored value)
+- `battery_cycle_counter_update(power_state)` called each telemetry loop; internally tracks previous state
+- `battery_cycle_counter_get(&count)` reads current count
+- Count included in telemetry packet (`cycle_count` field) and serialized in wire v2
+
 ### intelligence/battery_ntc_lut.c
 - 16-point resistance-to-temperature LUT for 10K NTC (B=3950), covering -40 °C to +125 °C
 - Resistance values computed from B-parameter equation: `R(T) = R0 * exp(B * (1/T - 1/T0))`
@@ -160,10 +180,12 @@
 - Null-checks packet pointer before serialization
 
 ### transport/battery_serialize.c
-- Encodes/decodes `battery_telemetry_packet` to/from 20-byte little-endian wire buffer
+- Encodes/decodes `battery_telemetry_packet` to/from wire buffer (v1: 20 bytes, v2: 24 bytes)
+- Wire v1 (20B): version(1) + timestamp(4) + voltage(4) + temperature(4) + soc(2) + power_state(1) + flags(4)
+- Wire v2 (24B): v1 fields + cycle_count(4) at offset 20
+- `battery_serialize_pack()` writes 24 bytes for v2, 20 bytes for v1
+- `battery_serialize_unpack()` accepts both sizes — backward compatible
 - Explicit byte shifts (`put_u16_le`, `put_u32_le`, etc.) — fully portable, no struct packing
-- 20 bytes fits within a single BLE ATT default MTU (23 − 3 = 20)
-- Wire format: version(1) + timestamp(4) + voltage(4) + temperature(4) + soc(2) + power_state(1) + flags(4)
 
 ### transport/ble/battery_transport_ble_zephyr.c
 - Custom BLE GATT service with notification characteristic for telemetry
@@ -178,28 +200,39 @@
 
 ---
 
-## Cloud Telemetry Pipeline (Phase 4)
+## Cloud Telemetry & Analytics Pipeline (Phase 4 + Phase 5)
 
 ```
-nRF52840-DK (BLE notifications, 20-byte packets every 2s)
+nRF52840-DK (BLE notifications, 20/24-byte packets every 2s)
     │
     ▼
 ibattery-gateway (Python / bleak)        gateway/
-    ├── scanner.py        BLE scan + connect + subscribe
-    ├── decoder.py        struct.unpack 20-byte LE wire format
-    ├── influxdb_writer   write Points to InfluxDB 2.x
-    └── cli.py            click CLI (scan / stream / run)
+    ├── scanner.py           BLE scan + connect + subscribe
+    ├── decoder.py           unpack v1 (20B) / v2 (24B) LE wire format
+    ├── influxdb_writer.py   write Points to InfluxDB 2.x
+    ├── cli.py               click CLI (scan / stream / run / analytics)
+    └── analytics/
+        ├── realtime.py          inline anomaly checks per packet
+        ├── health_score.py      voltage-based health scoring
+        ├── anomaly_detector.py  historical anomaly detection
+        ├── rul_estimator.py     remaining useful life estimation
+        └── cycle_analyzer.py    charge cycle pattern analysis
     │
     ▼
 Docker Compose stack                     cloud/
     ├── InfluxDB 2.x      time-series storage (port 8086)
-    └── Grafana            6-panel dashboard (port 3000)
+    └── Grafana            11-panel dashboard (port 3000)
 ```
 
-The gateway connects to the nRF52840 via BLE, decodes the same 20-byte wire format
-defined in `battery_serialize.c`, and writes measurement points to InfluxDB. Grafana
-auto-provisions the "iBattery Telemetry" dashboard with voltage, temperature, SoC gauge,
-power state, raw voltage, and status flags panels.
+The gateway connects to the nRF52840 via BLE, decodes the v1/v2 wire format
+defined in `battery_serialize.c`, runs real-time anomaly checks on each packet,
+and writes measurement points to InfluxDB. Grafana provides an 11-panel
+"iBattery Telemetry" dashboard with voltage, SoC, temperature, power state,
+cycle count, health score, anomaly log, RUL, and trend panels.
+
+The analytics CLI (`ibattery-gateway analytics`) queries InfluxDB history for
+health scoring, anomaly detection, remaining useful life estimation, and
+charge cycle analysis.
 
 ---
 
@@ -269,8 +302,8 @@ battery_telemetry_collect(&pkt)
 
 battery_transport_send(&pkt)           [optional, CONFIG_BATTERY_TRANSPORT]
   |
-  +-> battery_serialize_pack()          [pack into 20-byte wire buffer]
-  +-> g_ops->send(buf, 20)             [BLE notify / mock capture]
+  +-> battery_serialize_pack()          [pack into 20/24-byte wire buffer]
+  +-> g_ops->send(buf, len)            [BLE notify / mock capture]
 ```
 
 ---
@@ -280,14 +313,15 @@ battery_transport_send(&pkt)           [optional, CONFIG_BATTERY_TRANSPORT]
 `battery_sdk_init()` calls subsystems in this order. If any step fails, initialization stops and the error is returned.
 
 ```
-1. battery_hal_init()           -> ADC + temperature sensor ready
-2. battery_voltage_init()       -> ADC wrapper + filter ready
-3. battery_temperature_init()   -> Temperature sensor ready
-4. battery_hal_charger_init()   -> TP4056 GPIO pins ready (if CONFIG_BATTERY_CHARGER_TP4056)
-5. battery_power_manager_init() -> Power state monitor ready
-6. battery_soc_estimator_init() -> SoC estimator ready
-7. battery_telemetry_init()     -> Telemetry collector ready
-8. battery_transport_init()     -> BLE transport ready (if CONFIG_BATTERY_TRANSPORT)
+1. battery_hal_init()             -> ADC + temperature sensor ready
+2. battery_voltage_init()         -> ADC wrapper + filter ready
+3. battery_temperature_init()     -> Temperature sensor ready
+4. battery_hal_charger_init()     -> TP4056 GPIO pins ready (if CONFIG_BATTERY_CHARGER_TP4056)
+5. battery_power_manager_init()   -> Power state monitor ready
+6. battery_soc_estimator_init()   -> SoC estimator ready
+7. battery_cycle_counter_init()   -> Cycle counter ready (loads NVS count)
+8. battery_telemetry_init()       -> Telemetry collector ready
+9. battery_transport_init()       -> BLE transport ready (if CONFIG_BATTERY_TRANSPORT)
 ```
 
 ---
@@ -309,12 +343,13 @@ battery_transport_send(&pkt)           [optional, CONFIG_BATTERY_TRANSPORT]
 | ADC sample buffer (NTC) | 2 | Single int16_t (NTC mode only) |
 | Power state | 1 | Hysteresis memory (g_current_state) |
 | SDK runtime state | 7 | 7 booleans |
-| Telemetry packet | 20 | Stack-allocated per call |
-| Transport wire buffer | 20 | BLE cached value (if CONFIG_BATTERY_TRANSPORT) |
+| Cycle counter state | 9 | prev_state(1) + count(4) + initialized(4) |
+| Telemetry packet | 24 | Stack-allocated per call (v2) |
+| Transport wire buffer | 24 | BLE cached value (if CONFIG_BATTERY_TRANSPORT) |
 | SoC LUT (CR2032) | 0 (const) | 36 bytes in flash |
 | SoC LUT (LiPo) | 0 (const) | 44 bytes in flash |
 | NTC LUT (10K B3950) | 0 (const) | 128 bytes in flash (16 entries × 8 bytes) |
-| **Total static RAM** | **~39** | NTC mode; excluding Zephyr/BLE stack overhead |
+| **Total static RAM** | **~48** | NTC mode; excluding Zephyr/BLE stack overhead |
 | **BLE stack overhead** | **~12 KB** | Additional when CONFIG_BATTERY_TRANSPORT_BLE (Zephyr BLE stack) |
 
 ---

@@ -17,9 +17,17 @@ ctest --test-dir build_tests --output-on-failure
 
 ## Development Setup
 
-**Host tests** require only a C compiler and CMake (3.20+). They run on macOS and Linux without any embedded toolchain.
+**Host tests (firmware)** require only a C compiler and CMake (3.20+). They run on macOS and Linux without any embedded toolchain.
 
 **Firmware builds** require the nRF Connect SDK. See the [README](README.md) for details.
+
+**Gateway development** requires Python 3.10+:
+
+```bash
+cd gateway
+pip install -e ".[dev]"       # Install with dev dependencies (pytest)
+python -m pytest tests/ -v    # Run gateway tests (58 tests)
+```
 
 ## Code Style
 
@@ -64,10 +72,14 @@ See the step-by-step guide in [BATTERY_PROFILES.md](docs/BATTERY_PROFILES.md#add
 
 ## Testing
 
-All changes must pass the host test suite before merging:
+All changes must pass the test suites before merging:
 
 ```bash
+# Firmware tests (11 C suites)
 cmake --build build_tests && ctest --test-dir build_tests --output-on-failure
+
+# Gateway tests (58 Python tests)
+cd gateway && python -m pytest tests/ -v
 ```
 
 **Test expectations:**

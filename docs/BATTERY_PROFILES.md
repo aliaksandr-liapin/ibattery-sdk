@@ -16,6 +16,14 @@ The SDK estimates state-of-charge by mapping a measured open-circuit voltage (OC
 - Clamped at boundaries: above max → 100%, below min → 0%
 - Each entry costs 4 bytes flash (two `uint16_t` fields)
 
+**Chemistry selection at compile time:**
+
+The active LUT is selected via `CONFIG_BATTERY_CHEMISTRY` in `app/Kconfig`:
+- `CONFIG_BATTERY_CHEMISTRY_CR2032` (default) — CR2032 9-point LUT, no temperature compensation
+- `CONFIG_BATTERY_CHEMISTRY_LIPO` — LiPo 11-point LUT + temperature compensation via `battery_soc_temp_comp.c`
+
+Temperature compensation (Phase 5a) applies correction factors to the LUT-based SoC estimate based on measured temperature. It is only active for LiPo chemistry — CR2032 primary cells use the raw LUT because temperature compensation is not meaningful for non-rechargeable cells with relatively stable voltage curves.
+
 **Accuracy depends on:**
 1. How well the table matches the real discharge curve
 2. Number and placement of table points (more points in non-linear regions = less interpolation error)
@@ -211,7 +219,7 @@ To add a profile for a new chemistry or cell type:
 
 ## Future Work
 
-- **Temperature-compensated tables:** Ship multiple LUTs per chemistry (e.g., -10 °C, 0 °C, 25 °C, 45 °C) and interpolate between them based on measured temperature.
+- **Temperature-compensated tables:** ✅ Basic temperature compensation added for LiPo (Phase 5a) via correction factors. Future: ship multiple LUTs per chemistry (e.g., -10 °C, 0 °C, 25 °C, 45 °C) and interpolate between them based on measured temperature for higher accuracy.
 - **Lab-validated profiles:** Replace synthesised data with lab-measured discharge curves on specific cells at controlled discharge rates and temperatures.
 - **LiFePO4 profile:** Flat 3.2-3.3 V plateau makes voltage-based SoC especially challenging — may need coulomb counting or combined estimator.
 - **NiMH profile:** 1.2 V nominal, very flat discharge curve, similar challenges to LiFePO4.
