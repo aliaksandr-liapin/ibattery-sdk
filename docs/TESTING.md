@@ -307,7 +307,7 @@ python -m pytest tests/ -v
 | File | Tests | What it covers |
 |------|-------|---------------|
 | `test_decoder.py` | 25 | Wire v1 (20B) and v2 (24B) decoding, error handling, format_packet |
-| `test_influxdb_writer.py` | 5 | InfluxDB point construction, error resilience |
+| `test_writer.py` | 5 | InfluxDB point construction, error resilience |
 | `test_realtime.py` | 16 | Per-packet anomaly detection: voltage critical, SoC inconsistency, temperature high/low, multiple anomalies, CR2032 compatibility |
 | `test_rul_estimator.py` | 5 | Linear regression for RUL: positive/negative slope, flat, single point, two points |
 | `test_cycle_analyzer.py` | 2 | CycleAnalyzer instantiation, context manager protocol |
