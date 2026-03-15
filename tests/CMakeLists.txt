@@ -56,6 +56,7 @@ add_executable(test_telemetry
     mocks/mock_soc.c
     mocks/mock_power.c
     mocks/mock_sdk_state.c
+    mocks/mock_cycle_counter.c
 )
 
 target_include_directories(test_telemetry PRIVATE
@@ -195,6 +196,23 @@ target_include_directories(test_soc_temp_comp PRIVATE
 
 target_link_libraries(test_soc_temp_comp PRIVATE unity)
 
+# ── Cycle counter test ──────────────────────────────────────────────────────
+add_executable(test_cycle_counter
+    test_cycle_counter.c
+    ${SDK_SRC}/intelligence/battery_cycle_counter.c
+    mocks/mock_nvs.c
+)
+
+target_include_directories(test_cycle_counter PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/intelligence
+    ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_cycle_counter PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
@@ -207,3 +225,4 @@ add_test(NAME power_manager_charger COMMAND test_power_manager_charger)
 add_test(NAME ntc_lut COMMAND test_ntc_lut)
 add_test(NAME serialize COMMAND test_serialize)
 add_test(NAME transport COMMAND test_transport)
+add_test(NAME cycle_counter COMMAND test_cycle_counter)

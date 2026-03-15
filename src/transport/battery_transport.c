@@ -38,6 +38,7 @@ int battery_transport_init(void)
 int battery_transport_send(const struct battery_telemetry_packet *packet)
 {
     uint8_t buf[BATTERY_SERIALIZE_BUF_SIZE];
+    uint8_t wire_len;
     int rc;
 
     if (packet == NULL) {
@@ -52,7 +53,8 @@ int battery_transport_send(const struct battery_telemetry_packet *packet)
         return rc;
     }
 
-    return g_ops->send(buf, BATTERY_SERIALIZE_BUF_SIZE);
+    wire_len = battery_serialize_wire_size(packet->telemetry_version);
+    return g_ops->send(buf, wire_len);
 }
 
 int battery_transport_deinit(void)

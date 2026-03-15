@@ -28,7 +28,7 @@ int main(void)
         if (rc != BATTERY_STATUS_OK) {
             printk("Telemetry collect failed: %d\n", rc);
         } else {
-            printk("[v%u t=%u] V=%d mV T=%d.%02d C SOC=%u.%02u%% PWR=%u flags=0x%08x\n",
+            printk("[v%u t=%u] V=%d mV T=%d.%02d C SOC=%u.%02u%% PWR=%u CYC=%u flags=0x%08x\n",
                    pkt.telemetry_version,
                    pkt.timestamp_ms,
                    pkt.voltage_mv,
@@ -39,6 +39,7 @@ int main(void)
                    pkt.soc_pct_x100 / 100U,
                    pkt.soc_pct_x100 % 100U,
                    pkt.power_state,
+                   pkt.cycle_count,
                    pkt.status_flags);
 
 #if IS_ENABLED(CONFIG_BATTERY_TRANSPORT)

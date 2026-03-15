@@ -1,0 +1,253 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Battery Voltage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"voltage_v\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "State of Charge",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 20 },
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 80 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"soc_pct\")\n  |> last()",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Power State",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"power_state\")\n  |> last()",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Temperature",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "thresholds": {
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "green", "value": 10 },
+              { "color": "yellow", "value": 40 },
+              { "color": "red", "value": 50 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"temperature_c\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Cycle Count",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 300 },
+              { "color": "red", "value": 500 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"cycle_count\")\n  |> last()",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Health Score",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 60 },
+              { "color": "yellow", "value": 80 },
+              { "color": "green", "value": 90 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"battery_analytics\")\n  |> filter(fn: (r) => r._field == \"health_score\")\n  |> last()",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "SoC Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15 }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"soc_pct\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Capacity Fade (Voltage Early vs Late Avg)",
+      "type": "barchart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "color": { "mode": "palette-classic" }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: -90d)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"voltage_v\")\n  |> aggregateWindow(every: 7d, fn: mean, createEmpty: false)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Anomaly Log",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"battery_anomaly\")\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> sort(columns: [\"_time\"], desc: true)\n  |> limit(n: 50)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Remaining Useful Life",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 24 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 50 },
+              { "color": "yellow", "value": 200 },
+              { "color": "green", "value": 500 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"battery_analytics\")\n  |> filter(fn: (r) => r._field == \"remaining_cycles\")\n  |> last()",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Charge Duration Trend",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 24 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "m",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2 }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: -90d)\n  |> filter(fn: (r) => r._measurement == \"battery_analytics\")\n  |> filter(fn: (r) => r._field == \"avg_charge_duration_min\")\n  |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["ibattery", "embedded", "ble"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "iBattery Telemetry",
+  "uid": "ibattery-main",
+  "version": 2
+}

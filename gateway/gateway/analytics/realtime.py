@@ -23,22 +23,23 @@ def check_realtime(decoded: dict) -> list[dict]:
     temperature_c = decoded.get("temperature_c", 25.0)
     soc_pct = decoded.get("soc_pct", 0.0)
 
-    # Critical: very low voltage
-    if voltage_v < 3.0:
+    # Critical: very low voltage (below 2.5V — dangerous for any chemistry)
+    if voltage_v < 2.5:
         anomalies.append({
             "type": "voltage_critical",
             "severity": "critical",
             "value": voltage_v,
-            "threshold": 3.0,
+            "threshold": 2.5,
             "message": f"Very low voltage: {voltage_v:.3f}V",
         })
     # Warning: low voltage with high SoC (inconsistency)
-    elif voltage_v < 3.2 and soc_pct > 30.0:
+    # Threshold 2.8V works for both CR2032 (~3.0V nominal) and LiPo (~3.7V nominal)
+    elif voltage_v < 2.8 and soc_pct > 50.0:
         anomalies.append({
             "type": "soc_inconsistency",
             "severity": "warning",
             "value": voltage_v,
-            "threshold": 3.2,
+            "threshold": 2.8,
             "message": f"Voltage {voltage_v:.3f}V but SoC {soc_pct:.1f}% — inconsistent",
         })
 

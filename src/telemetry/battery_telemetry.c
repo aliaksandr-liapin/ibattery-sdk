@@ -4,6 +4,7 @@
 #include <battery_sdk/battery_temperature.h>
 #include <battery_sdk/battery_soc_estimator.h>
 #include <battery_sdk/battery_power_manager.h>
+#include <battery_sdk/battery_cycle_counter.h>
 #include <battery_sdk/battery_status.h>
 
 #include "../core/battery_internal.h"
@@ -65,9 +66,14 @@ int battery_telemetry_collect(struct battery_telemetry_packet *packet)
     rc = battery_power_manager_get_state(&power_state);
     if (rc == BATTERY_STATUS_OK) {
         packet->power_state = (uint8_t)power_state;
+        /* Feed power state to cycle counter for transition detection */
+        (void)battery_cycle_counter_update(packet->power_state);
     } else {
         packet->status_flags |= BATTERY_TELEMETRY_FLAG_POWER_STATE_ERR;
     }
+
+    /* Cycle count — best-effort */
+    (void)battery_cycle_counter_get(&packet->cycle_count);
 
     /* Always succeeds — partial data is flagged, not fatal */
     return BATTERY_STATUS_OK;

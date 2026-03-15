@@ -2,6 +2,24 @@
 
 menu "Battery SDK"
 
+choice BATTERY_CHEMISTRY
+    prompt "Battery chemistry"
+    default BATTERY_CHEMISTRY_CR2032
+
+config BATTERY_CHEMISTRY_CR2032
+    bool "CR2032 primary lithium coin cell (3.0 V nominal)"
+    help
+      CR2032 primary (non-rechargeable) lithium coin cell.
+      Nominal voltage 3.0 V, cutoff ~2.0 V.
+
+config BATTERY_CHEMISTRY_LIPO
+    bool "LiPo single-cell (3.7 V nominal)"
+    help
+      Lithium-polymer rechargeable cell.  Nominal voltage 3.7 V,
+      full charge 4.2 V, cutoff 3.0 V.
+
+endchoice
+
 choice BATTERY_TEMP_SOURCE
     prompt "Temperature sensor source"
     default BATTERY_TEMP_NTC
@@ -67,12 +85,24 @@ endif # BATTERY_TRANSPORT
 
 config BATTERY_SOC_TEMP_COMP
     bool "Temperature-compensated SoC estimation"
-    default y if BATTERY_TEMP_NTC
+    default y if BATTERY_TEMP_NTC && BATTERY_CHEMISTRY_LIPO
+    depends on BATTERY_CHEMISTRY_LIPO
     help
       Enable temperature-compensated SoC estimation by blending between
       cold (0 deg C), room (25 deg C), and hot (45 deg C) LiPo LUT tables.
-      Requires a working temperature sensor.  Falls back to room-temperature
-      LUT if the temperature read fails at runtime.
+      Requires LiPo chemistry and a working temperature sensor.  Falls back
+      to room-temperature LUT if the temperature read fails at runtime.
+
+config BATTERY_CYCLE_COUNTER
+    bool "Charge cycle counter with flash persistence"
+    default y if BATTERY_CHARGER_TP4056
+    select NVS
+    select FLASH
+    select FLASH_MAP
+    help
+      Count CHARGING to CHARGED transitions and persist the count
+      to flash via Zephyr NVS.  Requires a charger driver for meaningful
+      state transitions.
 
 config BATTERY_CHARGER_TP4056
     bool "TP4056 charger IC GPIO status detection"

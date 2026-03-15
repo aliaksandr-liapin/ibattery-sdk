@@ -1,9 +1,12 @@
 /*
  * Telemetry packet serialization.
  *
- * Encodes/decodes battery_telemetry_packet to/from a 20-byte
- * little-endian wire buffer using explicit byte shifts.  No struct
- * packing, no memcpy — fully portable across compilers and platforms.
+ * Encodes/decodes battery_telemetry_packet to/from a wire buffer
+ * using explicit byte shifts.  No struct packing, no memcpy —
+ * fully portable across compilers and platforms.
+ *
+ * v1: 20 bytes  (version == 1)
+ * v2: 24 bytes  (version >= 2, adds cycle_count)
  */
 
 #include "battery_serialize.h"
@@ -45,7 +48,14 @@ static uint32_t get_u32_le(const uint8_t *buf)
 int battery_serialize_pack(const struct battery_telemetry_packet *pkt,
                            uint8_t *buf, uint8_t buf_len)
 {
-    if (pkt == NULL || buf == NULL || buf_len < BATTERY_SERIALIZE_BUF_SIZE) {
+    uint8_t required;
+
+    if (pkt == NULL || buf == NULL) {
+        return BATTERY_STATUS_INVALID_ARG;
+    }
+
+    required = battery_serialize_wire_size(pkt->telemetry_version);
+    if (buf_len < required) {
         return BATTERY_STATUS_INVALID_ARG;
     }
 
@@ -57,6 +67,11 @@ int battery_serialize_pack(const struct battery_telemetry_packet *pkt,
     buf[15] = pkt->power_state;                             /* offset 15 */
     put_u32_le(&buf[16], pkt->status_flags);                /* offset 16 */
 
+    /* v2 extension */
+    if (pkt->telemetry_version >= 2) {
+        put_u32_le(&buf[20], pkt->cycle_count);             /* offset 20 */
+    }
+
     return BATTERY_STATUS_OK;
 }
 
@@ -65,7 +80,7 @@ int battery_serialize_pack(const struct battery_telemetry_packet *pkt,
 int battery_serialize_unpack(const uint8_t *buf, uint8_t buf_len,
                              struct battery_telemetry_packet *pkt)
 {
-    if (buf == NULL || pkt == NULL || buf_len < BATTERY_SERIALIZE_BUF_SIZE) {
+    if (buf == NULL || pkt == NULL || buf_len < BATTERY_SERIALIZE_V1_SIZE) {
         return BATTERY_STATUS_INVALID_ARG;
     }
 
@@ -76,6 +91,13 @@ int battery_serialize_unpack(const uint8_t *buf, uint8_t buf_len,
     pkt->soc_pct_x100        = get_u16_le(&buf[13]);
     pkt->power_state         = buf[15];
     pkt->status_flags        = get_u32_le(&buf[16]);
+
+    /* v2 extension */
+    if (pkt->telemetry_version >= 2 && buf_len >= BATTERY_SERIALIZE_V2_SIZE) {
+        pkt->cycle_count = get_u32_le(&buf[20]);
+    } else {
+        pkt->cycle_count = 0;
+    }
 
     return BATTERY_STATUS_OK;
 }

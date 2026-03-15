@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#define BATTERY_TELEMETRY_VERSION 1U
+#define BATTERY_TELEMETRY_VERSION 2U
 
 enum battery_power_state {
     BATTERY_POWER_STATE_UNKNOWN = 0,
@@ -30,6 +30,9 @@ struct battery_telemetry_packet {
 
     uint8_t power_state;
     uint32_t status_flags;
+
+    /* v2 fields — zero when telemetry_version == 1 */
+    uint32_t cycle_count;
 };
 
 /* Telemetry status_flags bit definitions.

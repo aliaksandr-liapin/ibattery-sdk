@@ -6,6 +6,7 @@
 #include <battery_sdk/battery_temperature.h>
 #include <battery_sdk/battery_power_manager.h>
 #include <battery_sdk/battery_soc_estimator.h>
+#include <battery_sdk/battery_cycle_counter.h>
 #include <battery_sdk/battery_telemetry.h>
 
 #if __has_include(<autoconf.h>)
@@ -74,6 +75,11 @@ int battery_sdk_init(void)
     }
 
     rc = battery_soc_estimator_init();
+    if (rc != BATTERY_STATUS_OK) {
+        return rc;
+    }
+
+    rc = battery_cycle_counter_init();
     if (rc != BATTERY_STATUS_OK) {
         return rc;
     }

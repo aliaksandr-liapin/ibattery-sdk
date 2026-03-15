@@ -16,6 +16,7 @@ target_sources(app PRIVATE
     ../src/core_modules/battery_voltage.c
     ../src/intelligence/battery_soc_estimator.c
     ../src/intelligence/battery_soc_lut.c
+    $<$<BOOL:${CONFIG_BATTERY_SOC_TEMP_COMP}>:../src/intelligence/battery_soc_temp_comp.c>
     ../src/telemetry/battery_telemetry.c
     $<$<BOOL:${CONFIG_BATTERY_TRANSPORT}>:../src/transport/battery_transport.c>
     $<$<BOOL:${CONFIG_BATTERY_TRANSPORT}>:../src/transport/battery_serialize.c>
@@ -24,7 +25,15 @@ target_sources(app PRIVATE
     ../src/hal/battery_hal_adc_zephyr.c
     ../src/core_modules/battery_voltage_filter.c
     $<$<BOOL:${CONFIG_BATTERY_CHARGER_TP4056}>:../src/hal/battery_hal_charger_tp4056_zephyr.c>
+    ../src/intelligence/battery_cycle_counter.c
 )
+
+# NVS HAL: real Zephyr NVS or stub
+if(CONFIG_BATTERY_CYCLE_COUNTER)
+    target_sources(app PRIVATE ../src/hal/battery_hal_nvs_zephyr.c)
+else()
+    target_sources(app PRIVATE ../src/hal/battery_hal_nvs_stub.c)
+endif()
 
 # Temperature HAL: NTC thermistor or internal die sensor
 if(CONFIG_BATTERY_TEMP_NTC)

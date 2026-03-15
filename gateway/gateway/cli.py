@@ -229,5 +229,81 @@ def anomalies(device: str, window: int, influxdb_url: str, influxdb_token: str, 
     click.echo()
 
 
+@analytics.command()
+@click.option("--device", default=config.DEVICE_NAME, help="Device name")
+@click.option("--window", default=90, help="Analysis window in days")
+@click.option("--eol-threshold", default=80, help="End-of-life health threshold (%%)")
+@click.option("--influxdb-url", default=config.INFLUXDB_URL, help="InfluxDB URL")
+@click.option("--influxdb-token", default=config.INFLUXDB_TOKEN, help="InfluxDB token")
+@click.option("--influxdb-org", default=config.INFLUXDB_ORG, help="InfluxDB org")
+@click.option("--influxdb-bucket", default=config.INFLUXDB_BUCKET, help="InfluxDB bucket")
+def rul(device: str, window: int, eol_threshold: int, influxdb_url: str, influxdb_token: str, influxdb_org: str, influxdb_bucket: str) -> None:
+    """Estimate remaining useful life from cycle and voltage trends."""
+    from .analytics.rul_estimator import RULEstimator
+
+    with RULEstimator(url=influxdb_url, token=influxdb_token, org=influxdb_org, bucket=influxdb_bucket) as estimator:
+        result = estimator.estimate_rul(device=device, window_days=window, eol_threshold=eol_threshold)
+
+    if result is None:
+        click.echo("Insufficient data for RUL estimation. Need more telemetry with cycle counts.")
+        return
+
+    click.echo("\n  Remaining Useful Life Estimate")
+    click.echo("  " + "=" * 40)
+    click.echo(f"  Status:           {result['status']}")
+    click.echo(f"  Current Health:   {result['current_health']}%")
+    click.echo(f"  Current Cycles:   {result['current_cycles']}")
+    click.echo(f"  EOL Threshold:    {result['eol_threshold']}%")
+
+    if result.get("remaining_cycles") is not None:
+        click.echo(f"  Remaining Cycles: {click.style(str(result['remaining_cycles']), bold=True)}")
+        click.echo(f"  Cycles at EOL:    {result['cycles_at_eol']}")
+
+    if result.get("slope_mv_per_cycle") is not None:
+        click.echo(f"  Slope:            {result['slope_mv_per_cycle']} mV/cycle")
+
+    click.echo(f"  Data Points:      {result['data_points']}")
+    click.echo(f"  Computed At:      {result['computed_at']}")
+    click.echo()
+
+
+@analytics.command()
+@click.option("--device", default=config.DEVICE_NAME, help="Device name")
+@click.option("--window", default=90, help="Analysis window in days")
+@click.option("--influxdb-url", default=config.INFLUXDB_URL, help="InfluxDB URL")
+@click.option("--influxdb-token", default=config.INFLUXDB_TOKEN, help="InfluxDB token")
+@click.option("--influxdb-org", default=config.INFLUXDB_ORG, help="InfluxDB org")
+@click.option("--influxdb-bucket", default=config.INFLUXDB_BUCKET, help="InfluxDB bucket")
+def cycles(device: str, window: int, influxdb_url: str, influxdb_token: str, influxdb_org: str, influxdb_bucket: str) -> None:
+    """Analyze charge cycle patterns — capacity fade, durations, temperature."""
+    from .analytics.cycle_analyzer import CycleAnalyzer
+
+    with CycleAnalyzer(url=influxdb_url, token=influxdb_token, org=influxdb_org, bucket=influxdb_bucket) as analyzer:
+        result = analyzer.analyze_cycles(device=device, window_days=window)
+
+    if result is None:
+        click.echo("Insufficient data for cycle analysis. Need more telemetry history.")
+        return
+
+    click.echo("\n  Charge Cycle Analysis")
+    click.echo("  " + "=" * 40)
+    click.echo(f"  Total Cycles:         {result['total_cycles']}")
+    click.echo(f"  Data Points:          {result['data_points']}")
+    click.echo(f"  Charging Sessions:    {result['charging_sessions']}")
+
+    if result["avg_charge_duration_min"] is not None:
+        click.echo(f"  Avg Charge Duration:  {result['avg_charge_duration_min']} min")
+
+    fade = result["capacity_fade_pct"]
+    fade_color = "green" if fade < 5 else ("yellow" if fade < 15 else "red")
+    click.echo(f"  Capacity Fade:        {click.style(f'{fade}%', fg=fade_color)}")
+    click.echo(f"  Voltage Early Avg:    {result['voltage_early_avg']:.4f} V")
+    click.echo(f"  Voltage Late Avg:     {result['voltage_late_avg']:.4f} V")
+    click.echo(f"  Temperature Avg:      {result['temperature_avg_c']}°C")
+    click.echo(f"  Temperature Range:    {result['temperature_min_c']}°C — {result['temperature_max_c']}°C")
+    click.echo(f"  Computed At:          {result['computed_at']}")
+    click.echo()
+
+
 if __name__ == "__main__":
     main()

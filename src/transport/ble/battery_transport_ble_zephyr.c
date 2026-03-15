@@ -40,6 +40,7 @@ static struct bt_uuid_128 chr_uuid = BT_UUID_INIT_128(
 /* ── File-scope state ───────────────────────────────────────────────── */
 
 static uint8_t  g_wire_buf[BATTERY_TRANSPORT_WIRE_SIZE];
+static uint8_t  g_wire_len = BATTERY_TRANSPORT_WIRE_SIZE_V1;
 static bool     g_notify_enabled;
 static struct bt_conn *g_conn;
 
@@ -53,7 +54,7 @@ static ssize_t on_read(struct bt_conn *conn,
                        void *buf, uint16_t len, uint16_t offset)
 {
     return bt_gatt_attr_read(conn, attr, buf, len, offset,
-                             g_wire_buf, sizeof(g_wire_buf));
+                             g_wire_buf, g_wire_len);
 }
 
 static void on_ccc_changed(const struct bt_gatt_attr *attr, uint16_t value)
@@ -164,12 +165,14 @@ static int ble_init(void)
 
 static int ble_send(const uint8_t *buf, uint8_t len)
 {
-    if (buf == NULL || len != BATTERY_TRANSPORT_WIRE_SIZE) {
+    if (buf == NULL || len < BATTERY_TRANSPORT_WIRE_SIZE_V1 ||
+        len > BATTERY_TRANSPORT_WIRE_SIZE) {
         return BATTERY_STATUS_INVALID_ARG;
     }
 
-    /* Update cached buffer (for read characteristic) */
-    memcpy(g_wire_buf, buf, BATTERY_TRANSPORT_WIRE_SIZE);
+    /* Update cached buffer and length (for read characteristic) */
+    memcpy(g_wire_buf, buf, len);
+    g_wire_len = len;
 
     /* Drop silently when no subscriber — this is normal */
     if (!g_notify_enabled || g_conn == NULL) {
@@ -179,7 +182,7 @@ static int ble_send(const uint8_t *buf, uint8_t len)
     int err = bt_gatt_notify(g_conn,
                              &battery_telem_svc.attrs[1],
                              g_wire_buf,
-                             BATTERY_TRANSPORT_WIRE_SIZE);
+                             g_wire_len);
     if (err) {
         return BATTERY_STATUS_IO;
     }

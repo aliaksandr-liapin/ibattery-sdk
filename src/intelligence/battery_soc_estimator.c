@@ -47,8 +47,14 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
     }
 #endif
 
+#if defined(CONFIG_BATTERY_CHEMISTRY_LIPO)
+    rc = battery_soc_lut_interpolate(&battery_soc_lut_lipo_1s,
+                                     voltage_mv,
+                                     soc_pct_x100);
+#else
     rc = battery_soc_lut_interpolate(&battery_soc_lut_cr2032,
                                      voltage_mv,
                                      soc_pct_x100);
+#endif
     return rc;
 }

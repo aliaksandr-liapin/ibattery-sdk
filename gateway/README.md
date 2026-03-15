@@ -68,15 +68,34 @@ python -m pytest tests/ -v
 ## Architecture
 
 ```
-nRF52840-DK (BLE notifications, 20-byte packets)
+nRF52840-DK (BLE notifications, 20/24-byte packets)
     │
     ▼
 ibattery-gateway (Python / bleak)
     ├── scanner.py      — BLE scan + connect + subscribe
-    ├── decoder.py      — unpack 20-byte LE wire format
-    ├── influxdb_writer — write Points to InfluxDB 2.x
-    └── cli.py          — click CLI (scan / stream / run)
+    ├── decoder.py        — unpack v1 (20B) / v2 (24B) LE wire format
+    ├── influxdb_writer   — write Points to InfluxDB 2.x
+    ├── cli.py            — click CLI (scan / stream / run / analytics)
+    └── analytics/
+        ├── realtime.py       — inline anomaly checks per packet
+        ├── health_score.py   — voltage-based health scoring
+        ├── anomaly_detector.py — historical anomaly detection
+        ├── rul_estimator.py  — remaining useful life estimation
+        └── cycle_analyzer.py — charge cycle pattern analysis
     │
     ▼
-InfluxDB 2.x → Grafana dashboard
+InfluxDB 2.x → Grafana dashboard (11 panels)
 ```
+
+### Analytics commands
+
+```bash
+ibattery-gateway analytics health      # Battery health score (0-100)
+ibattery-gateway analytics anomalies   # Detect anomalies in recent data
+ibattery-gateway analytics rul         # Remaining useful life estimate
+ibattery-gateway analytics cycles      # Charge cycle analysis
+```
+
+### Grafana dashboard
+
+Import `grafana/ibattery-dashboard.json` into Grafana for an 11-panel dashboard.

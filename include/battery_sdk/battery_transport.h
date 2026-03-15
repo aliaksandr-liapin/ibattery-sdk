@@ -20,7 +20,9 @@
 extern "C" {
 #endif
 
-#define BATTERY_TRANSPORT_WIRE_SIZE 20
+#define BATTERY_TRANSPORT_WIRE_SIZE_V1 20
+#define BATTERY_TRANSPORT_WIRE_SIZE_V2 24
+#define BATTERY_TRANSPORT_WIRE_SIZE    BATTERY_TRANSPORT_WIRE_SIZE_V2
 
 /**
  * Transport backend operations — compile-time vtable.

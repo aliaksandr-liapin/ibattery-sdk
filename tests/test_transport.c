@@ -26,13 +26,15 @@ extern int           mock_transport_get_send_count(void);
 static struct battery_telemetry_packet make_sample_packet(void)
 {
     struct battery_telemetry_packet pkt;
-    pkt.telemetry_version   = 1;
+    memset(&pkt, 0, sizeof(pkt));
+    pkt.telemetry_version   = BATTERY_TELEMETRY_VERSION;  /* v2 */
     pkt.timestamp_ms        = 5000;
     pkt.voltage_mv          = 2950;
     pkt.temperature_c_x100  = 2500;
     pkt.soc_pct_x100        = 8500;
     pkt.power_state         = BATTERY_POWER_STATE_ACTIVE;
     pkt.status_flags        = 0;
+    pkt.cycle_count         = 7;
     return pkt;
 }
 
@@ -67,8 +69,9 @@ void test_send_null_packet(void)
 void test_send_happy_path(void)
 {
     struct battery_telemetry_packet pkt = make_sample_packet();
+    uint8_t expected_len = battery_serialize_wire_size(pkt.telemetry_version);
     TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK, battery_transport_send(&pkt));
-    TEST_ASSERT_EQUAL_UINT8(BATTERY_TRANSPORT_WIRE_SIZE,
+    TEST_ASSERT_EQUAL_UINT8(expected_len,
                             mock_transport_get_last_send_len());
     TEST_ASSERT_EQUAL_INT(1, mock_transport_get_send_count());
 }
@@ -77,6 +80,7 @@ void test_send_captures_correct_wire_bytes(void)
 {
     struct battery_telemetry_packet pkt = make_sample_packet();
     uint8_t expected[BATTERY_SERIALIZE_BUF_SIZE];
+    uint8_t wire_len = battery_serialize_wire_size(pkt.telemetry_version);
 
     /* Compute expected wire bytes independently */
     battery_serialize_pack(&pkt, expected, sizeof(expected));
@@ -85,7 +89,7 @@ void test_send_captures_correct_wire_bytes(void)
 
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expected,
                                   mock_transport_get_last_send_buf(),
-                                  BATTERY_SERIALIZE_BUF_SIZE);
+                                  wire_len);
 }
 
 void test_send_backend_error_propagates(void)

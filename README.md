@@ -9,7 +9,7 @@ Currently targets the **nRF52840** (Zephyr RTOS) with **CR2032** coin cell and *
 
 ---
 
-## Current Status: Phase 4 Complete
+## Current Status: Phase 5b Complete
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -17,8 +17,9 @@ Currently targets the **nRF52840** (Zephyr RTOS) with **CR2032** coin cell and *
 | Phase 1 | Core battery intelligence (voltage, SoC, telemetry) | Done |
 | Phase 2 | Real temperature sensor + power state machine | Done |
 | Phase 3 | BLE telemetry transport | Done |
-| Phase 4 | Cloud telemetry (BLE gateway + InfluxDB + Grafana) | **Done** |
-| Phase 5 | AI-driven battery analytics | Planned |
+| Phase 4 | Cloud telemetry (BLE gateway + InfluxDB + Grafana) | Done |
+| Phase 5a | Temperature-compensated SoC + cloud analytics (health score, anomaly detection) | Done |
+| Phase 5b | Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2 | **Done** |
 
 ---
 
@@ -47,16 +48,20 @@ Currently targets the **nRF52840** (Zephyr RTOS) with **CR2032** coin cell and *
 - Unified error codes (`battery_status.h`)
 - Centralized SDK initialization (`battery_sdk_init()`)
 - LiPo single-cell (3.7 V nominal) discharge curve LUT (11-point, extra density in knee region)
+- `CONFIG_BATTERY_CHEMISTRY` Kconfig: selects CR2032 or LiPo LUT + gates temp compensation on LiPo only
 - BLE telemetry transport with custom GATT service and notification characteristic
-- 20-byte little-endian wire format fitting BLE default ATT MTU
+- Wire format v1 (20 bytes) and v2 (24 bytes with `cycle_count`) — backward compatible
 - Compile-time transport backend selection via Kconfig (BLE or mock)
 - Dual output: serial printk + BLE notifications (when `CONFIG_BATTERY_TRANSPORT=y`)
+- Charge cycle counter with NVS flash persistence (CHARGING→CHARGED transitions)
 - Python BLE gateway with auto-reconnect (bleak) → InfluxDB 2.x → Grafana dashboard
-- Docker Compose cloud stack: InfluxDB time-series storage + 6-panel Grafana dashboard
-- `ibattery-gateway` CLI: scan, stream (terminal), run (full pipeline to InfluxDB)
+- Docker Compose cloud stack: InfluxDB time-series storage + 11-panel Grafana dashboard
+- `ibattery-gateway` CLI: scan, stream, run, analytics (health, anomalies, rul, cycles)
+- Real-time and historical anomaly detection (voltage, temperature, SoC inconsistency)
+- Battery health scoring, remaining useful life (RUL) estimation, cycle analysis
 - Full battery state machine: ACTIVE, IDLE (30s), SLEEP (120s), CRITICAL, CHARGING, DISCHARGING, CHARGED
 - TP4056 charger IC integration via GPIO (Kconfig-gated: `CONFIG_BATTERY_CHARGER_TP4056`)
-- Host-based unit tests (Unity framework, 125+ tests across 9 suites, no Zephyr required)
+- Host-based unit tests (Unity framework, 11 C test suites + 58 Python tests)
 
 ---
 
@@ -92,24 +97,32 @@ Open http://localhost:3000 → "iBattery Telemetry" dashboard with live voltage,
 
 ```
 Battery SDK initialized OK
-[v1 t=250]  V=3017 mV T=24.50 C SOC=100.00% PWR=1 flags=0x00000000
-[v1 t=2259] V=3016 mV T=24.50 C SOC=100.00% PWR=1 flags=0x00000000
-[v1 t=4269] V=3015 mV T=25.00 C SOC=100.00% PWR=1 flags=0x00000000
+[v2 t=11]   V=3019 mV T=30.89 C SOC=100.00% PWR=6 CYC=0 flags=0x00000000
+[v2 t=2030] V=3014 mV T=31.00 C SOC=100.00% PWR=6 CYC=0 flags=0x00000000
+[v2 t=4049] V=3014 mV T=30.82 C SOC=100.00% PWR=6 CYC=0 flags=0x00000000
 ```
 
 ---
 
 ## Telemetry Packet Format
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `telemetry_version` | `uint8_t` | Protocol version (currently 1) |
-| `timestamp_ms` | `uint32_t` | Uptime in milliseconds |
-| `voltage_mv` | `int32_t` | Filtered battery voltage in mV |
-| `temperature_c_x100` | `int32_t` | Temperature in 0.01 C units |
-| `soc_pct_x100` | `uint16_t` | State of charge in 0.01% units |
-| `power_state` | `uint8_t` | Power state enum |
-| `status_flags` | `uint32_t` | Per-field error bits |
+### v1 (20 bytes)
+
+| Offset | Field | Type | Description |
+|--------|-------|------|-------------|
+| 0 | `telemetry_version` | `uint8_t` | Protocol version (1 or 2) |
+| 1 | `timestamp_ms` | `uint32_t` | Uptime in milliseconds |
+| 5 | `voltage_mv` | `int32_t` | Filtered battery voltage in mV |
+| 9 | `temperature_c_x100` | `int32_t` | Temperature in 0.01 C units |
+| 13 | `soc_pct_x100` | `uint16_t` | State of charge in 0.01% units |
+| 15 | `power_state` | `uint8_t` | Power state enum |
+| 16 | `status_flags` | `uint32_t` | Per-field error bits |
+
+### v2 (24 bytes, extends v1)
+
+| Offset | Field | Type | Description |
+|--------|-------|------|-------------|
+| 20 | `cycle_count` | `uint32_t` | Charge cycle count (NVS-persisted) |
 
 ---
 

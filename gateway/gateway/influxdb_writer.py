@@ -43,6 +43,7 @@ class TelemetryWriter:
             .field("soc_pct", decoded["soc_pct"])
             .field("power_state", decoded["power_state_raw"])
             .field("status_flags", decoded["status_flags"])
+            .field("cycle_count", decoded.get("cycle_count", 0))
             .time(datetime.now(timezone.utc), WritePrecision.MS)
         )
 

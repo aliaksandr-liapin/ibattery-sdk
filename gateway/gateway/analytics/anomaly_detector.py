@@ -10,14 +10,14 @@ from .. import config
 
 logger = logging.getLogger(__name__)
 
-# Thresholds
+# Thresholds — tuned for both CR2032 (~3.0V nominal) and LiPo (~3.7V nominal)
 VOLTAGE_DROP_THRESHOLD_V = 0.200       # 200 mV sudden drop
-VOLTAGE_LOW_THRESHOLD_V = 3.2          # Low voltage warning
-VOLTAGE_CRITICAL_THRESHOLD_V = 3.0     # Critical voltage
-SOC_VOLTAGE_INCONSISTENCY_SOC = 30.0   # SoC above this + low voltage = anomaly
+VOLTAGE_LOW_THRESHOLD_V = 2.8          # Low voltage warning (safe for CR2032)
+VOLTAGE_CRITICAL_THRESHOLD_V = 2.5     # Critical voltage (any chemistry)
+SOC_VOLTAGE_INCONSISTENCY_SOC = 50.0   # SoC above this + low voltage = anomaly
 TEMP_HIGH_THRESHOLD_C = 45.0           # High temperature warning
 TEMP_LOW_THRESHOLD_C = 0.0             # Low temperature (LiPo danger)
-TEMP_RATE_THRESHOLD_C_PER_MIN = 5.0    # Rate of change warning
+TEMP_RATE_THRESHOLD_C_PER_MIN = 15.0   # Rate of change warning (die sensor has ~0.3°C/sample noise)
 
 
 class AnomalyDetector:

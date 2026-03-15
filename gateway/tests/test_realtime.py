@@ -36,31 +36,41 @@ class TestRealtimeNormal:
         result = check_realtime(_make_packet(temperature_c=25.0))
         assert result == []
 
+    def test_cr2032_nominal_no_anomaly(self):
+        """CR2032 at 3.0V with 100% SoC is normal — not an anomaly."""
+        result = check_realtime(_make_packet(voltage_v=3.012, soc_pct=100.0))
+        assert result == []
+
 
 class TestRealtimeVoltageAnomalies:
     """Voltage-related anomaly checks."""
 
     def test_critical_voltage(self):
-        result = check_realtime(_make_packet(voltage_v=2.8))
+        result = check_realtime(_make_packet(voltage_v=2.4))
         assert len(result) == 1
         assert result[0]["type"] == "voltage_critical"
         assert result[0]["severity"] == "critical"
 
     def test_low_voltage_high_soc_inconsistency(self):
-        result = check_realtime(_make_packet(voltage_v=3.1, soc_pct=50.0))
+        result = check_realtime(_make_packet(voltage_v=2.7, soc_pct=60.0))
         assert len(result) == 1
         assert result[0]["type"] == "soc_inconsistency"
         assert result[0]["severity"] == "warning"
 
     def test_low_voltage_low_soc_no_inconsistency(self):
         """Low voltage with low SoC is expected, not anomalous."""
-        result = check_realtime(_make_packet(voltage_v=3.1, soc_pct=10.0))
+        result = check_realtime(_make_packet(voltage_v=2.7, soc_pct=10.0))
         assert result == []
 
-    def test_borderline_voltage_3_0_is_critical(self):
-        result = check_realtime(_make_packet(voltage_v=2.999))
+    def test_borderline_voltage_2_5_is_critical(self):
+        result = check_realtime(_make_packet(voltage_v=2.499))
         types = [a["type"] for a in result]
         assert "voltage_critical" in types
+
+    def test_voltage_2_8_not_critical(self):
+        """2.8V is below inconsistency threshold but not critical."""
+        result = check_realtime(_make_packet(voltage_v=2.8, soc_pct=10.0))
+        assert result == []
 
 
 class TestRealtimeTemperatureAnomalies:
@@ -93,7 +103,7 @@ class TestRealtimeMultipleAnomalies:
     """Multiple anomalies in a single packet."""
 
     def test_critical_voltage_and_high_temp(self):
-        result = check_realtime(_make_packet(voltage_v=2.5, temperature_c=50.0))
+        result = check_realtime(_make_packet(voltage_v=2.3, temperature_c=50.0))
         types = {a["type"] for a in result}
         assert "voltage_critical" in types
         assert "temp_high" in types
