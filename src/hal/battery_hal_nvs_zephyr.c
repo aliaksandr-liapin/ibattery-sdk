@@ -10,6 +10,7 @@
 
 #include <zephyr/fs/nvs.h>
 #include <zephyr/storage/flash_map.h>
+#include <zephyr/drivers/flash.h>
 #include <zephyr/device.h>
 
 static struct nvs_fs g_nvs;
@@ -29,7 +30,18 @@ int battery_hal_nvs_init(void)
     }
 
     g_nvs.offset = FIXED_PARTITION_OFFSET(storage_partition);
-    g_nvs.sector_size = 4096;   /* nRF52840 flash page size */
+
+    /* Query flash page size at runtime — portable across SoC families
+     * (4096 on nRF52840, 2048 on STM32L476, etc.). */
+    {
+        struct flash_pages_info page_info;
+        int rc2 = flash_get_page_info_by_offs(g_nvs.flash_device,
+                                              g_nvs.offset, &page_info);
+        if (rc2 < 0) {
+            return BATTERY_STATUS_IO;
+        }
+        g_nvs.sector_size = page_info.size;
+    }
     g_nvs.sector_count = 2;     /* Minimum for wear leveling */
 
     rc = nvs_mount(&g_nvs);

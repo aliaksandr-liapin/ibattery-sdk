@@ -75,21 +75,30 @@
 |  battery_hal_nvs.h              NVS flash key-value store  |
 |  battery_hal_nvs_zephyr.c       Zephyr NVS backend         |
 |  battery_hal_nvs_stub.c         Host-test stub (RAM-only)  |
+|  helpers/                                                   |
+|    battery_adc_platform.h       Per-SoC ADC config macros  |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
 |                Platform Drivers                       |
-|      Zephyr ADC API + nRF SAADC + Zephyr Sensor API  |
+|      Zephyr ADC + Sensor + GPIO + NVS + BLE APIs     |
 +------------------------------------------------------+
                          |
 +------------------------------------------------------+
 |                   Hardware                            |
-|   nRF52840 SAADC Ch0 -> VDD rail -> CR2032/LiPo      |
-|   nRF52840 SAADC Ch1 -> AIN1 (P0.03) -> NTC divider  |
-|   nRF52840 TEMP peripheral (die temperature, opt.)    |
-|   nRF52840 GPIO P0.28 -> TP4056 CHRG (active low)    |
-|   nRF52840 GPIO P0.29 -> TP4056 STDBY (active low)   |
-|   TP4056 HW-373 OUT+/OUT- -> VDD/GND (LiPo power)    |
+|                                                       |
+|  nRF52840-DK:                                         |
+|   SAADC Ch0 -> VDD rail -> CR2032/LiPo               |
+|   SAADC Ch1 -> AIN1 (P0.03) -> NTC divider           |
+|   TEMP peripheral (die temperature, opt.)             |
+|   GPIO P0.28/P0.29 -> TP4056 CHRG/STDBY              |
+|                                                       |
+|  NUCLEO-L476RG:                                       |
+|   ADC1 Ch0 -> VREFINT (VDD via factory calibration)   |
+|   ADC1 Ch5 -> PA0/A0 -> NTC divider                  |
+|   Die temp sensor (st,stm32-temp-cal)                 |
+|   GPIO PC6/PC7 -> TP4056 CHRG/STDBY                  |
+|   X-NUCLEO-IDB05A2 BLE shield (opt.)                 |
 +------------------------------------------------------+
 ```
 

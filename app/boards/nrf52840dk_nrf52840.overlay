@@ -7,6 +7,10 @@
  * future external ADC channels (e.g., NTC thermistor in Phase 2).
  */
 / {
+    aliases {
+        battery-charger-gpio = &gpio0;
+    };
+
     zephyr,user {
         io-channels = <&adc 0>;
     };

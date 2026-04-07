@@ -1,5 +1,47 @@
 # Release Notes
 
+## v0.6.0-rc1 — Phase 6: STM32 HAL Port (2026-04-07)
+
+Adds multi-platform support by porting the HAL layer to STM32L476 (NUCLEO-L476RG) under Zephyr RTOS. All core modules, intelligence, telemetry, and transport code remain unchanged — only the HAL abstraction was refactored to be SoC-agnostic.
+
+### What's New
+
+**Platform Abstraction**
+- New `src/hal/helpers/battery_adc_platform.h` replaces nRF-specific `nrfx_analog_common.h`
+- Per-SoC ADC configuration (input channels, gain, reference voltage) selected via `CONFIG_SOC_SERIES_*`
+- STM32 VDD measurement via VREFINT factory calibration (ROM address `0x1FFF75AA`)
+
+**STM32L476 Board Support**
+- `app/boards/nucleo_l476rg.overlay` — ADC1, die temp sensor, charger GPIO alias
+- `app/boards/nucleo_l476rg.conf` — board-specific Kconfig (BLE disabled by default)
+- BLE supported via X-NUCLEO-IDB05A2 shield (`-DSHIELD=x_nucleo_idb05a1`)
+
+**HAL Portability Improvements**
+- `battery_hal_adc_zephyr.c` — VREFINT path for STM32, platform macros for gain/ref
+- `battery_hal_temp_ntc_zephyr.c` — platform-agnostic ADC channel and reference
+- `battery_hal_temp_zephyr.c` — auto-detect `temp` (nRF) vs `die_temp` (STM32) DT node
+- `battery_hal_charger_tp4056_zephyr.c` — DT alias (`battery-charger-gpio`) instead of hardcoded `gpio0`
+- `battery_hal_nvs_zephyr.c` — dynamic flash page size query (4096 nRF, 2048 STM32)
+- `app/Kconfig` — platform-neutral: conditional `TEMP_NRF5` select, updated help text
+
+**Build Matrix**
+- nRF52840-DK: `west build -b nrf52840dk/nrf52840 app` — 152 KB Flash, 30 KB RAM
+- NUCLEO-L476RG: `west build -b nucleo_l476rg app` — 34 KB Flash, 10 KB RAM
+
+### Status
+
+Build-verified on both platforms. On-target hardware validation pending (Phase 4/5 in plan).
+
+### No Changes
+
+- All 11 C unit tests pass (host, unchanged)
+- All 58 Python gateway tests pass (unchanged)
+- No core module, intelligence, telemetry, or transport changes
+- Wire format v1/v2 unchanged
+- nRF52840 firmware binary identical in memory footprint
+
+---
+
 ## v0.5.1 — Phase 5b: Cycle Counter, Wire v2, RUL & Cycle Analysis (2026-03-14)
 
 Adds charge cycle counting with flash persistence, extends the wire format to 24 bytes (v2), and delivers remaining useful life estimation, cycle analysis, and an 11-panel Grafana dashboard.

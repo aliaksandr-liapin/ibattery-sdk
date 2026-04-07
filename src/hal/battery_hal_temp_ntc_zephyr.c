@@ -30,17 +30,21 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/adc.h>
 
-#include <helpers/nrfx_analog_common.h>
+#include "helpers/battery_adc_platform.h"
 
 /* ── ADC configuration for NTC channel ──────────────────────────── */
 
+#if defined(CONFIG_SOC_SERIES_STM32L4X)
+#define NTC_ADC_NODE          DT_NODELABEL(adc1)
+#else
 #define NTC_ADC_NODE          DT_NODELABEL(adc)
+#endif
 #define NTC_ADC_CHANNEL_ID    1
 #define NTC_ADC_RESOLUTION    12
-#define NTC_ADC_GAIN          ADC_GAIN_1_6
-#define NTC_ADC_REFERENCE     ADC_REF_INTERNAL
+#define NTC_ADC_GAIN          BATTERY_ADC_NTC_GAIN
+#define NTC_ADC_REFERENCE     BATTERY_ADC_NTC_REFERENCE
 #define NTC_ADC_ACQ_TIME      ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 40)
-#define NTC_ADC_INPUT         NRFX_ANALOG_EXTERNAL_AIN1    /* P0.03 */
+#define NTC_ADC_INPUT         BATTERY_ADC_NTC_INPUT
 
 /* ── Circuit parameters ─────────────────────────────────────────── */
 
@@ -109,7 +113,7 @@ int battery_hal_temp_read_c_x100(int32_t *temp_c_x100_out)
 
     /* Step 2: Convert raw → millivolts */
     adc_mv = g_ntc_sample_buffer;
-    if (adc_raw_to_millivolts(600, NTC_ADC_GAIN, NTC_ADC_RESOLUTION,
+    if (adc_raw_to_millivolts(BATTERY_ADC_NTC_REF_MV, NTC_ADC_GAIN, NTC_ADC_RESOLUTION,
                               &adc_mv) < 0) {
         return BATTERY_STATUS_ERROR;
     }

@@ -1,0 +1,22 @@
+/*
+ * Device tree overlay for Battery SDK on NUCLEO-L476RG.
+ *
+ * ADC1:  channel 0 = VREFINT (internal, for VDD measurement)
+ *        channel 5 = PA0 / Arduino A0 (external NTC thermistor)
+ * GPIO:  PC6 = TP4056 CHRG, PC7 = TP4056 STDBY
+ */
+
+/ {
+	aliases {
+		battery-charger-gpio = &gpioc;
+	};
+};
+
+&adc1 {
+	status = "okay";
+};
+
+/* Enable die temperature sensor for CONFIG_BATTERY_TEMP_DIE option */
+&die_temp {
+	status = "okay";
+};

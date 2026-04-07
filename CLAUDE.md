@@ -4,10 +4,11 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840 
 
 ## Current State
 
-- **Version**: v0.5.1 (Phase 5b complete)
+- **Version**: v0.6.0-rc1 (Phase 6 — STM32 port, build-verified)
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
-- **Next milestone**: STM32 HAL port (priority 6 in ROADMAP.md)
+- **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32)
+- **Next milestone**: On-target STM32 validation + BLE shield testing
 
 ## Build Commands
 
@@ -15,13 +16,31 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840 
 
 ```bash
 export PATH="/opt/homebrew/bin:/usr/bin:/bin:/opt/nordic/ncs/toolchains/e5f4758bcf/bin:$PATH"
+export ZEPHYR_BASE="/opt/nordic/ncs/v3.2.2/zephyr"
+export ZEPHYR_SDK_INSTALL_DIR="/opt/nordic/ncs/toolchains/e5f4758bcf/opt/zephyr-sdk"
 ```
 
 ### Firmware (nRF52840-DK)
 
 ```bash
-west build -b nrf52840dk/nrf52840 app -d build-app --pristine
-west flash -d build-app
+west build -b nrf52840dk/nrf52840 app -d build-nrf --pristine
+west flash -d build-nrf
+```
+
+### Firmware (NUCLEO-L476RG, no BLE)
+
+```bash
+west build -b nucleo_l476rg app -d build-stm32 --pristine -- \
+  -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
+west flash -d build-stm32
+```
+
+### Firmware (NUCLEO-L476RG + BLE shield)
+
+```bash
+west build -b nucleo_l476rg app -d build-stm32-ble --pristine -- \
+  -DSHIELD=x_nucleo_idb05a1 \
+  -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
 ```
 
 ### C unit tests (host, no hardware needed)
@@ -104,8 +123,10 @@ Both formats accepted by gateway decoder (auto-detect by length).
 
 ```
 app/              Zephyr application (main.c, prj.conf, Kconfig)
+app/boards/       Per-board overlays and Kconfig (nrf52840dk, nucleo_l476rg)
 include/          Public API headers (battery_sdk/*.h)
 src/              Implementation (core/, core_modules/, hal/, intelligence/, telemetry/, transport/)
+src/hal/helpers/  Platform-specific ADC config (battery_adc_platform.h)
 tests/            C unit tests (Unity) + mocks/
 gateway/          Python BLE gateway + analytics + Grafana dashboards
 cloud/            Docker Compose (InfluxDB + Grafana)

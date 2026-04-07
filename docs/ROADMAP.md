@@ -111,7 +111,7 @@ Lower scale but immediate revenue with zero infrastructure cost.
 | ~~3.5~~ | ~~Phase 4 — Cloud telemetry (BLE gateway + InfluxDB + Grafana)~~ | ✅ Done (v0.4.0) |
 | ~~4~~ | ~~Phase 5a — Temperature-compensated SoC + cloud analytics~~ | ✅ Done (v0.5.0) |
 | ~~5~~ | ~~Phase 5b — Cycle counter, wire v2, RUL, cycle analysis, Grafana v2~~ | ✅ Done (v0.5.1) |
-| 6 | STM32 HAL port | Huge market, multiplies addressable audience |
+| 6 | STM32 HAL port | **In progress** — builds on NUCLEO-L476RG, hardware validation pending |
 | 7 | ESP32 HAL port | Huge community, drives open-source adoption |
 | 8 | Zephyr module registry submission | Discoverability via `west manifest` |
 

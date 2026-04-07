@@ -1,9 +1,11 @@
 /*
- * Temperature HAL — nRF52840 die temperature sensor via Zephyr sensor API.
+ * Temperature HAL — SoC die temperature sensor via Zephyr sensor API.
  *
- * Uses the on-chip TEMP peripheral (±2 °C accuracy).  The HAL abstraction
- * allows a future swap to an external NTC thermistor without touching the
+ * Uses the on-chip temperature peripheral.  The HAL abstraction allows
+ * a future swap to an external NTC thermistor without touching the
  * temperature module above.
+ *
+ * Node label varies by platform: "temp" on nRF52, "die_temp" on STM32.
  */
 
 #include "battery_hal.h"
@@ -15,10 +17,12 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/sensor.h>
 
+#if DT_NODE_EXISTS(DT_NODELABEL(temp))
 #define BATTERY_TEMP_NODE DT_NODELABEL(temp)
-
-#if !DT_NODE_EXISTS(BATTERY_TEMP_NODE)
-#error "Temperature sensor node 'temp' is missing in devicetree"
+#elif DT_NODE_EXISTS(DT_NODELABEL(die_temp))
+#define BATTERY_TEMP_NODE DT_NODELABEL(die_temp)
+#else
+#error "No die temperature sensor node found in devicetree"
 #endif
 
 static const struct device *g_temp_dev = DEVICE_DT_GET(BATTERY_TEMP_NODE);

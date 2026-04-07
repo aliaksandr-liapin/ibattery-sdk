@@ -20,7 +20,7 @@
 
 #include "battery_hal_charger.h"
 
-/* GPIO device — port 0 on nRF52840 */
+/* GPIO device — resolved via devicetree alias or fallback */
 static const struct device *gpio_dev;
 
 #ifndef CONFIG_BATTERY_CHARGER_TP4056_CHRG_PIN
@@ -38,7 +38,13 @@ int battery_hal_charger_init(void)
 {
     int rc;
 
+#if DT_NODE_EXISTS(DT_ALIAS(battery_charger_gpio))
+    gpio_dev = DEVICE_DT_GET(DT_ALIAS(battery_charger_gpio));
+#elif DT_NODE_EXISTS(DT_NODELABEL(gpio0))
     gpio_dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
+#else
+#error "No GPIO device for charger — define battery-charger-gpio alias in DT overlay"
+#endif
     if (!device_is_ready(gpio_dev)) {
         return BATTERY_STATUS_IO;
     }

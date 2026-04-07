@@ -25,18 +25,19 @@ choice BATTERY_TEMP_SOURCE
     default BATTERY_TEMP_NTC
 
 config BATTERY_TEMP_NTC
-    bool "External NTC thermistor (10K B3950 on AIN1)"
+    bool "External NTC thermistor (10K B3950)"
     help
-      Use an external NTC thermistor in a voltage divider on SAADC AIN1
-      (P0.03) for temperature measurement. Requires a 10K pull-up resistor
+      Use an external NTC thermistor in a voltage divider on an ADC
+      channel for temperature measurement. The exact pin is defined in
+      the board's devicetree overlay. Requires a 10K pull-up resistor
       to VDD and a 10K NTC (B=3950) to GND.
 
 config BATTERY_TEMP_DIE
     bool "Internal die temperature sensor"
     select SENSOR
-    select TEMP_NRF5
+    select TEMP_NRF5 if SOC_SERIES_NRF52X
     help
-      Use the nRF52840 internal die temperature sensor via the Zephyr
+      Use the SoC internal die temperature sensor via the Zephyr
       sensor API. No external components needed, but measures chip
       temperature rather than ambient/battery temperature.
 
@@ -61,7 +62,8 @@ config BATTERY_TRANSPORT_BLE
     select BT_PERIPHERAL
     help
       Send telemetry via BLE GATT notifications using a custom service.
-      Requires a BLE-capable SoC (nRF52840, etc.).
+      Requires a BLE-capable SoC or external BLE shield (e.g.
+      X-NUCLEO-IDB05A2 on STM32 Nucleo boards).
 
 endchoice
 

@@ -5,11 +5,11 @@
 
 Embedded firmware library providing a **standardized battery intelligence layer** for battery-powered IoT devices. Measures voltage, estimates state-of-charge, monitors temperature and power state, and packages everything into structured telemetry packets.
 
-Currently targets the **nRF52840** (Zephyr RTOS) with **CR2032** coin cell and **LiPo 500mAh** (via TP4056 USB-C charger). LiPo power delivery verified on real hardware; charger state GPIO signals validated with jumper-wire simulation. Designed to scale to other MCUs and battery chemistries.
+Currently targets the **nRF52840** and **STM32L476** (Zephyr RTOS) with **CR2032** coin cell and **LiPo 500mAh** (via TP4056 USB-C charger). LiPo power delivery verified on real hardware; charger state GPIO signals validated with jumper-wire simulation. Designed to scale to other MCUs and battery chemistries.
 
 ---
 
-## Current Status: Phase 5b Complete
+## Current Status: Phase 6 In Progress
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -19,18 +19,26 @@ Currently targets the **nRF52840** (Zephyr RTOS) with **CR2032** coin cell and *
 | Phase 3 | BLE telemetry transport | Done |
 | Phase 4 | Cloud telemetry (BLE gateway + InfluxDB + Grafana) | Done |
 | Phase 5a | Temperature-compensated SoC + cloud analytics (health score, anomaly detection) | Done |
-| Phase 5b | Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2 | **Done** |
+| Phase 5b | Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2 | Done |
+| Phase 6 | STM32 HAL port (NUCLEO-L476RG) | **In progress** — builds, hardware validation pending |
 
 ---
 
 ## Hardware
 
+### nRF52840-DK (primary target)
 - **Board**: nRF52840-DK (PCA10056 rev 3.0.3)
 - **Battery**: CR2032 Energizer (3V primary lithium) or LiPo 500mAh PL602535 (3.7V)
 - **Charger**: TP4056 HW-373 V1.2.1 (USB-C, with DW01A battery protection)
 - **Power switch**: VDD position
 - **SDK**: nRF Connect SDK v3.2.2 / Zephyr OS v4.2.99
-- **ADC**: SAADC Ch0 measuring VDD rail, Ch1 measuring NTC thermistor (AIN1/P0.03); 12-bit, 1/6 gain, 0.6V internal reference. Uses `NRFX_ANALOG_EXTERNAL_AINx` enums (nrfx v3.x); channel setup re-applied before every read to work around SAADC driver input-mux clobbering
+- **ADC**: SAADC Ch0 measuring VDD rail, Ch1 measuring NTC thermistor (AIN1/P0.03); 12-bit, 1/6 gain, 0.6V internal reference
+
+### NUCLEO-L476RG (STM32 port)
+- **Board**: NUCLEO-L476RG (STM32L476RGT6, Cortex-M4F, 80 MHz, 1 MB Flash)
+- **BLE shield**: X-NUCLEO-IDB05A2 (BlueNRG-M0, optional)
+- **ADC**: ADC1 Ch0 = VREFINT (VDD measurement via factory calibration), Ch5 = PA0/A0 (NTC)
+- **Charger GPIO**: PC6 (CHRG), PC7 (STDBY) on Morpho connector
 
 ---
 
@@ -70,9 +78,19 @@ Currently targets the **nRF52840** (Zephyr RTOS) with **CR2032** coin cell and *
 ### Build firmware
 
 ```bash
-cd app
-west build -b nrf52840dk/nrf52840
-west flash
+# nRF52840-DK
+west build -b nrf52840dk/nrf52840 app -d build-nrf --pristine
+west flash -d build-nrf
+
+# NUCLEO-L476RG (STM32, no BLE)
+west build -b nucleo_l476rg app -d build-stm32 --pristine -- \
+  -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
+west flash -d build-stm32
+
+# NUCLEO-L476RG with BLE shield
+west build -b nucleo_l476rg app -d build-stm32-ble --pristine -- \
+  -DSHIELD=x_nucleo_idb05a1 \
+  -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
 ```
 
 ### Run unit tests (host, no hardware needed)
