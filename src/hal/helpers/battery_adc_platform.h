@@ -22,6 +22,9 @@
 
 #include <zephyr/dt-bindings/adc/nrf-saadc.h>
 
+/* ADC device node */
+#define BATTERY_ADC_DT_NODE         DT_NODELABEL(adc)
+
 /* VDD channel — internal SAADC input, 0.6 V ref, 1/6 gain */
 #define BATTERY_ADC_VDD_INPUT       NRF_SAADC_VDD
 #define BATTERY_ADC_VDD_GAIN        ADC_GAIN_1_6
@@ -69,6 +72,41 @@
 #define BATTERY_ADC_NTC_GAIN        ADC_GAIN_1
 #define BATTERY_ADC_NTC_REFERENCE   ADC_REF_INTERNAL
 #define BATTERY_ADC_NTC_REF_MV      3300
+
+/* ── ESP32-C3 series ──────────────────────────────────────────────── */
+
+#elif defined(CONFIG_SOC_SERIES_ESP32C3)
+
+/*
+ * ESP32-C3 cannot read VDD directly.  Battery voltage is measured via
+ * an external resistor divider on a GPIO pin:
+ *
+ *   V_batt --- [R1] ---+--- [R2] --- GND
+ *                       |
+ *                     GPIO (ADC channel)
+ *
+ *   V_adc = V_batt * R2 / (R1 + R2)
+ *
+ * With R1 = R2 = 100K, the divider ratio is 2 (V_adc = V_batt / 2).
+ * ADC is configured with 12 dB attenuation for ~0–2500 mV input range.
+ */
+#define BATTERY_ADC_VDD_USE_DIVIDER    1
+#define BATTERY_ADC_VDD_DIVIDER_RATIO  2     /* V_batt = V_adc * ratio */
+
+/* ADC device node */
+#define BATTERY_ADC_DT_NODE         DT_NODELABEL(adc0)
+
+/* VDD channel — GPIO2, ADC1 channel 2, 12 dB attenuation */
+#define BATTERY_ADC_VDD_INPUT       2
+#define BATTERY_ADC_VDD_GAIN        ADC_GAIN_1_4   /* maps to 12 dB atten */
+#define BATTERY_ADC_VDD_REFERENCE   ADC_REF_INTERNAL
+#define BATTERY_ADC_VDD_REF_MV      2500   /* effective range with 12 dB */
+
+/* NTC channel — GPIO3, ADC1 channel 3, same settings */
+#define BATTERY_ADC_NTC_INPUT       3
+#define BATTERY_ADC_NTC_GAIN        ADC_GAIN_1_4
+#define BATTERY_ADC_NTC_REFERENCE   ADC_REF_INTERNAL
+#define BATTERY_ADC_NTC_REF_MV      2500
 
 /* ── Unsupported ──────────────────────────────────────────────────── */
 

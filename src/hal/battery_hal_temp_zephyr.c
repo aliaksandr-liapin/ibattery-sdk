@@ -18,9 +18,11 @@
 #include <zephyr/drivers/sensor.h>
 
 #if DT_NODE_EXISTS(DT_NODELABEL(temp))
-#define BATTERY_TEMP_NODE DT_NODELABEL(temp)
+#define BATTERY_TEMP_NODE DT_NODELABEL(temp)        /* nRF52 */
 #elif DT_NODE_EXISTS(DT_NODELABEL(die_temp))
-#define BATTERY_TEMP_NODE DT_NODELABEL(die_temp)
+#define BATTERY_TEMP_NODE DT_NODELABEL(die_temp)    /* STM32 */
+#elif DT_NODE_EXISTS(DT_NODELABEL(coretemp))
+#define BATTERY_TEMP_NODE DT_NODELABEL(coretemp)    /* ESP32 */
 #else
 #error "No die temperature sensor node found in devicetree"
 #endif

@@ -36,6 +36,7 @@ config BATTERY_TEMP_DIE
     bool "Internal die temperature sensor"
     select SENSOR
     select TEMP_NRF5 if SOC_SERIES_NRF52X
+    select ESP32_TEMP if SOC_SERIES_ESP32C3
     help
       Use the SoC internal die temperature sensor via the Zephyr
       sensor API. No external components needed, but measures chip

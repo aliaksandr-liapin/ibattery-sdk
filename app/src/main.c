@@ -21,6 +21,9 @@ static void print_platform_info(void)
 #elif defined(CONFIG_SOC_SERIES_NRF52X)
     printk("Platform: nRF52 (nRF52840-DK)\n");
     printk("VDD read: SAADC direct\n");
+#elif defined(CONFIG_SOC_SERIES_ESP32C3)
+    printk("Platform: ESP32-C3 (DevKitM)\n");
+    printk("VDD read: External voltage divider\n");
 #else
     printk("Platform: unknown\n");
 #endif

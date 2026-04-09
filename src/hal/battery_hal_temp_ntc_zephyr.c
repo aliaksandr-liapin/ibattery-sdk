@@ -36,6 +36,8 @@
 
 #if defined(CONFIG_SOC_SERIES_STM32L4X)
 #define NTC_ADC_NODE          DT_NODELABEL(adc1)
+#elif defined(CONFIG_SOC_SERIES_ESP32C3)
+#define NTC_ADC_NODE          DT_NODELABEL(adc0)
 #else
 #define NTC_ADC_NODE          DT_NODELABEL(adc)
 #endif

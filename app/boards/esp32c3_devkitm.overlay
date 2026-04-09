@@ -1,0 +1,30 @@
+/*
+ * Device tree overlay for Battery SDK on ESP32-C3 DevKitM.
+ *
+ * ADC0:  channel 2 = GPIO2 (battery voltage via external divider)
+ *        channel 3 = GPIO3 (external NTC thermistor)
+ * GPIO:  GPIO6 = TP4056 CHRG, GPIO7 = TP4056 STDBY
+ *
+ * Battery voltage divider circuit:
+ *   Battery+ --- [100K R1] ---+--- [100K R2] --- GND
+ *                             |
+ *                           GPIO2 (ADC1 ch2)
+ *
+ *   V_adc = V_batt * R2 / (R1 + R2) = V_batt / 2
+ *   Firmware multiplies ADC reading by 2 to get battery voltage.
+ */
+
+/ {
+	aliases {
+		battery-charger-gpio = &gpio0;
+	};
+};
+
+&adc0 {
+	status = "okay";
+};
+
+/* Enable die temperature sensor */
+&coretemp {
+	status = "okay";
+};
