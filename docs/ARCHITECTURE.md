@@ -212,8 +212,8 @@
 ## Cloud Telemetry & Analytics Pipeline (Phase 4 + Phase 5)
 
 ```
-nRF52840-DK (BLE notifications, 20/24-byte packets every 2s)
-    │
+nRF52840-DK (native BLE) or NUCLEO-L476RG + X-NUCLEO-IDB05A2 (SPI BLE shield)
+    │  BLE notifications, 20/24-byte packets every 2s
     ▼
 ibattery-gateway (Python / bleak)        gateway/
     ├── scanner.py           BLE scan + connect + subscribe
@@ -233,7 +233,7 @@ Docker Compose stack                     cloud/
     └── Grafana            11-panel dashboard (port 3000)
 ```
 
-The gateway connects to the nRF52840 via BLE, decodes the v1/v2 wire format
+The gateway connects to either platform via BLE, decodes the v1/v2 wire format
 defined in `battery_serialize.c`, runs real-time anomaly checks on each packet,
 and writes measurement points to InfluxDB. Grafana provides an 11-panel
 "iBattery Telemetry" dashboard with voltage, SoC, temperature, power state,
@@ -246,29 +246,28 @@ charge cycle analysis.
 ---
 
 ### hal/battery_hal_adc_zephyr.c
-- Configures nRF52840 SAADC via Zephyr ADC API
-- Input: `NRFX_ANALOG_INTERNAL_VDD` (measures supply rail, not an external pin)
-- Config: 12-bit resolution, 1/6 gain, 0.6V internal reference, 40us acquisition time
-- 16x hardware oversampling for noise reduction
-- Auto-calibration before each read
-- Channel config stored at file scope; `adc_channel_setup()` re-called before every read to work around nRF SAADC driver clobbering per-channel input-mux settings when other channels are read
+- Dual code path selected at compile time via `battery_adc_platform.h`:
+  - **nRF52**: Direct SAADC VDD read — `NRFX_ANALOG_INTERNAL_VDD`, 12-bit, 1/6 gain, 0.6V ref, 40us acq, 16x oversampling, auto-calibration. Channel config re-applied before every read (SAADC driver clobbers per-channel input-mux).
+  - **STM32**: VREFINT sensor path — Zephyr `st,stm32-vref` driver handles ADC enable, stabilization, and factory calibration (ROM `0x1FFF75AA`). Returns VDD in mV directly via `sensor_channel_get(SENSOR_CHAN_VOLTAGE)`.
 
 ### hal/battery_hal_temp_zephyr.c (CONFIG_BATTERY_TEMP_DIE)
-- Reads nRF52840 on-chip die temperature sensor via Zephyr sensor API
-- Uses `DEVICE_DT_GET(DT_NODELABEL(temp))` to obtain the TEMP peripheral device
+- Reads on-chip die temperature sensor via Zephyr sensor API
+- Auto-detects DT node label: `temp` (nRF52) or `die_temp` (STM32)
 - `sensor_sample_fetch()` + `sensor_channel_get(SENSOR_CHAN_DIE_TEMP)` for each read
 - Converts `sensor_value` to 0.01 °C: `val1 * 100 + val2 / 10000`
-- Accuracy: ±2 °C (nRF52840 TEMP peripheral specification)
+- Accuracy: ±2 °C (nRF52840), ±1.5 °C (STM32L476)
 
-### hal/battery_hal_temp_ntc_zephyr.c (CONFIG_BATTERY_TEMP_NTC, default)
-- Reads external 10K NTC thermistor (B=3950) via nRF52840 SAADC channel 1 (AIN1 / P0.03)
+### hal/battery_hal_temp_ntc_zephyr.c (CONFIG_BATTERY_TEMP_NTC)
+- Reads external 10K NTC thermistor (B=3950) via ADC
 - Circuit: VDD → 10K pullup → ADC pin → NTC → GND
 - 4-step pipeline: ADC read → raw to mV → mV to resistance → LUT interpolation
-- ADC config: 12-bit, 1/6 gain, 0.6V internal reference, 40µs acquisition, 4x oversampling
-- Analog input selected via `NRFX_ANALOG_EXTERNAL_AIN1` from `<helpers/nrfx_analog_common.h>` (nrfx v3.x 0-based enum; the legacy `NRF_SAADC_INPUT_AINx` enum is 1-based and causes an off-by-one pin selection)
-- Channel config stored at file scope; `adc_channel_setup()` re-called before every read to restore AIN1 after the VDD channel clobbers the input mux
+- Platform-specific ADC config from `battery_adc_platform.h`:
+  - nRF52: SAADC Ch1, AIN1 (P0.03), 1/6 gain, 0.6V ref, 4x oversampling
+  - STM32: ADC1 Ch5, PA0 (Arduino A0), 1x gain, VDDA ref
+- ADC node label: `adc` (nRF52) or `adc1` (STM32) — auto-selected via `CONFIG_SOC_SERIES_*`
+- Channel config re-applied before every read (nRF SAADC input-mux workaround)
 - Uses `battery_ntc_lut.c` for resistance-to-temperature conversion
-- Selected at compile time via `CONFIG_BATTERY_TEMP_NTC=y` in `app/Kconfig`
+- Default on nRF52; STM32 defaults to die temp (override with `CONFIG_BATTERY_TEMP_NTC=y`)
 - Same interface as die sensor HAL — modules above are unchanged
 
 ### hal/battery_hal_zephyr.c
@@ -372,5 +371,7 @@ To port to a new platform:
 3. Implement `battery_hal_init()` and `battery_hal_get_uptime_ms()` for the target OS
 4. Add a new SoC LUT in `battery_soc_lut.c` for the target battery chemistry
 5. Everything above the HAL layer compiles unchanged
+
+**Reference port:** The STM32L476 port (`battery_adc_platform.h` STM32L4X section + board overlay/conf files) serves as a complete porting example. Key differences from nRF52: VREFINT-based VDD measurement, different ADC node labels, GPIO controller aliases for charger pins, and dynamic NVS flash page size.
 
 **nRF-specific note:** Use `NRFX_ANALOG_EXTERNAL_AINx` from `<helpers/nrfx_analog_common.h>` for external analog inputs — the legacy `NRF_SAADC_INPUT_AINx` enum from `<hal/nrf_saadc.h>` is 1-based and causes an off-by-one pin selection with the Zephyr ADC driver. Both ADC HAL drivers must also re-call `adc_channel_setup()` before every read because the nRF SAADC driver does not preserve per-channel input-mux settings.

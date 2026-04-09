@@ -377,10 +377,30 @@ mock_voltage_set_rc(BATTERY_STATUS_IO);
 
 ## Hardware Validation
 
-In addition to host tests, firmware changes are validated on real hardware:
+In addition to host tests, firmware changes are validated on real hardware.
 
-1. Build: `cd app && west build -b nrf52840dk/nrf52840`
-2. Flash: `west flash`
+### nRF52840-DK
+
+1. Build: `west build -b nrf52840dk/nrf52840 app -d build-nrf --pristine`
+2. Flash: `west flash -d build-nrf`
 3. Monitor serial output (115200 baud) for telemetry packets
 4. Verify voltage readings match expected CR2032 range (2000-3100 mV)
 5. Verify `flags=0x00000000` (no collection errors)
+6. Verify BLE: `ibattery-gateway scan` finds "iBattery"
+
+### NUCLEO-L476RG (STM32)
+
+1. Build: `west build -b nucleo_l476rg app -d build-stm32 --pristine -- -DZEPHYR_EXTRA_MODULES="..."`
+2. Flash: `west flash -d build-stm32 --runner openocd`
+3. Monitor serial on `/dev/tty.usbmodem*` (115200 baud)
+4. Verify boot banner shows "Platform: STM32L4 (NUCLEO-L476RG)"
+5. Verify VDD ~3300 mV (USB powered), die temp 20-40 C, `flags=0x00000000`
+6. Verify state machine: ACTIVE (t=0) → IDLE (~30s) → SLEEP (~120s)
+
+### NUCLEO-L476RG + BLE Shield
+
+1. Mount X-NUCLEO-IDB05A2 on Arduino headers
+2. Build with `-DSHIELD=x_nucleo_idb05a1 -DEXTRA_CONF_FILE=boards/nucleo_l476rg_ble.conf`
+3. Flash and verify "iBattery-STM32" visible in `ibattery-gateway scan`
+4. Verify `ibattery-gateway stream` receives v2 telemetry packets
+5. Verify full pipeline: `ibattery-gateway run` → InfluxDB → Grafana dashboard

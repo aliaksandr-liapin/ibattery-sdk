@@ -9,7 +9,7 @@ Currently targets the **nRF52840** and **STM32L476** (Zephyr RTOS) with **CR2032
 
 ---
 
-## Current Status: Phase 6 In Progress
+## Current Status: Phase 6 Complete (v0.6.0)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -20,7 +20,7 @@ Currently targets the **nRF52840** and **STM32L476** (Zephyr RTOS) with **CR2032
 | Phase 4 | Cloud telemetry (BLE gateway + InfluxDB + Grafana) | Done |
 | Phase 5a | Temperature-compensated SoC + cloud analytics (health score, anomaly detection) | Done |
 | Phase 5b | Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2 | Done |
-| Phase 6 | STM32 HAL port (NUCLEO-L476RG) | **In progress** — builds, hardware validation pending |
+| Phase 6 | STM32 HAL port (NUCLEO-L476RG) | Done — hardware-validated, BLE shield tested |
 
 ---
 
@@ -87,9 +87,10 @@ west build -b nucleo_l476rg app -d build-stm32 --pristine -- \
   -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
 west flash -d build-stm32
 
-# NUCLEO-L476RG with BLE shield
+# NUCLEO-L476RG with BLE shield (X-NUCLEO-IDB05A2)
 west build -b nucleo_l476rg app -d build-stm32-ble --pristine -- \
   -DSHIELD=x_nucleo_idb05a1 \
+  -DEXTRA_CONF_FILE=boards/nucleo_l476rg_ble.conf \
   -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
 ```
 
@@ -106,7 +107,7 @@ ctest --test-dir build_tests --output-on-failure
 ```bash
 cd cloud && docker compose up -d          # Start InfluxDB + Grafana
 cd gateway && pip install -e .            # Install Python gateway
-ibattery-gateway run                      # Connect to nRF52840 → write to InfluxDB
+ibattery-gateway run                      # Connect to iBattery device → write to InfluxDB
 ```
 
 Open http://localhost:3000 → "iBattery Telemetry" dashboard with live voltage, temperature, SoC, and power state panels.
