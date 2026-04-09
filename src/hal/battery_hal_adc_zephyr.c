@@ -8,11 +8,79 @@
 
 #include "helpers/battery_adc_platform.h"
 
-#if defined(CONFIG_SOC_SERIES_STM32L4X)
-#define BATTERY_ADC_NODE DT_NODELABEL(adc1)
+/*
+ * ── STM32: Use Zephyr vref sensor for VDD measurement ──────────────
+ *
+ * STM32 cannot read VDD directly.  The Zephyr "st,stm32-vref" sensor
+ * driver handles VREFINT ADC path enable, stabilization delay, and
+ * factory calibration.  We use the sensor API here (same pattern as
+ * the die temperature sensor), which avoids raw ADC channel config.
+ *
+ * ── nRF52: Use SAADC with internal VDD input ───────────────────────
+ *
+ * nRF52 reads VDD directly via the SAADC internal input, with a
+ * 0.6 V reference and 1/6 gain.
+ */
+
+#if defined(BATTERY_ADC_VDD_USE_VREFINT)
+
+/* ── STM32 path: vref sensor ──────────────────────────────────────── */
+
+#include <zephyr/drivers/sensor.h>
+
+static const struct device *g_vref_dev = DEVICE_DT_GET(DT_NODELABEL(vref));
+static int32_t g_last_vdd_mv;
+
+int battery_hal_adc_init(void)
+{
+    if (!device_is_ready(g_vref_dev)) {
+        return BATTERY_STATUS_IO;
+    }
+    return BATTERY_STATUS_OK;
+}
+
+int battery_hal_adc_read_raw(int16_t *raw_out)
+{
+    struct sensor_value val;
+
+    if (raw_out == NULL) {
+        return BATTERY_STATUS_INVALID_ARG;
+    }
+
+    if (sensor_sample_fetch(g_vref_dev) < 0) {
+        return BATTERY_STATUS_IO;
+    }
+
+    if (sensor_channel_get(g_vref_dev, SENSOR_CHAN_VOLTAGE, &val) < 0) {
+        return BATTERY_STATUS_IO;
+    }
+
+    /* vref sensor returns VDD in volts (val1=V, val2=uV).
+     * Convert to mV and store for raw_to_pin_mv to return. */
+    g_last_vdd_mv = val.val1 * 1000 + val.val2 / 1000;
+
+    /* Return a dummy "raw" value; the real mV is in g_last_vdd_mv. */
+    *raw_out = (int16_t)(g_last_vdd_mv > 32767 ? 32767 : g_last_vdd_mv);
+    return BATTERY_STATUS_OK;
+}
+
+int battery_hal_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out)
+{
+    (void)raw;  /* On STM32, the real value was captured in read_raw. */
+
+    if (mv_out == NULL) {
+        return BATTERY_STATUS_INVALID_ARG;
+    }
+
+    *mv_out = g_last_vdd_mv;
+    return BATTERY_STATUS_OK;
+}
+
 #else
+
+/* ── nRF52 path: direct SAADC VDD read ───────────────────────────── */
+
 #define BATTERY_ADC_NODE DT_NODELABEL(adc)
-#endif
 
 #if !DT_NODE_EXISTS(BATTERY_ADC_NODE)
 #error "ADC node is missing in devicetree"
@@ -87,35 +155,21 @@ int battery_hal_adc_read_raw(int16_t *raw_out)
 
 int battery_hal_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out)
 {
+    int32_t value = raw;
+
     if (mv_out == NULL) {
         return BATTERY_STATUS_INVALID_ARG;
     }
 
-#if defined(BATTERY_ADC_VDD_USE_VREFINT)
-    /*
-     * STM32: ADC reads VREFINT against VDDA.  Compute actual VDD:
-     *   VDD_mV = cal_vref * cal_raw / adc_raw
-     * where cal_raw is the factory value stored in ROM at cal_addr.
-     */
-    if (raw <= 0) {
+    if (adc_raw_to_millivolts(BATTERY_ADC_VDD_REF_MV,
+                               BATTERY_ADC_GAIN,
+                               BATTERY_ADC_RESOLUTION,
+                               &value) < 0) {
         return BATTERY_STATUS_ERROR;
     }
-    {
-        uint16_t cal_raw = *BATTERY_STM32_VREFINT_CAL_ADDR;
-        *mv_out = (int32_t)BATTERY_STM32_VREFINT_CAL_VREF * cal_raw / raw;
-    }
-#else
-    {
-        int32_t value = raw;
-        if (adc_raw_to_millivolts(BATTERY_ADC_VDD_REF_MV,
-                                   BATTERY_ADC_GAIN,
-                                   BATTERY_ADC_RESOLUTION,
-                                   &value) < 0) {
-            return BATTERY_STATUS_ERROR;
-        }
-        *mv_out = value;
-    }
-#endif
 
+    *mv_out = value;
     return BATTERY_STATUS_OK;
 }
+
+#endif /* BATTERY_ADC_VDD_USE_VREFINT */

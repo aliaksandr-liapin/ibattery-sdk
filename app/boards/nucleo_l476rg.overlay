@@ -16,6 +16,11 @@
 	status = "okay";
 };
 
+/* Enable VREFINT sensor for VDD measurement */
+&vref {
+	status = "okay";
+};
+
 /* Enable die temperature sensor for CONFIG_BATTERY_TEMP_DIE option */
 &die_temp {
 	status = "okay";
