@@ -4,11 +4,11 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840 
 
 ## Current State
 
-- **Version**: v0.6.0-rc1 (Phase 6 — STM32 port, build-verified)
+- **Version**: v0.6.0 (Phase 6 — STM32 port, hardware-validated)
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
-- **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32)
-- **Next milestone**: On-target STM32 validation + BLE shield testing
+- **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32) — both hardware-verified
+- **Next milestone**: NTC/TP4056 peripheral validation + BLE shield testing
 
 ## Build Commands
 
@@ -32,7 +32,7 @@ west flash -d build-nrf
 ```bash
 west build -b nucleo_l476rg app -d build-stm32 --pristine -- \
   -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
-west flash -d build-stm32
+west flash -d build-stm32 --runner openocd
 ```
 
 ### Firmware (NUCLEO-L476RG + BLE shield)
@@ -40,7 +40,9 @@ west flash -d build-stm32
 ```bash
 west build -b nucleo_l476rg app -d build-stm32-ble --pristine -- \
   -DSHIELD=x_nucleo_idb05a1 \
+  -DEXTRA_CONF_FILE=boards/nucleo_l476rg_ble.conf \
   -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
+west flash -d build-stm32-ble --runner openocd
 ```
 
 ### C unit tests (host, no hardware needed)

@@ -1,8 +1,8 @@
 # Release Notes
 
-## v0.6.0-rc1 — Phase 6: STM32 HAL Port (2026-04-07)
+## v0.6.0 — Phase 6: STM32 HAL Port + On-Target Validation (2026-04-08)
 
-Adds multi-platform support by porting the HAL layer to STM32L476 (NUCLEO-L476RG) under Zephyr RTOS. All core modules, intelligence, telemetry, and transport code remain unchanged — only the HAL abstraction was refactored to be SoC-agnostic.
+Adds multi-platform support by porting the HAL layer to STM32L476 (NUCLEO-L476RG) under Zephyr RTOS. All core modules, intelligence, telemetry, and transport code remain unchanged — only the HAL abstraction was refactored to be SoC-agnostic. Hardware-validated on NUCLEO-L476RG.
 
 ### What's New
 
@@ -13,7 +13,7 @@ Adds multi-platform support by porting the HAL layer to STM32L476 (NUCLEO-L476RG
 
 **STM32L476 Board Support**
 - `app/boards/nucleo_l476rg.overlay` — ADC1, die temp sensor, charger GPIO alias
-- `app/boards/nucleo_l476rg.conf` — board-specific Kconfig (BLE disabled by default)
+- `app/boards/nucleo_l476rg.conf` — board-specific Kconfig (die temp + BLE disabled by default)
 - BLE supported via X-NUCLEO-IDB05A2 shield (`-DSHIELD=x_nucleo_idb05a1`)
 
 **HAL Portability Improvements**
@@ -24,13 +24,44 @@ Adds multi-platform support by porting the HAL layer to STM32L476 (NUCLEO-L476RG
 - `battery_hal_nvs_zephyr.c` — dynamic flash page size query (4096 nRF, 2048 STM32)
 - `app/Kconfig` — platform-neutral: conditional `TEMP_NRF5` select, updated help text
 
+**Boot Diagnostics**
+- `print_platform_info()` at boot — shows platform, VDD method, temp source, chemistry, transport, charger status
+- Useful for on-target validation and debugging multi-platform builds
+
 **Build Matrix**
 - nRF52840-DK: `west build -b nrf52840dk/nrf52840 app` — 152 KB Flash, 30 KB RAM
-- NUCLEO-L476RG: `west build -b nucleo_l476rg app` — 34 KB Flash, 10 KB RAM
+- NUCLEO-L476RG: `west build -b nucleo_l476rg app` — 38 KB Flash, 10 KB RAM
+
+### Hardware Verified
+
+NUCLEO-L476RG (STM32L476RG, ST-Link V2, Rev 4) via OpenOCD:
+
+| Check | Expected | Result |
+|-------|----------|--------|
+| VDD via VREFINT sensor | 3200-3400 mV (USB) | 3316-3324 mV |
+| Die temperature sensor | 20-40 C (room) | 23.23-24.88 C |
+| SoC estimation (CR2032 LUT) | 100% at 3.3V | 100.00% |
+| Telemetry loop interval | 2000 ms | 2002 ms |
+| Error flags | 0x00000000 | 0x00000000 |
+| ACTIVE→IDLE transition | ~30s | 30028 ms |
+| IDLE→SLEEP transition | ~120s | 120113 ms |
+
+**BLE Shield Validation (X-NUCLEO-IDB05A2)**
+
+| Check | Expected | Result |
+|-------|----------|--------|
+| BLE SPI init | No crash at boot | OK — telemetry streaming |
+| BLE advertising | "iBattery-STM32" visible | OK — RSSI -43 dBm |
+| Gateway scan | Device found | OK — `ibattery-gateway scan` |
+| Gateway stream | Live telemetry via BLE | OK — v2 packets, 2s intervals |
+| BLE wire format | v2, 24 bytes | OK — voltage, temp, SoC, power state |
+
+Build: `west build -b nucleo_l476rg app -- -DSHIELD=x_nucleo_idb05a1 -DEXTRA_CONF_FILE=boards/nucleo_l476rg_ble.conf`
+Footprint: 95 KB Flash, 33 KB RAM (vs 38 KB / 10 KB without BLE)
 
 ### Status
 
-Build-verified on both platforms. On-target hardware validation pending (Phase 4/5 in plan).
+Fully validated on both platforms including BLE. Pending: NTC thermistor (requires external hardware on PA0), TP4056 charger GPIO (requires wiring PC6/PC7).
 
 ### No Changes
 

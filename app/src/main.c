@@ -11,10 +11,53 @@
 
 #include <stdint.h>
 
+static void print_platform_info(void)
+{
+    printk("\n=== iBattery SDK — On-Target Validation ===\n");
+
+#if defined(CONFIG_SOC_SERIES_STM32L4X)
+    printk("Platform: STM32L4 (NUCLEO-L476RG)\n");
+    printk("VDD read: VREFINT sensor\n");
+#elif defined(CONFIG_SOC_SERIES_NRF52X)
+    printk("Platform: nRF52 (nRF52840-DK)\n");
+    printk("VDD read: SAADC direct\n");
+#else
+    printk("Platform: unknown\n");
+#endif
+
+#if IS_ENABLED(CONFIG_BATTERY_TEMP_NTC)
+    printk("Temp src: NTC thermistor (external)\n");
+#elif IS_ENABLED(CONFIG_BATTERY_TEMP_DIE)
+    printk("Temp src: Die sensor (internal)\n");
+#endif
+
+#if IS_ENABLED(CONFIG_BATTERY_CHEMISTRY_LIPO)
+    printk("Chemistry: LiPo (3.7V)\n");
+#else
+    printk("Chemistry: CR2032 (3.0V)\n");
+#endif
+
+#if IS_ENABLED(CONFIG_BATTERY_TRANSPORT)
+    printk("Transport: BLE enabled\n");
+#else
+    printk("Transport: disabled\n");
+#endif
+
+#if IS_ENABLED(CONFIG_BATTERY_CHARGER_TP4056)
+    printk("Charger:   TP4056 GPIO\n");
+#else
+    printk("Charger:   disabled\n");
+#endif
+
+    printk("============================================\n\n");
+}
+
 int main(void)
 {
     struct battery_telemetry_packet pkt;
     int rc;
+
+    print_platform_info();
 
     rc = battery_sdk_init();
     if (rc != BATTERY_STATUS_OK) {
