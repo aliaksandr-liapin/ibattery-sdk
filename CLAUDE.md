@@ -136,14 +136,14 @@ Both formats accepted by gateway decoder (auto-detect by length).
 
 ```
 app/              Zephyr application (main.c, prj.conf, Kconfig)
-app/boards/       Per-board overlays and Kconfig (nrf52840dk, nucleo_l476rg)
+app/boards/       Per-board overlays and Kconfig (nrf52840dk, nucleo_l476rg, esp32c3_devkitm)
 include/          Public API headers (battery_sdk/*.h)
 src/              Implementation (core/, core_modules/, hal/, intelligence/, telemetry/, transport/)
 src/hal/helpers/  Platform-specific ADC config (battery_adc_platform.h)
 tests/            C unit tests (Unity) + mocks/
 gateway/          Python BLE gateway + analytics + Grafana dashboards
 cloud/            Docker Compose (InfluxDB + Grafana)
-docs/             ARCHITECTURE, SDK_API, TESTING, BATTERY_PROFILES, ROADMAP, RELEASE_NOTES
+docs/             ARCHITECTURE, SDK_API, TESTING, WIRING, BATTERY_PROFILES, ROADMAP, RELEASE_NOTES
 ```
 
 ## Documentation Map

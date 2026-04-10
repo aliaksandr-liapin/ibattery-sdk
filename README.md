@@ -172,6 +172,7 @@ ibattery-sdk/
 
 - [SDK API Reference](docs/SDK_API.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Hardware Wiring Guide](docs/WIRING.md)
 - [Battery Profiles](docs/BATTERY_PROFILES.md)
 - [Testing Guide](docs/TESTING.md)
 - [Release Notes](docs/RELEASE_NOTES.md)
