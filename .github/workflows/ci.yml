@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    name: Unit Tests
+  host-tests:
+    name: C Unit Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -25,3 +25,25 @@ jobs:
 
       - name: Run tests
         run: ctest --test-dir build_tests --output-on-failure
+
+  gateway-tests:
+    name: Python Gateway Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install gateway
+        run: |
+          cd gateway
+          pip install -e ".[dev]"
+
+      - name: Run pytest
+        run: |
+          cd gateway
+          python -m pytest tests/ -v
