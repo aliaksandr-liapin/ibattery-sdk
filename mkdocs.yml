@@ -1,0 +1,49 @@
+site_name: iBattery SDK
+site_url: https://aliaksandr-liapin.github.io/ibattery-sdk/
+site_description: Embedded C SDK providing battery intelligence for IoT devices
+repo_url: https://github.com/aliaksandr-liapin/ibattery-sdk
+repo_name: aliaksandr-liapin/ibattery-sdk
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - tables
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Hardware Wiring: WIRING.md
+      - Contributing: contributing.md
+  - Architecture: ARCHITECTURE.md
+  - API Reference: SDK_API.md
+  - Battery Profiles: BATTERY_PROFILES.md
+  - Testing: TESTING.md
+  - Gateway: gateway.md
+  - Cloud Stack: cloud.md
+  - Roadmap: ROADMAP.md
+  - Release Notes: RELEASE_NOTES.md

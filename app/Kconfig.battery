@@ -1,0 +1,137 @@
+# Battery SDK application configuration
+
+menu "Battery SDK"
+
+choice BATTERY_CHEMISTRY
+    prompt "Battery chemistry"
+    default BATTERY_CHEMISTRY_CR2032
+
+config BATTERY_CHEMISTRY_CR2032
+    bool "CR2032 primary lithium coin cell (3.0 V nominal)"
+    help
+      CR2032 primary (non-rechargeable) lithium coin cell.
+      Nominal voltage 3.0 V, cutoff ~2.0 V.
+
+config BATTERY_CHEMISTRY_LIPO
+    bool "LiPo single-cell (3.7 V nominal)"
+    help
+      Lithium-polymer rechargeable cell.  Nominal voltage 3.7 V,
+      full charge 4.2 V, cutoff 3.0 V.
+
+endchoice
+
+choice BATTERY_TEMP_SOURCE
+    prompt "Temperature sensor source"
+    default BATTERY_TEMP_NTC
+
+config BATTERY_TEMP_NTC
+    bool "External NTC thermistor (10K B3950)"
+    help
+      Use an external NTC thermistor in a voltage divider on an ADC
+      channel for temperature measurement. The exact pin is defined in
+      the board's devicetree overlay. Requires a 10K pull-up resistor
+      to VDD and a 10K NTC (B=3950) to GND.
+
+config BATTERY_TEMP_DIE
+    bool "Internal die temperature sensor"
+    select SENSOR
+    select TEMP_NRF5 if SOC_SERIES_NRF52X
+    select ESP32_TEMP if SOC_SERIES_ESP32C3
+    help
+      Use the SoC internal die temperature sensor via the Zephyr
+      sensor API. No external components needed, but measures chip
+      temperature rather than ambient/battery temperature.
+
+endchoice
+
+config BATTERY_TRANSPORT
+    bool "Enable telemetry transport"
+    default n
+    help
+      Enable the transport abstraction layer for sending telemetry
+      packets off-device (BLE, serial, etc.).
+
+if BATTERY_TRANSPORT
+
+choice BATTERY_TRANSPORT_BACKEND
+    prompt "Transport backend"
+    default BATTERY_TRANSPORT_BLE
+
+config BATTERY_TRANSPORT_BLE
+    bool "Bluetooth Low Energy (BLE)"
+    select BT
+    select BT_PERIPHERAL
+    help
+      Send telemetry via BLE GATT notifications using a custom service.
+      Requires a BLE-capable SoC or external BLE shield (e.g.
+      X-NUCLEO-IDB05A2 on STM32 Nucleo boards).
+
+endchoice
+
+config BATTERY_BLE_DEVICE_NAME
+    string "BLE device name"
+    default "iBattery"
+    depends on BATTERY_TRANSPORT_BLE
+    help
+      The Bluetooth device name advertised by the SDK.
+
+config BATTERY_BLE_ADV_INTERVAL_MS
+    int "BLE advertising interval (ms)"
+    default 1000
+    range 20 10240
+    depends on BATTERY_TRANSPORT_BLE
+    help
+      Advertising interval in milliseconds.  Lower values improve
+      discoverability at the cost of power consumption.
+
+endif # BATTERY_TRANSPORT
+
+config BATTERY_SOC_TEMP_COMP
+    bool "Temperature-compensated SoC estimation"
+    default y if BATTERY_TEMP_NTC && BATTERY_CHEMISTRY_LIPO
+    depends on BATTERY_CHEMISTRY_LIPO
+    help
+      Enable temperature-compensated SoC estimation by blending between
+      cold (0 deg C), room (25 deg C), and hot (45 deg C) LiPo LUT tables.
+      Requires LiPo chemistry and a working temperature sensor.  Falls back
+      to room-temperature LUT if the temperature read fails at runtime.
+
+config BATTERY_CYCLE_COUNTER
+    bool "Charge cycle counter with flash persistence"
+    default y if BATTERY_CHARGER_TP4056
+    select NVS
+    select FLASH
+    select FLASH_MAP
+    help
+      Count CHARGING to CHARGED transitions and persist the count
+      to flash via Zephyr NVS.  Requires a charger driver for meaningful
+      state transitions.
+
+config BATTERY_CHARGER_TP4056
+    bool "TP4056 charger IC GPIO status detection"
+    default n
+    select GPIO
+    help
+      Enable detection of charging state via TP4056 CHRG and STDBY
+      GPIO pins.  CHRG (active low) indicates charging in progress.
+      STDBY (active low) indicates charge complete.
+
+if BATTERY_CHARGER_TP4056
+
+config BATTERY_CHARGER_TP4056_CHRG_PIN
+    int "TP4056 CHRG GPIO pin number"
+    default 28
+    help
+      GPIO pin connected to TP4056 CHRG output (P0.28 by default).
+      Active low: LOW = charging, HIGH = not charging.
+
+config BATTERY_CHARGER_TP4056_STDBY_PIN
+    int "TP4056 STDBY GPIO pin number"
+    default 29
+    help
+      GPIO pin connected to TP4056 STDBY output (P0.29 by default).
+      Active low: LOW = charge complete, HIGH = not complete.
+
+endif # BATTERY_CHARGER_TP4056
+
+endmenu

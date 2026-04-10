@@ -48,7 +48,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 - **Temp**: On-chip die temperature sensor (coretemp)
 - **SDK**: Vanilla Zephyr v4.2.2 (not NCS)
 
-See [Hardware Wiring Guide](docs/WIRING.md) for pin diagrams and circuit schematics.
+See [Hardware Wiring Guide](WIRING.md) for pin diagrams and circuit schematics.
 
 ---
 
@@ -103,24 +103,6 @@ west build -b nucleo_l476rg app -d build-stm32-ble --pristine -- \
   -DEXTRA_CONF_FILE=boards/nucleo_l476rg_ble.conf \
   -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
 ```
-
-### Use as a Zephyr module (in your own project)
-
-Add to your `west.yml`:
-
-```yaml
-manifest:
-  remotes:
-    - name: aliaksandr-liapin
-      url-base: https://github.com/aliaksandr-liapin
-  projects:
-    - name: ibattery-sdk
-      remote: aliaksandr-liapin
-      revision: v0.7.0
-      path: modules/lib/ibattery-sdk
-```
-
-Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 
 ### Run unit tests (host, no hardware needed)
 
@@ -197,19 +179,19 @@ ibattery-sdk/
 
 ## Documentation
 
-- [SDK API Reference](docs/SDK_API.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Hardware Wiring Guide](docs/WIRING.md)
-- [Battery Profiles](docs/BATTERY_PROFILES.md)
-- [Testing Guide](docs/TESTING.md)
-- [Release Notes](docs/RELEASE_NOTES.md)
-- [Roadmap & Strategy](docs/ROADMAP.md)
+- [SDK API Reference](SDK_API.md)
+- [Architecture](ARCHITECTURE.md)
+- [Hardware Wiring Guide](WIRING.md)
+- [Battery Profiles](BATTERY_PROFILES.md)
+- [Testing Guide](TESTING.md)
+- [Release Notes](RELEASE_NOTES.md)
+- [Roadmap & Strategy](ROADMAP.md)
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style, and how to submit changes.
+See [Contributing](contributing.md) for development setup, code style, and how to submit changes.
 
 ---
 

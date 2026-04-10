@@ -1,0 +1,16 @@
+# iBattery SDK — Zephyr Module Kconfig
+#
+# This file is used when ibattery-sdk is consumed as a Zephyr module.
+# The app/Kconfig is for the sample application.
+
+config BATTERY_SDK
+    bool "iBattery SDK — battery intelligence library"
+    default y
+    help
+      Enable the iBattery SDK battery monitoring library.
+      Provides voltage measurement, SoC estimation, temperature
+      monitoring, power state management, and BLE telemetry.
+
+if BATTERY_SDK
+rsource "app/Kconfig.battery"
+endif
