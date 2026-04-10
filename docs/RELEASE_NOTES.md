@@ -1,5 +1,62 @@
 # Release Notes
 
+## v0.7.0 — Phase 7: ESP32-C3 HAL Port + On-Target Validation (2026-04-09)
+
+Adds ESP32-C3 as the third supported platform, making iBattery SDK a genuine 3-platform solution. Introduces a new VDD measurement strategy via external voltage divider. Native BLE — no shield needed.
+
+### What's New
+
+**ESP32-C3 DevKitM Board Support**
+- `app/boards/esp32c3_devkitm.overlay` — ADC0, die temp sensor (coretemp), GPIO alias
+- `app/boards/esp32c3_devkitm.conf` — board-specific Kconfig (native BLE, die temp default)
+- Build requires vanilla Zephyr v4.2.2 workspace (not NCS)
+
+**Voltage Divider ADC Path**
+- New `BATTERY_ADC_VDD_USE_DIVIDER` flag — third VDD strategy alongside direct SAADC (nRF52) and VREFINT (STM32)
+- External resistor divider: Battery+ → R1(100K) → GPIO2 → R2(100K) → GND
+- ADC reads divided voltage, firmware multiplies by `BATTERY_ADC_VDD_DIVIDER_RATIO` (default 2)
+- 12 dB attenuation, ~0–2500 mV input range
+
+**Platform Abstraction Improvements**
+- `battery_adc_platform.h` — ESP32-C3 section with `BATTERY_ADC_DT_NODE` macro
+- `battery_hal_temp_zephyr.c` — auto-detect `coretemp` node label (ESP32)
+- `battery_hal_temp_ntc_zephyr.c` — `adc0` node label for ESP32-C3
+- `battery_transport_ble_zephyr.c` — conditional include for `assigned_numbers.h` (NCS-only header)
+- `app/Kconfig` — `select ESP32_TEMP if SOC_SERIES_ESP32C3` for die temp driver
+
+**Build Matrix**
+- nRF52840-DK: 152 KB Flash, 30 KB RAM (NCS)
+- NUCLEO-L476RG: 38 KB Flash, 10 KB RAM (NCS)
+- ESP32-C3 DevKitM: 356 KB Flash, 138 KB RAM (vanilla Zephyr v4.2.2)
+
+### Hardware Verified
+
+ESP32-C3-DevKitM-1-N4X (RISC-V, ESP32-C3-MINI-1 module):
+
+| Check | Expected | Result |
+|-------|----------|--------|
+| Boot banner | "ESP32-C3 (DevKitM)" | OK |
+| Die temperature sensor | 30-50 C (ESP32 runs warm) | 38-44 C |
+| BLE advertising | "iBattery-ESP32C3" visible | OK — RSSI -42/-43 dBm |
+| Gateway scan | Device found | OK |
+| Gateway stream | Live telemetry via BLE | OK — v2 packets, 2s intervals |
+| Gateway run → InfluxDB → Grafana | Full pipeline | OK — dashboard live |
+| ACTIVE→IDLE transition | ~30s | OK |
+| IDLE→SLEEP transition | ~120s | OK |
+| Error flags | 0x00000000 | OK |
+
+**Note**: VDD reads ~4.0–4.2V from floating ADC pin (no voltage divider hardware connected). With R1=R2=100K divider from battery, readings will be accurate.
+
+### No Changes
+
+- All 11 C unit tests pass (host, unchanged)
+- All 58 Python gateway tests pass (unchanged)
+- No core module, intelligence, telemetry, or transport logic changes
+- Wire format v1/v2 unchanged
+- nRF52840 and STM32 firmware unchanged
+
+---
+
 ## v0.6.0 — Phase 6: STM32 HAL Port + On-Target Validation (2026-04-08)
 
 Adds multi-platform support by porting the HAL layer to STM32L476 (NUCLEO-L476RG) under Zephyr RTOS. All core modules, intelligence, telemetry, and transport code remain unchanged — only the HAL abstraction was refactored to be SoC-agnostic. Hardware-validated on NUCLEO-L476RG.

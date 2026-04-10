@@ -23,7 +23,9 @@
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/uuid.h>
 #include <zephyr/bluetooth/gatt.h>
+#if __has_include(<zephyr/bluetooth/assigned_numbers.h>)
 #include <zephyr/bluetooth/assigned_numbers.h>
+#endif
 
 #include <string.h>
 

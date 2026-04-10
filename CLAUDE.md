@@ -1,14 +1,14 @@
 # iBattery SDK — Claude Code Context
 
-Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840 (Zephyr RTOS) with CR2032 and LiPo support. Full pipeline: firmware → BLE → Python gateway → InfluxDB → Grafana.
+Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840, STM32L476, and ESP32-C3 (Zephyr RTOS) with CR2032 and LiPo support. Full pipeline: firmware → BLE → Python gateway → InfluxDB → Grafana.
 
 ## Current State
 
-- **Version**: v0.6.0 (Phase 6 — STM32 port, hardware-validated)
+- **Version**: v0.7.0 (Phase 7 — ESP32-C3 port, hardware-validated)
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
-- **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32) — both hardware-verified
-- **Next milestone**: NTC/TP4056 peripheral validation + BLE shield testing
+- **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32), ESP32-C3 DevKitM — all hardware-verified
+- **Next milestone**: Voltage divider validation + advanced SoC (coulomb counting)
 
 ## Build Commands
 
@@ -43,6 +43,17 @@ west build -b nucleo_l476rg app -d build-stm32-ble --pristine -- \
   -DEXTRA_CONF_FILE=boards/nucleo_l476rg_ble.conf \
   -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
 west flash -d build-stm32-ble --runner openocd
+```
+
+### Firmware (ESP32-C3 DevKitM — requires vanilla Zephyr workspace)
+
+```bash
+# From ~/zephyr-esp32 workspace (not NCS)
+cd ~/zephyr-esp32 && source .venv/bin/activate
+export ZEPHYR_BASE=~/zephyr-esp32/zephyr
+export ZEPHYR_SDK_INSTALL_DIR=/opt/nordic/ncs/toolchains/e5f4758bcf/opt/zephyr-sdk
+west build -b esp32c3_devkitm /path/to/ibattery-sdk/app -d build-esp32c3 --pristine
+west flash -d build-esp32c3
 ```
 
 ### C unit tests (host, no hardware needed)

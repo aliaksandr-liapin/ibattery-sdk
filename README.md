@@ -9,7 +9,7 @@ Currently targets the **nRF52840** and **STM32L476** (Zephyr RTOS) with **CR2032
 
 ---
 
-## Current Status: Phase 6 Complete (v0.6.0)
+## Current Status: Phase 7 Complete (v0.7.0)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -21,6 +21,7 @@ Currently targets the **nRF52840** and **STM32L476** (Zephyr RTOS) with **CR2032
 | Phase 5a | Temperature-compensated SoC + cloud analytics (health score, anomaly detection) | Done |
 | Phase 5b | Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2 | Done |
 | Phase 6 | STM32 HAL port (NUCLEO-L476RG) | Done — hardware-validated, BLE shield tested |
+| Phase 7 | ESP32-C3 HAL port (DevKitM) | Done — hardware-validated, native BLE, full pipeline |
 
 ---
 
