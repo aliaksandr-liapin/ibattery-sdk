@@ -1,0 +1,39 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - 'gateway/README.md'
+      - 'cloud/README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install mkdocs-material
+        run: pip install mkdocs-material
+
+      - name: Copy root docs into docs/
+        run: |
+          cp README.md docs/index.md
+          cp CONTRIBUTING.md docs/contributing.md
+          cp gateway/README.md docs/gateway.md
+          cp cloud/README.md docs/cloud.md
+
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force
