@@ -156,7 +156,7 @@ docs/             ARCHITECTURE, SDK_API, TESTING, WIRING, BATTERY_PROFILES, ROAD
 | `docs/TESTING.md` | Test procedures, suite descriptions, running instructions |
 | `docs/BATTERY_PROFILES.md` | CR2032 + LiPo discharge curves, LUT design rationale |
 | `docs/ROADMAP.md` | Business strategy, development priorities, monetization |
-| `docs/RELEASE_NOTES.md` | Version history (v0.1.0 through v0.5.1) |
+| `docs/RELEASE_NOTES.md` | Version history (v0.1.0 through v0.7.0) |
 | `CONTRIBUTING.md` | Dev setup, code style, porting guide |
 | `gateway/README.md` | Gateway CLI usage, analytics, architecture |
 | `cloud/README.md` | Docker stack setup |

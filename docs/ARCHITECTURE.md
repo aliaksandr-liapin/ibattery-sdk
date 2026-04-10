@@ -99,6 +99,13 @@
 |   Die temp sensor (st,stm32-temp-cal)                 |
 |   GPIO PC6/PC7 -> TP4056 CHRG/STDBY                  |
 |   X-NUCLEO-IDB05A2 BLE shield (opt.)                 |
+|                                                       |
+|  ESP32-C3 DevKitM:                                    |
+|   ADC1 Ch2 -> GPIO2 -> voltage divider (VDD * 0.5)   |
+|   ADC1 Ch3 -> GPIO3 -> NTC divider                   |
+|   Die temp sensor (espressif,esp32-temp / coretemp)   |
+|   GPIO6/GPIO7 -> TP4056 CHRG/STDBY                   |
+|   Native BLE 5.0 (no external shield needed)          |
 +------------------------------------------------------+
 ```
 
@@ -212,7 +219,7 @@
 ## Cloud Telemetry & Analytics Pipeline (Phase 4 + Phase 5)
 
 ```
-nRF52840-DK (native BLE) or NUCLEO-L476RG + X-NUCLEO-IDB05A2 (SPI BLE shield)
+nRF52840-DK (native BLE) / NUCLEO-L476RG + IDB05A2 shield / ESP32-C3 (native BLE)
     │  BLE notifications, 20/24-byte packets every 2s
     ▼
 ibattery-gateway (Python / bleak)        gateway/

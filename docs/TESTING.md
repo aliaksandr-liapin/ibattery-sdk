@@ -404,3 +404,17 @@ In addition to host tests, firmware changes are validated on real hardware.
 3. Flash and verify "iBattery-STM32" visible in `ibattery-gateway scan`
 4. Verify `ibattery-gateway stream` receives v2 telemetry packets
 5. Verify full pipeline: `ibattery-gateway run` → InfluxDB → Grafana dashboard
+
+### ESP32-C3 DevKitM
+
+Requires a vanilla Zephyr v4.2.2 workspace (not NCS). See CLAUDE.md for build commands.
+
+1. Build: `west build -b esp32c3_devkitm /path/to/ibattery-sdk/app -d build-esp32c3 --pristine`
+2. Flash: `west flash -d build-esp32c3`
+3. Monitor serial on `/dev/tty.usbserial-*` (115200 baud)
+4. Verify boot banner shows "Platform: ESP32-C3 (DevKitM)"
+5. Verify die temp 30-50 C (ESP32-C3 runs warmer than nRF/STM32)
+6. Verify BLE: `ibattery-gateway scan` finds "iBattery-ESP32C3"
+7. Verify `ibattery-gateway stream` receives v2 telemetry packets
+8. Verify full pipeline: `ibattery-gateway run` → InfluxDB → Grafana dashboard
+9. Note: VDD reads floating value without voltage divider hardware (2x 100K resistors on GPIO2)

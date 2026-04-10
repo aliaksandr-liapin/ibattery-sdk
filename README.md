@@ -41,6 +41,15 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 - **ADC**: ADC1 Ch0 = VREFINT (VDD measurement via factory calibration), Ch5 = PA0/A0 (NTC)
 - **Charger GPIO**: PC6 (CHRG), PC7 (STDBY) on Morpho connector
 
+### ESP32-C3 DevKitM (ESP32 port)
+- **Board**: ESP32-C3-DevKitM-1-N4X (RISC-V, 160 MHz, 4 MB Flash)
+- **BLE**: Native BLE 5.0 (no shield needed)
+- **ADC**: ADC1 Ch2 = GPIO2 (battery voltage via external divider), Ch3 = GPIO3 (NTC)
+- **Temp**: On-chip die temperature sensor (coretemp)
+- **SDK**: Vanilla Zephyr v4.2.2 (not NCS)
+
+See [Hardware Wiring Guide](docs/WIRING.md) for pin diagrams and circuit schematics.
+
 ---
 
 ## Features

@@ -70,7 +70,7 @@ See the step-by-step guide in [BATTERY_PROFILES.md](docs/BATTERY_PROFILES.md#add
 2. Create board overlay (`app/boards/<board>.overlay`) for ADC, temp sensor, charger GPIO
 3. Create board config (`app/boards/<board>.conf`) for platform-specific Kconfig defaults
 4. No changes to core modules should be needed — if they are, the HAL interface is incomplete
-5. See the STM32L476 port as a reference: `battery_adc_platform.h` (STM32L4X section), `nucleo_l476rg.overlay`, `nucleo_l476rg.conf`
+5. See existing ports as reference: STM32L476 (VREFINT path) and ESP32-C3 (voltage divider path) in `battery_adc_platform.h`, board overlays and configs in `app/boards/`
 6. See the portability section of [ARCHITECTURE.md](docs/ARCHITECTURE.md) for details
 
 ## Testing

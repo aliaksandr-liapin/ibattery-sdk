@@ -118,10 +118,10 @@ The sensor source is selected at compile time via Kconfig:
 
 | Config | Sensor | Description |
 |--------|--------|-------------|
-| `CONFIG_BATTERY_TEMP_NTC=y` | External 10K NTC thermistor (B=3950) | nRF52: AIN1 (P0.03); STM32: PA0 (A0). Voltage divider with 10K pullup |
-| `CONFIG_BATTERY_TEMP_DIE=y` | On-chip die temperature sensor | nRF52: TEMP peripheral (±2 °C); STM32: internal temp sensor (±1.5 °C) |
+| `CONFIG_BATTERY_TEMP_NTC=y` | External 10K NTC thermistor (B=3950) | nRF52: AIN1 (P0.03); STM32: PA0 (A0); ESP32-C3: GPIO3. Voltage divider with 10K pullup |
+| `CONFIG_BATTERY_TEMP_DIE=y` | On-chip die temperature sensor | nRF52: TEMP peripheral (±2 °C); STM32: internal temp sensor (±1.5 °C); ESP32-C3: coretemp sensor |
 
-Default: NTC on nRF52840-DK, die temp on NUCLEO-L476RG (set per-board in `app/boards/<board>.conf`).
+Default: NTC on nRF52840-DK, die temp on NUCLEO-L476RG and ESP32-C3 DevKitM (set per-board in `app/boards/<board>.conf`).
 
 Both sensors use the same HAL interface — modules above the HAL are unchanged regardless of which sensor or platform is selected.
 
@@ -135,9 +135,9 @@ Read the current temperature.
 |-----------|-----------|-------------|
 | `temperature_c_x100` | out | Temperature in 0.01 C units (e.g., 2350 = 23.50 C) |
 
-**NTC mode**: Reads ADC (nRF52: SAADC AIN1; STM32: ADC1 Ch5), converts millivolts to NTC resistance via voltage divider math, then interpolates through a 16-point resistance-to-temperature lookup table (-40 °C to +125 °C). All integer math.
+**NTC mode**: Reads ADC (nRF52: SAADC AIN1; STM32: ADC1 Ch5; ESP32-C3: ADC1 Ch3/GPIO3), converts millivolts to NTC resistance via voltage divider math, then interpolates through a 16-point resistance-to-temperature lookup table (-40 °C to +125 °C). All integer math.
 
-**Die sensor mode**: Reads the on-chip die temperature sensor via Zephyr sensor API. Accuracy: ±2 °C (nRF52840), ±1.5 °C (STM32L476). Note: measures chip temperature, not ambient or battery temperature.
+**Die sensor mode**: Reads the on-chip die temperature sensor via Zephyr sensor API. Accuracy: ±2 °C (nRF52840), ±1.5 °C (STM32L476), ~1 °C (ESP32-C3). Note: measures chip temperature, not ambient or battery temperature.
 
 **Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer), `BATTERY_STATUS_NOT_INITIALIZED`, or `BATTERY_STATUS_IO`.
 
