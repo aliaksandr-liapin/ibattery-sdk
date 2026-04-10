@@ -5,7 +5,7 @@
 
 Embedded firmware library providing a **standardized battery intelligence layer** for battery-powered IoT devices. Measures voltage, estimates state-of-charge, monitors temperature and power state, and packages everything into structured telemetry packets.
 
-Currently targets the **nRF52840** and **STM32L476** (Zephyr RTOS) with **CR2032** coin cell and **LiPo 500mAh** (via TP4056 USB-C charger). LiPo power delivery verified on real hardware; charger state GPIO signals validated with jumper-wire simulation. Designed to scale to other MCUs and battery chemistries.
+Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS) with **CR2032** coin cell and **LiPo 500mAh** (via TP4056 USB-C charger). All three platforms hardware-validated with full BLE telemetry pipeline. Designed to scale to other MCUs and battery chemistries.
 
 ---
 
