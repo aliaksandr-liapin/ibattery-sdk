@@ -44,8 +44,8 @@ ESP32-C3-DevKitM-1-N4X (RISC-V, ESP32-C3-MINI-1 module):
 | ACTIVE→IDLE transition | ~30s | OK |
 | IDLE→SLEEP transition | ~120s | OK |
 | Error flags | 0x00000000 | OK |
-
-**Note**: VDD reads ~4.0–4.2V from floating ADC pin (no voltage divider hardware connected). With R1=R2=100K divider from battery, readings will be accurate.
+| Voltage divider (LiPo 500mAh) | ~3.7-4.2V | 4110-4134 mV (avg 4119, 24 mV spread) |
+| SoC with LiPo LUT | 85-100% at ~4.1V | 90-93% (correct) |
 
 ### No Changes
 
