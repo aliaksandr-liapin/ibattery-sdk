@@ -1,0 +1,1427 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/ROADMAP/">
+      
+      
+        <link rel="prev" href="../cloud/">
+      
+      
+        <link rel="next" href="../RELEASE_NOTES/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Roadmap - iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#roadmap-business-strategy" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Roadmap
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BATTERY_PROFILES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#current-state-phase-7-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current State (Phase 7 Complete)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#product-positioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Product Positioning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#growth-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Growth Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Growth Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#path-a-open-source-sdk-with-commercial-extensions-open-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path A: Open-Source SDK with Commercial Extensions (Open Core)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-b-battery-as-a-service-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path B: Battery-as-a-Service Platform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-c-consulting-custom-integrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path C: Consulting + Custom Integrations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#near-term-1-3-months" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Near-term (1-3 months)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mid-term-3-6-months" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mid-term (3-6 months)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-6-months" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term (6+ months)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monetization-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monetization Models
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-decision-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Decision Points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#glossary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Glossary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RELEASE_NOTES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#current-state-phase-7-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current State (Phase 7 Complete)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#product-positioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Product Positioning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#growth-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Growth Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Growth Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#path-a-open-source-sdk-with-commercial-extensions-open-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path A: Open-Source SDK with Commercial Extensions (Open Core)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-b-battery-as-a-service-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path B: Battery-as-a-Service Platform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-c-consulting-custom-integrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path C: Consulting + Custom Integrations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#near-term-1-3-months" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Near-term (1-3 months)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mid-term-3-6-months" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mid-term (3-6 months)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-6-months" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term (6+ months)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monetization-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monetization Models
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-decision-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Decision Points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#glossary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Glossary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="roadmap-business-strategy">Roadmap &amp; Business Strategy<a class="headerlink" href="#roadmap-business-strategy" title="Permanent link">&para;</a></h1>
+<h2 id="current-state-phase-7-complete">Current State (Phase 7 Complete)<a class="headerlink" href="#current-state-phase-7-complete" title="Permanent link">&para;</a></h2>
+<p>ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.</p>
+<p><strong>What exists today:</strong>
+- Targets nRF52840 + CR2032 coin cells and LiPo single-cell (3.7V)
+- Voltage reading (SAADC) → SoC estimation (LUT interpolation) → telemetry collection
+- Real die temperature sensor via nRF52840 TEMP peripheral (±2 °C) or external 10K NTC thermistor (B=3950) on SAADC AIN1
+- Temperature-compensated SoC for LiPo cells (<code>CONFIG_BATTERY_CHEMISTRY</code> Kconfig)
+- Voltage-threshold power state machine with 100 mV hysteresis
+- Full battery state machine: IDLE/SLEEP inactivity timers + TP4056 CHARGING/DISCHARGING/CHARGED
+- LiPo single-cell (3.7 V nominal) discharge curve LUT
+- BLE telemetry transport with custom GATT service + notification characteristic
+- Wire format v1 (20B) and v2 (24B with <code>cycle_count</code>) — backward compatible
+- Charge cycle counter with NVS flash persistence (CHARGING → CHARGED transitions)
+- Compile-time transport backend and chemistry selection via Kconfig
+- ~48 bytes static RAM (core), integer-only math, no heap allocation
+- HAL abstraction layer — core logic is platform-independent portable C
+- LiPo 500mAh powering nRF52840-DK via TP4056 HW-373 (USB-C) — real battery power verified
+- TP4056 charging confirmed (voltage rise on USB-C connect); CHRG/STDBY GPIO signals simulated with jumper wires (LED pad soldering pending)
+- Python BLE gateway (bleak) → InfluxDB 2.x → Grafana 11-panel dashboard (Docker Compose)
+- <code>ibattery-gateway</code> CLI: scan, stream, run, analytics (health, anomalies, rul, cycles)
+- Cloud analytics: battery health scoring, real-time + historical anomaly detection, RUL estimation, cycle analysis
+- 11 C test suites (Unity) + 58 Python tests (pytest), zero hardware required to run
+- Zephyr RTOS integration with clean layered architecture
+- Production-quality codebase: no layer violations, consistent conventions, full documentation</p>
+<hr />
+<h2 id="product-positioning">Product Positioning<a class="headerlink" href="#product-positioning" title="Permanent link">&para;</a></h2>
+<p><strong>Category:</strong> Battery monitoring middleware library for embedded developers building battery-powered products.</p>
+<p><strong>Strengths:</strong>
+- Clean architecture, genuinely production-quality code
+- HAL abstraction is well-executed — porting is realistic, not theoretical
+- Tiny footprint makes it viable for real constrained devices (coin cells, wearables)
+- Test infrastructure is solid and runs without hardware</p>
+<p><strong>Gaps to address before monetizing:</strong>
+- ~~CR2032-only is too niche~~ — ✅ LiPo support added (v0.2.0+), dual-chemistry Kconfig
+- ~~No charging detection~~ — ✅ TP4056 charger driver + NVS cycle counter (v0.4.1 + v0.5.1)
+- Single platform (nRF52840) limits reach — STM32 port would be highest-impact addition</p>
+<p><strong>Competitive landscape:</strong>
+- Nordic's nrf_fuel_gauge library
+- TI BQ series fuel gauge drivers
+- Zephyr's native fuel gauge API</p>
+<p><strong>Differentiation options (pick one to lead with):</strong>
+1. <em>Simplicity</em> — easier to integrate than the alternatives
+2. <em>Portability</em> — works across chip vendors and RTOSes
+3. <em>Intelligence</em> — better SoC accuracy through advanced algorithms</p>
+<hr />
+<h2 id="growth-strategy">Growth Strategy<a class="headerlink" href="#growth-strategy" title="Permanent link">&para;</a></h2>
+<h3 id="path-a-open-source-sdk-with-commercial-extensions-open-core">Path A: Open-Source SDK with Commercial Extensions (Open Core)<a class="headerlink" href="#path-a-open-source-sdk-with-commercial-extensions-open-core" title="Permanent link">&para;</a></h3>
+<p><strong>Free tier (open-source, MIT/Apache 2.0):</strong>
+- Current functionality: voltage, SoC, telemetry, basic power states
+- Community builds trust, adoption, GitHub stars, contributors
+- Target audience: hobby developers, students, startups prototyping</p>
+<p><strong>Paid tier (commercial license):</strong>
+- Advanced SoC algorithms (coulomb counting, Kalman filter, hybrid estimators)
+- Multi-chemistry support (LiPo, LiFePO4, NiMH)
+- Battery health / cycle count / degradation prediction
+- Cloud telemetry integration (BLE → gateway → dashboard)
+- OTA-updateable battery profiles
+- Certified/validated LUTs with lab-measured discharge curves
+- Priority support + SLA</p>
+<p>Reference: Redis, GitLab, and Zephyr use variations of this model.</p>
+<h3 id="path-b-battery-as-a-service-platform">Path B: Battery-as-a-Service Platform<a class="headerlink" href="#path-b-battery-as-a-service-platform" title="Permanent link">&para;</a></h3>
+<p>Full stack vision where the SDK is the device-side agent:</p>
+<ol>
+<li><strong>Device SDK</strong> (what exists today) — collects telemetry</li>
+<li><strong>Transport layer</strong> — BLE, LoRaWAN, or cellular upload</li>
+<li><strong>Cloud backend</strong> — ingests telemetry, stores time-series data</li>
+<li><strong>Dashboard</strong> — fleet-wide battery health monitoring, alerts, analytics</li>
+<li><strong>API</strong> — customers integrate battery insights into their own platforms</li>
+</ol>
+<p>Revenue: per-device subscriptions or per-fleet annual licenses.</p>
+<h3 id="path-c-consulting-custom-integrations">Path C: Consulting + Custom Integrations<a class="headerlink" href="#path-c-consulting-custom-integrations" title="Permanent link">&para;</a></h3>
+<p>Use the SDK as a portfolio piece and proof of expertise:
+- Custom battery profiling for specific chemistries/form factors
+- Integration into client firmware (Nordic, STM32, ESP32, etc.)
+- Battery-related certification consulting (IEC 62133, UN 38.3)</p>
+<p>Lower scale but immediate revenue with zero infrastructure cost.</p>
+<hr />
+<h2 id="development-roadmap">Development Roadmap<a class="headerlink" href="#development-roadmap" title="Permanent link">&para;</a></h2>
+<h3 id="near-term-1-3-months">Near-term (1-3 months)<a class="headerlink" href="#near-term-1-3-months" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Task</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>~~1~~</td>
+<td>~~Multi-chemistry LUTs — LiPo single-cell (3.7V nominal)~~</td>
+<td>✅ Done (v0.2.0)</td>
+</tr>
+<tr>
+<td>~~2~~</td>
+<td>~~Real temperature + dynamic power states~~</td>
+<td>✅ Done (v0.2.0 + v0.2.1)</td>
+</tr>
+<tr>
+<td>~~3~~</td>
+<td>~~Phase 3 — BLE telemetry transport~~</td>
+<td>✅ Done (v0.3.0)</td>
+</tr>
+<tr>
+<td>~~3.5~~</td>
+<td>~~Phase 4 — Cloud telemetry (BLE gateway + InfluxDB + Grafana)~~</td>
+<td>✅ Done (v0.4.0)</td>
+</tr>
+<tr>
+<td>~~4~~</td>
+<td>~~Phase 5a — Temperature-compensated SoC + cloud analytics~~</td>
+<td>✅ Done (v0.5.0)</td>
+</tr>
+<tr>
+<td>~~5~~</td>
+<td>~~Phase 5b — Cycle counter, wire v2, RUL, cycle analysis, Grafana v2~~</td>
+<td>✅ Done (v0.5.1)</td>
+</tr>
+<tr>
+<td>~~6~~</td>
+<td>~~STM32 HAL port~~</td>
+<td>✅ Done (v0.6.0) — NUCLEO-L476RG hardware-validated</td>
+</tr>
+<tr>
+<td>~~7~~</td>
+<td>~~ESP32 HAL port~~</td>
+<td>✅ Done (v0.7.0) — ESP32-C3 DevKitM hardware-validated</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Zephyr module registry submission</td>
+<td>Discoverability via <code>west manifest</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="mid-term-3-6-months">Mid-term (3-6 months)<a class="headerlink" href="#mid-term-3-6-months" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Task</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>~~9~~</td>
+<td>~~Advanced SoC — temperature compensation~~</td>
+<td>✅ Done (v0.5.0 — LiPo temp-compensated SoC)</td>
+</tr>
+<tr>
+<td>~~10~~</td>
+<td>~~Charging support — detect charging state, track charge cycles~~</td>
+<td>✅ Done (v0.4.1 + v0.5.1 — TP4056 GPIO driver + NVS cycle counter)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Advanced SoC — coulomb counting or Kalman filter</td>
+<td>Next accuracy improvement beyond temp compensation</td>
+</tr>
+<tr>
+<td>12</td>
+<td>PlatformIO library publication</td>
+<td>Major distribution channel for Arduino/ESP32 community</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Documentation site — GitHub Pages with guides and API reference</td>
+<td>Lowers barrier to adoption</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo)</td>
+<td>Hardware reference designs drive SDK adoption</td>
+</tr>
+</tbody>
+</table>
+<h3 id="long-term-6-months">Long-term (6+ months)<a class="headerlink" href="#long-term-6-months" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Task</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>~~15~~</td>
+<td>~~Cloud backend + dashboard~~</td>
+<td>✅ Done (v0.4.0 + v0.5.1 — InfluxDB + 11-panel Grafana + analytics CLI)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Certification-ready battery profiles with lab-validated data</td>
+<td>Enterprise/industrial customers</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Partner integrations — Nordic DevZone, AWS IoT, Zephyr ecosystem</td>
+<td>Distribution and credibility</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="monetization-models">Monetization Models<a class="headerlink" href="#monetization-models" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Revenue</th>
+<th>Effort</th>
+<th>Timing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consulting — custom integrations</td>
+<td>$100-250/hr</td>
+<td>Low</td>
+<td>Now</td>
+</tr>
+<tr>
+<td>Paid support tiers — SLA, priority fixes</td>
+<td>$500-5K/yr per customer</td>
+<td>Low</td>
+<td>After 50+ GitHub users</td>
+</tr>
+<tr>
+<td>Commercial license — advanced features</td>
+<td>$2K-20K/yr per product line</td>
+<td>Medium</td>
+<td>After multi-chemistry + advanced SoC</td>
+</tr>
+<tr>
+<td>SaaS dashboard — fleet monitoring</td>
+<td>$0.50-2/device/month</td>
+<td>High</td>
+<td>6-12 months out</td>
+</tr>
+<tr>
+<td>Hardware reference design — kits/license</td>
+<td>$50-200/kit</td>
+<td>Medium</td>
+<td>After 2+ platform ports</td>
+</tr>
+<tr>
+<td>Training/workshops — embedded battery courses</td>
+<td>$500-2K per session</td>
+<td>Low</td>
+<td>Anytime</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="key-decision-points">Key Decision Points<a class="headerlink" href="#key-decision-points" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>License choice</strong> — ✅ Apache 2.0 (patent protection + permissive, compatible with open-core model)</li>
+<li><strong>Lead differentiation</strong> — simplicity, portability, or intelligence? Pick one and lean into it.</li>
+<li><strong>First paid offering</strong> — consulting (immediate) vs commercial license (requires feature gap) vs SaaS (requires infrastructure)</li>
+<li><strong>Chemistry priority</strong> — LiPo single-cell is the biggest market; LiFePO4 is growing in IoT/solar</li>
+<li><strong>Platform priority</strong> — STM32 (professional market) vs ESP32 (maker community) first</li>
+</ol>
+<hr />
+<h2 id="glossary">Glossary<a class="headerlink" href="#glossary" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Abbreviation</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADC</td>
+<td>Analog-to-Digital Converter — hardware peripheral that converts analog voltage to a digital value</td>
+</tr>
+<tr>
+<td>BLE</td>
+<td>Bluetooth Low Energy — short-range wireless protocol common in IoT and wearables</td>
+</tr>
+<tr>
+<td>FPU</td>
+<td>Floating Point Unit — hardware for fast floating-point math (absent on some low-cost MCUs)</td>
+</tr>
+<tr>
+<td>HAL</td>
+<td>Hardware Abstraction Layer — interface isolating portable code from platform-specific drivers</td>
+</tr>
+<tr>
+<td>IoT</td>
+<td>Internet of Things — network of connected embedded devices</td>
+</tr>
+<tr>
+<td>LiFePO4</td>
+<td>Lithium Iron Phosphate — rechargeable battery chemistry, 3.2 V nominal, long cycle life</td>
+</tr>
+<tr>
+<td>LiPo</td>
+<td>Lithium Polymer — rechargeable battery chemistry, 3.7 V nominal, common in consumer electronics</td>
+</tr>
+<tr>
+<td>LoRaWAN</td>
+<td>Long Range Wide Area Network — low-power, long-range wireless protocol for IoT</td>
+</tr>
+<tr>
+<td>LUT</td>
+<td>Lookup Table — precomputed array used here to map voltage to state-of-charge</td>
+</tr>
+<tr>
+<td>MCU</td>
+<td>Microcontroller Unit — small computer on a single chip (CPU, memory, peripherals)</td>
+</tr>
+<tr>
+<td>NiMH</td>
+<td>Nickel-Metal Hydride — rechargeable battery chemistry, 1.2 V nominal</td>
+</tr>
+<tr>
+<td>NTC</td>
+<td>Negative Temperature Coefficient thermistor — resistor whose resistance decreases with temperature</td>
+</tr>
+<tr>
+<td>OTA</td>
+<td>Over-The-Air — wireless firmware or data update mechanism</td>
+</tr>
+<tr>
+<td>RTOS</td>
+<td>Real-Time Operating System — OS with deterministic timing guarantees (e.g., Zephyr, FreeRTOS)</td>
+</tr>
+<tr>
+<td>SAADC</td>
+<td>Successive Approximation Analog-to-Digital Converter — ADC type used in nRF52840</td>
+</tr>
+<tr>
+<td>SDK</td>
+<td>Software Development Kit — library plus tools for building applications</td>
+</tr>
+<tr>
+<td>SLA</td>
+<td>Service Level Agreement — contract guaranteeing response/fix times for support</td>
+</tr>
+<tr>
+<td>SoC</td>
+<td>State of Charge — remaining battery capacity as a percentage (0–100%)</td>
+</tr>
+<tr>
+<td>VDD</td>
+<td>Voltage Drain Drain — positive supply rail of the MCU</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2311 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/TESTING/">
+      
+      
+        <link rel="prev" href="../BATTERY_PROFILES/">
+      
+      
+        <link rel="next" href="../gateway/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Testing - iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#testing-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Testing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BATTERY_PROFILES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-a-single-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running a single suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Suites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Suites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-voltage-filter-test_voltage_filterc-12-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Voltage Filter (test_voltage_filter.c) — 12 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-soc-lut-test_soc_lutc-19-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. SoC LUT (test_soc_lut.c) — 19 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-soc-temperature-compensation-test_soc_temp_compc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. SoC Temperature Compensation (test_soc_temp_comp.c)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-telemetry-test_telemetryc-9-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Telemetry (test_telemetry.c) — 9 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-temperature-test_temperaturec-7-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Temperature (test_temperature.c) — 7 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-ntc-lut-test_ntc_lutc-21-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. NTC LUT (test_ntc_lut.c) — 21 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-power-manager-test_power_managerc-12-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Power Manager (test_power_manager.c) — 12 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-power-manager-charger-test_power_manager_charger-23-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Power Manager + Charger (test_power_manager_charger) — 23 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-serialization-test_serializec-15-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Serialization (test_serialize.c) — 15 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-transport-test_transportc-11-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Transport (test_transport.c) — 11 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-cycle-counter-test_cycle_counterc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Cycle Counter (test_cycle_counter.c)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-gateway-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Gateway Tests
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python Gateway Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mock-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mock Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mock Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mock-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mock files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-configuring-a-mock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: configuring a mock
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hardware Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nrf52840-dk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nRF52840-DK
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nucleo-l476rg-stm32" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NUCLEO-L476RG (STM32)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nucleo-l476rg-ble-shield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NUCLEO-L476RG + BLE Shield
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esp32-c3-devkitm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESP32-C3 DevKitM
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RELEASE_NOTES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-a-single-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running a single suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-suites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Suites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Suites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-voltage-filter-test_voltage_filterc-12-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Voltage Filter (test_voltage_filter.c) — 12 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-soc-lut-test_soc_lutc-19-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. SoC LUT (test_soc_lut.c) — 19 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-soc-temperature-compensation-test_soc_temp_compc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. SoC Temperature Compensation (test_soc_temp_comp.c)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-telemetry-test_telemetryc-9-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Telemetry (test_telemetry.c) — 9 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-temperature-test_temperaturec-7-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Temperature (test_temperature.c) — 7 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-ntc-lut-test_ntc_lutc-21-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. NTC LUT (test_ntc_lut.c) — 21 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-power-manager-test_power_managerc-12-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Power Manager (test_power_manager.c) — 12 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-power-manager-charger-test_power_manager_charger-23-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Power Manager + Charger (test_power_manager_charger) — 23 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-serialization-test_serializec-15-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Serialization (test_serialize.c) — 15 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-transport-test_transportc-11-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Transport (test_transport.c) — 11 tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-cycle-counter-test_cycle_counterc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Cycle Counter (test_cycle_counter.c)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-gateway-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Gateway Tests
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Python Gateway Tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mock-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mock Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mock Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mock-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mock files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-configuring-a-mock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: configuring a mock
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hardware Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nrf52840-dk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nRF52840-DK
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nucleo-l476rg-stm32" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NUCLEO-L476RG (STM32)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nucleo-l476rg-ble-shield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NUCLEO-L476RG + BLE Shield
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esp32-c3-devkitm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESP32-C3 DevKitM
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="testing-guide">Testing Guide<a class="headerlink" href="#testing-guide" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The Battery SDK uses <strong>host-based unit tests</strong> that compile and run on the development machine (macOS/Linux) without Zephyr, nRF toolchain, or target hardware. This enables fast iteration: tests run in under 1 second.</p>
+<p><strong>Framework:</strong> <a href="https://github.com/ThrowTheSwitch/Unity">Unity</a> v2.6.0 (fetched automatically via CMake FetchContent)</p>
+<p><strong>Firmware test count:</strong> 11 C test suites (Unity)</p>
+<p><strong>Gateway test count:</strong> 58 Python tests (pytest)</p>
+<hr />
+<h2 id="running-tests">Running Tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Configure (one time)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cmake<span class="w"> </span>-B<span class="w"> </span>build_tests<span class="w"> </span>tests
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Build</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build_tests
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Run all tests</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>ctest<span class="w"> </span>--test-dir<span class="w"> </span>build_tests<span class="w"> </span>--output-on-failure
+</code></pre></div>
+<p>Expected output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Test project /path/to/ibattery-sdk/build_tests
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>     Start  1: voltage_filter
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a> 1/11 Test  #1: voltage_filter ...................   Passed    0.00 sec
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>     Start  2: soc_lut
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a> 2/11 Test  #2: soc_lut ..........................   Passed    0.00 sec
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>     Start  3: soc_temp_comp
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a> 3/11 Test  #3: soc_temp_comp ....................   Passed    0.00 sec
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>     Start  4: telemetry
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a> 4/11 Test  #4: telemetry ........................   Passed    0.00 sec
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>     Start  5: temperature
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a> 5/11 Test  #5: temperature ......................   Passed    0.00 sec
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>     Start  6: power_manager
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a> 6/11 Test  #6: power_manager ....................   Passed    0.00 sec
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>     Start  7: power_manager_charger
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a> 7/11 Test  #7: power_manager_charger ............   Passed    0.00 sec
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>     Start  8: ntc_lut
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a> 8/11 Test  #8: ntc_lut ..........................   Passed    0.00 sec
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>     Start  9: serialize
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a> 9/11 Test  #9: serialize ........................   Passed    0.00 sec
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>     Start 10: transport
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>10/11 Test #10: transport ........................   Passed    0.00 sec
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>     Start 11: cycle_counter
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>11/11 Test #11: cycle_counter ....................   Passed    0.00 sec
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>100% tests passed, 0 tests failed out of 11
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>Total Test time (real) =   0.05 sec
+</code></pre></div></p>
+<h3 id="running-a-single-suite">Running a single suite<a class="headerlink" href="#running-a-single-suite" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>./build_tests/test_voltage_filter
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>./build_tests/test_soc_lut
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>./build_tests/test_soc_temp_comp
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>./build_tests/test_telemetry
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>./build_tests/test_temperature
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>./build_tests/test_power_manager
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>./build_tests/test_power_manager_charger
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>./build_tests/test_ntc_lut
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>./build_tests/test_serialize
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>./build_tests/test_transport
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>./build_tests/test_cycle_counter
+</code></pre></div>
+<hr />
+<h2 id="test-suites">Test Suites<a class="headerlink" href="#test-suites" title="Permanent link">&para;</a></h2>
+<h3 id="1-voltage-filter-test_voltage_filterc-12-tests">1. Voltage Filter (<code>test_voltage_filter.c</code>) — 12 tests<a class="headerlink" href="#1-voltage-filter-test_voltage_filterc-12-tests" title="Permanent link">&para;</a></h3>
+<p>Tests the moving average filter in isolation. No mocks needed — the filter is a pure function operating on a struct.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_init_null_filter</code></td>
+<td>NULL filter pointer returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_init_valid</code></td>
+<td>Initialization succeeds, zeroes internal state</td>
+</tr>
+<tr>
+<td><code>test_update_null_filter</code></td>
+<td>NULL filter pointer returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_update_null_output</code></td>
+<td>NULL output pointer returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_update_single_sample</code></td>
+<td>First sample returned directly (no averaging yet)</td>
+</tr>
+<tr>
+<td><code>test_update_averaging</code></td>
+<td>Average of two samples is correct</td>
+</tr>
+<tr>
+<td><code>test_update_window_full</code></td>
+<td>Window fills and computes correct average of 12 samples</td>
+</tr>
+<tr>
+<td><code>test_update_window_rollover</code></td>
+<td>After window overflows, oldest sample drops out correctly</td>
+</tr>
+<tr>
+<td><code>test_reset_clears_state</code></td>
+<td>Reset zeroes count, sum, and index</td>
+</tr>
+<tr>
+<td><code>test_init_window_zero_clamps</code></td>
+<td>Window size 0 clamps to 1</td>
+</tr>
+<tr>
+<td><code>test_init_window_over_max_clamps</code></td>
+<td>Window above max clamps to max (64)</td>
+</tr>
+<tr>
+<td><code>test_get_without_update</code></td>
+<td>Get after init (no samples) returns INVALID_ARG</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-soc-lut-test_soc_lutc-19-tests">2. SoC LUT (<code>test_soc_lut.c</code>) — 19 tests<a class="headerlink" href="#2-soc-lut-test_soc_lutc-19-tests" title="Permanent link">&para;</a></h3>
+<p>Tests the voltage-to-SoC lookup table interpolation for both CR2032 and LiPo chemistries. Pure integer math, no mocks.</p>
+<p><strong>CR2032 (11 tests)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_null_lut</code></td>
+<td>NULL LUT pointer returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_null_output</code></td>
+<td>NULL output pointer returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_empty_lut</code></td>
+<td>Empty LUT (count=0) returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_exact_3000mv_is_100pct</code></td>
+<td>3000 mV returns exactly 10000 (100.00%)</td>
+</tr>
+<tr>
+<td><code>test_exact_2000mv_is_0pct</code></td>
+<td>2000 mV returns exactly 0 (0.00%)</td>
+</tr>
+<tr>
+<td><code>test_exact_2700mv_is_50pct</code></td>
+<td>2700 mV returns exactly 5000 (50.00%)</td>
+</tr>
+<tr>
+<td><code>test_above_max_clamps_to_100pct</code></td>
+<td>3300 mV clamps to 10000 (100.00%)</td>
+</tr>
+<tr>
+<td><code>test_below_min_clamps_to_0pct</code></td>
+<td>1800 mV clamps to 0 (0.00%)</td>
+</tr>
+<tr>
+<td><code>test_interpolation_midpoint_2950mv</code></td>
+<td>2950 mV interpolates to 9500 (95.00%)</td>
+</tr>
+<tr>
+<td><code>test_interpolation_2850mv</code></td>
+<td>2850 mV interpolates to 8000 (80.00%)</td>
+</tr>
+<tr>
+<td><code>test_interpolation_2300mv</code></td>
+<td>2300 mV interpolates to 750 (7.50%)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>LiPo 1S (8 tests)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_lipo_4200mv_is_100pct</code></td>
+<td>4200 mV returns exactly 10000 (100.00%)</td>
+</tr>
+<tr>
+<td><code>test_lipo_3000mv_is_0pct</code></td>
+<td>3000 mV returns exactly 0 (0.00%)</td>
+</tr>
+<tr>
+<td><code>test_lipo_3870mv_is_55pct</code></td>
+<td>3870 mV returns exactly 5500 (55.00%)</td>
+</tr>
+<tr>
+<td><code>test_lipo_above_max_clamps</code></td>
+<td>4500 mV clamps to 10000 (100.00%)</td>
+</tr>
+<tr>
+<td><code>test_lipo_below_min_clamps</code></td>
+<td>2500 mV clamps to 0 (0.00%)</td>
+</tr>
+<tr>
+<td><code>test_lipo_interpolation_3950mv</code></td>
+<td>Plateau region: 3950 mV interpolates to 7000 (70.00%)</td>
+</tr>
+<tr>
+<td><code>test_lipo_interpolation_3745mv</code></td>
+<td>Knee region: 3745 mV interpolates to 2000 (20.00%)</td>
+</tr>
+<tr>
+<td><code>test_lipo_interpolation_3600mv</code></td>
+<td>Steep cliff: 3600 mV interpolates to 650 (6.50%)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-soc-temperature-compensation-test_soc_temp_compc">3. SoC Temperature Compensation (<code>test_soc_temp_comp.c</code>)<a class="headerlink" href="#3-soc-temperature-compensation-test_soc_temp_compc" title="Permanent link">&para;</a></h3>
+<p>Tests temperature compensation logic for LiPo SoC estimation. Pure integer math, no mocks.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Temperature correction factors</td>
+<td>Cold/hot temperature adjustments to SoC</td>
+</tr>
+<tr>
+<td>CR2032 passthrough</td>
+<td>No compensation applied when chemistry is CR2032</td>
+</tr>
+<tr>
+<td>Boundary conditions</td>
+<td>Edge cases at temperature extremes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4-telemetry-test_telemetryc-9-tests">4. Telemetry (<code>test_telemetry.c</code>) — 9 tests<a class="headerlink" href="#4-telemetry-test_telemetryc-9-tests" title="Permanent link">&para;</a></h3>
+<p>Tests the telemetry collection logic with configurable mocks for all dependencies.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_collect_null_packet</code></td>
+<td>NULL packet pointer returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_collect_full_packet</code></td>
+<td>Full packet with all fields populated, flags=0</td>
+</tr>
+<tr>
+<td><code>test_collect_voltage_error_sets_flag</code></td>
+<td>Voltage failure sets VOLTAGE_ERR flag, field zeroed</td>
+</tr>
+<tr>
+<td><code>test_collect_temp_error_sets_flag</code></td>
+<td>Temperature failure sets TEMP_ERR flag</td>
+</tr>
+<tr>
+<td><code>test_collect_soc_error_sets_flag</code></td>
+<td>SoC failure sets SOC_ERR flag</td>
+</tr>
+<tr>
+<td><code>test_collect_power_error_sets_flag</code></td>
+<td>Power state failure sets POWER_STATE_ERR flag</td>
+</tr>
+<tr>
+<td><code>test_collect_timestamp_error_sets_flag</code></td>
+<td>Timestamp failure sets TIMESTAMP_ERR flag, field zeroed</td>
+</tr>
+<tr>
+<td><code>test_collect_multiple_failures</code></td>
+<td>Multiple subsystems fail — correct flags accumulated, good fields intact</td>
+</tr>
+<tr>
+<td><code>test_init_returns_ok</code></td>
+<td><code>battery_telemetry_init()</code> returns OK</td>
+</tr>
+</tbody>
+</table>
+<h3 id="5-temperature-test_temperaturec-7-tests">5. Temperature (<code>test_temperature.c</code>) — 7 tests<a class="headerlink" href="#5-temperature-test_temperaturec-7-tests" title="Permanent link">&para;</a></h3>
+<p>Tests the temperature module with mock HAL. Verifies HAL delegation, error propagation, and edge cases.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_get_null_pointer</code></td>
+<td>NULL output returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_get_returns_hal_value</code></td>
+<td>Normal read returns HAL value (23.50 C)</td>
+</tr>
+<tr>
+<td><code>test_get_negative_temperature</code></td>
+<td>Handles negative values (-10.50 C)</td>
+</tr>
+<tr>
+<td><code>test_get_zero_temperature</code></td>
+<td>Handles exactly 0.00 C</td>
+</tr>
+<tr>
+<td><code>test_get_hal_io_error</code></td>
+<td>HAL IO error propagates correctly</td>
+</tr>
+<tr>
+<td><code>test_init_hal_failure</code></td>
+<td>Init failure from HAL propagates</td>
+</tr>
+<tr>
+<td><code>test_init_success</code></td>
+<td>Successful init returns OK</td>
+</tr>
+</tbody>
+</table>
+<h3 id="6-ntc-lut-test_ntc_lutc-21-tests">6. NTC LUT (<code>test_ntc_lut.c</code>) — 21 tests<a class="headerlink" href="#6-ntc-lut-test_ntc_lutc-21-tests" title="Permanent link">&para;</a></h3>
+<p>Tests the NTC thermistor resistance-to-temperature conversion pipeline: voltage divider math and LUT interpolation. Pure integer math, no mocks.</p>
+<p><strong>Resistance Conversion (8 tests)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_resistance_null_output</code></td>
+<td>NULL output returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_resistance_zero_vdd</code></td>
+<td>Zero VDD returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_resistance_adc_equals_vdd_open_circuit</code></td>
+<td>ADC = VDD (open circuit NTC) returns IO error</td>
+</tr>
+<tr>
+<td><code>test_resistance_adc_above_vdd_open_circuit</code></td>
+<td>ADC &gt; VDD returns IO error</td>
+</tr>
+<tr>
+<td><code>test_resistance_adc_zero_shorted</code></td>
+<td>ADC = 0 (shorted NTC) returns resistance = 0</td>
+</tr>
+<tr>
+<td><code>test_resistance_half_vdd_equals_pullup</code></td>
+<td>ADC = VDD/2 → R = pullup (balanced divider)</td>
+</tr>
+<tr>
+<td><code>test_resistance_low_voltage_high_resistance</code></td>
+<td>Low ADC → high resistance (cold NTC)</td>
+</tr>
+<tr>
+<td><code>test_resistance_high_voltage_low_resistance</code></td>
+<td>High ADC → low resistance (hot NTC)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>LUT Interpolation (13 tests)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_interpolate_null_lut</code></td>
+<td>NULL LUT returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_interpolate_null_output</code></td>
+<td>NULL output returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_interpolate_empty_lut</code></td>
+<td>Empty LUT returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_interpolate_exact_25c_reference</code></td>
+<td>10000 Ω = 25.00 °C (reference point)</td>
+</tr>
+<tr>
+<td><code>test_interpolate_exact_0c</code></td>
+<td>33640 Ω = 0.00 °C</td>
+</tr>
+<tr>
+<td><code>test_interpolate_exact_negative_40c</code></td>
+<td>401600 Ω = -40.00 °C (coldest entry)</td>
+</tr>
+<tr>
+<td><code>test_interpolate_exact_125c</code></td>
+<td>359 Ω = 125.00 °C (hottest entry)</td>
+</tr>
+<tr>
+<td><code>test_interpolate_above_max_resistance_clamps_cold</code></td>
+<td>Very high R clamps to -40 °C</td>
+</tr>
+<tr>
+<td><code>test_interpolate_below_min_resistance_clamps_hot</code></td>
+<td>Very low R clamps to 125 °C</td>
+</tr>
+<tr>
+<td><code>test_interpolate_midpoint_20c_25c</code></td>
+<td>11260 Ω → 22.50 °C (room temp interpolation)</td>
+</tr>
+<tr>
+<td><code>test_interpolate_negative_range</code></td>
+<td>152900 Ω → -25.00 °C (negative temp interpolation)</td>
+</tr>
+<tr>
+<td><code>test_interpolate_across_zero</code></td>
+<td>26920 Ω → 5.00 °C (crosses 0 °C boundary)</td>
+</tr>
+<tr>
+<td><code>test_interpolate_hot_range</code></td>
+<td>983 Ω → 90.01 °C (high temp interpolation)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="7-power-manager-test_power_managerc-12-tests">7. Power Manager (<code>test_power_manager.c</code>) — 12 tests<a class="headerlink" href="#7-power-manager-test_power_managerc-12-tests" title="Permanent link">&para;</a></h3>
+<p>Tests the voltage-threshold state machine with hysteresis. Uses mock voltage to simulate battery conditions.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_get_state_null_pointer</code></td>
+<td>NULL output returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_healthy_voltage_returns_active</code></td>
+<td>2950 mV → ACTIVE</td>
+</tr>
+<tr>
+<td><code>test_below_critical_threshold_returns_critical</code></td>
+<td>2050 mV → CRITICAL</td>
+</tr>
+<tr>
+<td><code>test_at_critical_enter_boundary</code></td>
+<td>2100 mV stays ACTIVE (strict less-than)</td>
+</tr>
+<tr>
+<td><code>test_one_below_critical_enter</code></td>
+<td>2099 mV → CRITICAL</td>
+</tr>
+<tr>
+<td><code>test_hysteresis_stays_critical_in_deadband</code></td>
+<td>CRITICAL at 2150 mV stays CRITICAL</td>
+</tr>
+<tr>
+<td><code>test_hysteresis_exits_critical_above_exit</code></td>
+<td>CRITICAL → 2201 mV → ACTIVE</td>
+</tr>
+<tr>
+<td><code>test_hysteresis_at_exit_boundary</code></td>
+<td>CRITICAL at 2200 mV stays CRITICAL (strict greater-than)</td>
+</tr>
+<tr>
+<td><code>test_voltage_error_returns_last_known_active</code></td>
+<td>Voltage fail after ACTIVE → still ACTIVE</td>
+</tr>
+<tr>
+<td><code>test_voltage_error_returns_last_known_critical</code></td>
+<td>Voltage fail after CRITICAL → still CRITICAL</td>
+</tr>
+<tr>
+<td><code>test_init_returns_ok</code></td>
+<td>Init succeeds with OK</td>
+</tr>
+<tr>
+<td><code>test_init_sets_active</code></td>
+<td>Post-init state is ACTIVE</td>
+</tr>
+</tbody>
+</table>
+<h3 id="8-power-manager-charger-test_power_manager_charger-23-tests">8. Power Manager + Charger (<code>test_power_manager_charger</code>) — 23 tests<a class="headerlink" href="#8-power-manager-charger-test_power_manager_charger-23-tests" title="Permanent link">&para;</a></h3>
+<p>Same test file as Power Manager but compiled with <code>CONFIG_BATTERY_CHARGER_TP4056=1</code>. Tests charger-specific state transitions.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CHARGING state</td>
+<td>CHRG=LOW detected correctly</td>
+</tr>
+<tr>
+<td>CHARGED state</td>
+<td>STDBY=LOW detected correctly</td>
+</tr>
+<tr>
+<td>DISCHARGING default</td>
+<td>Both pins floating → DISCHARGING</td>
+</tr>
+<tr>
+<td>Critical-to-charging recovery</td>
+<td>CRITICAL → charger connected → CHARGING</td>
+</tr>
+<tr>
+<td>Charger error fallback</td>
+<td>Charger read failure → fall through to voltage logic</td>
+</tr>
+<tr>
+<td>Charging overrides idle</td>
+<td>CHARGING takes priority over inactivity-based IDLE/SLEEP</td>
+</tr>
+</tbody>
+</table>
+<h3 id="9-serialization-test_serializec-15-tests">9. Serialization (<code>test_serialize.c</code>) — 15 tests<a class="headerlink" href="#9-serialization-test_serializec-15-tests" title="Permanent link">&para;</a></h3>
+<p>Tests the telemetry packet wire serialization (pack/unpack). Pure logic, no mocks.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_pack_null_pkt</code></td>
+<td>NULL packet returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_pack_null_buf</code></td>
+<td>NULL buffer returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_pack_short_buf</code></td>
+<td>Buffer &lt; 20 bytes returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_unpack_null_buf</code></td>
+<td>NULL buffer returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_unpack_null_pkt</code></td>
+<td>NULL packet returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_unpack_short_buf</code></td>
+<td>Buffer &lt; 20 bytes returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_roundtrip_typical</code></td>
+<td>Pack → unpack with typical values matches original</td>
+</tr>
+<tr>
+<td><code>test_roundtrip_zeroes</code></td>
+<td>All-zero packet survives round-trip</td>
+</tr>
+<tr>
+<td><code>test_roundtrip_max_values</code></td>
+<td>Maximum field values survive round-trip</td>
+</tr>
+<tr>
+<td><code>test_roundtrip_negative_values</code></td>
+<td>Negative voltage/temperature survive round-trip</td>
+</tr>
+<tr>
+<td><code>test_roundtrip_all_power_states</code></td>
+<td>All power state enum values survive round-trip</td>
+</tr>
+<tr>
+<td><code>test_wire_version_byte</code></td>
+<td>Version byte at correct offset (0)</td>
+</tr>
+<tr>
+<td><code>test_wire_timestamp_le</code></td>
+<td>Timestamp at offset 1, little-endian</td>
+</tr>
+<tr>
+<td><code>test_wire_voltage_le</code></td>
+<td>Voltage at offset 5, little-endian</td>
+</tr>
+<tr>
+<td><code>test_wire_format_total_size</code></td>
+<td>Pack writes exactly 20 bytes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="10-transport-test_transportc-11-tests">10. Transport (<code>test_transport.c</code>) — 11 tests<a class="headerlink" href="#10-transport-test_transportc-11-tests" title="Permanent link">&para;</a></h3>
+<p>Tests the transport abstraction layer with a mock backend. Verifies delegation, error propagation, and wire byte correctness.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_init_calls_backend</code></td>
+<td>Init delegates to backend and returns OK</td>
+</tr>
+<tr>
+<td><code>test_init_error_propagates</code></td>
+<td>Backend init error propagates to caller</td>
+</tr>
+<tr>
+<td><code>test_send_null_packet</code></td>
+<td>NULL packet returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_send_happy_path</code></td>
+<td>Send serializes and delegates, correct wire size</td>
+</tr>
+<tr>
+<td><code>test_send_captures_correct_wire_bytes</code></td>
+<td>Captured bytes match independent serialization</td>
+</tr>
+<tr>
+<td><code>test_send_backend_error_propagates</code></td>
+<td>Backend send error propagates to caller</td>
+</tr>
+<tr>
+<td><code>test_deinit_calls_backend</code></td>
+<td>Deinit delegates to backend</td>
+</tr>
+<tr>
+<td><code>test_deinit_error_propagates</code></td>
+<td>Backend deinit error propagates</td>
+</tr>
+<tr>
+<td><code>test_is_connected_null_pointer</code></td>
+<td>NULL output returns INVALID_ARG</td>
+</tr>
+<tr>
+<td><code>test_is_connected_returns_false</code></td>
+<td>Reports disconnected state correctly</td>
+</tr>
+<tr>
+<td><code>test_is_connected_returns_true</code></td>
+<td>Reports connected state correctly</td>
+</tr>
+</tbody>
+</table>
+<h3 id="11-cycle-counter-test_cycle_counterc">11. Cycle Counter (<code>test_cycle_counter.c</code>)<a class="headerlink" href="#11-cycle-counter-test_cycle_counterc" title="Permanent link">&para;</a></h3>
+<p>Tests charge cycle counting logic with mock NVS backend.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>What it verifies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Init loads from NVS</td>
+<td>Stored count loaded on init</td>
+</tr>
+<tr>
+<td>Init with no stored value</td>
+<td>Starts at 0 when NVS is empty</td>
+</tr>
+<tr>
+<td>CHARGING → CHARGED increments</td>
+<td>Transition detected, count incremented</td>
+</tr>
+<tr>
+<td>Non-transition no increment</td>
+<td>Other state changes don't increment</td>
+</tr>
+<tr>
+<td>Get returns current count</td>
+<td><code>battery_cycle_counter_get()</code> returns correct value</td>
+</tr>
+<tr>
+<td>NULL pointer check</td>
+<td>NULL output returns INVALID_ARG</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="python-gateway-tests">Python Gateway Tests<a class="headerlink" href="#python-gateway-tests" title="Permanent link">&para;</a></h2>
+<p>The gateway has <strong>58 pytest tests</strong> across 6 test files.</p>
+<h3 id="running">Running<a class="headerlink" href="#running" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>gateway
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/<span class="w"> </span>-v
+</code></pre></div>
+<h3 id="test-files">Test Files<a class="headerlink" href="#test-files" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Tests</th>
+<th>What it covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_decoder.py</code></td>
+<td>25</td>
+<td>Wire v1 (20B) and v2 (24B) decoding, error handling, format_packet</td>
+</tr>
+<tr>
+<td><code>test_writer.py</code></td>
+<td>5</td>
+<td>InfluxDB point construction, error resilience</td>
+</tr>
+<tr>
+<td><code>test_realtime.py</code></td>
+<td>16</td>
+<td>Per-packet anomaly detection: voltage critical, SoC inconsistency, temperature high/low, multiple anomalies, CR2032 compatibility</td>
+</tr>
+<tr>
+<td><code>test_rul_estimator.py</code></td>
+<td>5</td>
+<td>Linear regression for RUL: positive/negative slope, flat, single point, two points</td>
+</tr>
+<tr>
+<td><code>test_cycle_analyzer.py</code></td>
+<td>2</td>
+<td>CycleAnalyzer instantiation, context manager protocol</td>
+</tr>
+<tr>
+<td><code>test_health_score.py</code></td>
+<td>5</td>
+<td>Health scoring logic</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="mock-architecture">Mock Architecture<a class="headerlink" href="#mock-architecture" title="Permanent link">&para;</a></h2>
+<p>Mock files are in <code>tests/mocks/</code>. Each mock provides:
+- A stub implementation of the real module's functions
+- <code>mock_*_set_rc()</code> — set the return code for subsequent calls
+- <code>mock_*_set_*()</code> — set the value that will be written to output parameters</p>
+<h3 id="mock-files">Mock files<a class="headerlink" href="#mock-files" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Mock</th>
+<th>Replaces</th>
+<th>Configurable state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mock_hal.c</code></td>
+<td><code>battery_hal_zephyr.c</code> + <code>battery_hal_adc_zephyr.c</code> + <code>battery_hal_temp_zephyr.c</code></td>
+<td>uptime_ms, adc_raw, adc_mv, temp_c_x100, return codes</td>
+</tr>
+<tr>
+<td><code>mock_voltage.c</code></td>
+<td><code>battery_voltage.c</code></td>
+<td>voltage_mv, return code</td>
+</tr>
+<tr>
+<td><code>mock_temperature.c</code></td>
+<td><code>battery_temperature.c</code></td>
+<td>temperature_c_x100, return code</td>
+</tr>
+<tr>
+<td><code>mock_soc.c</code></td>
+<td><code>battery_soc_estimator.c</code></td>
+<td>soc_pct_x100, return code</td>
+</tr>
+<tr>
+<td><code>mock_power.c</code></td>
+<td><code>battery_power_manager.c</code></td>
+<td>power_state, return code</td>
+</tr>
+<tr>
+<td><code>mock_sdk_state.c</code></td>
+<td><code>battery_sdk.c</code> (state + uptime)</td>
+<td>all-initialized state, uptime_ms, return code</td>
+</tr>
+<tr>
+<td><code>mock_transport.c</code></td>
+<td><code>battery_transport_ble_zephyr.c</code></td>
+<td>init/send/deinit return codes, connected state, captured send buffer + count</td>
+</tr>
+<tr>
+<td><code>mock_charger.c</code></td>
+<td><code>battery_hal_charger_tp4056_zephyr.c</code></td>
+<td>charger state (CHRG/STDBY pins), return code</td>
+</tr>
+<tr>
+<td><code>mock_nvs.c</code></td>
+<td><code>battery_hal_nvs_zephyr.c</code></td>
+<td>NVS read/write values, return codes (RAM-backed)</td>
+</tr>
+<tr>
+<td><code>mock_cycle_counter.c</code></td>
+<td><code>battery_cycle_counter.c</code></td>
+<td>cycle count value, return code</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-configuring-a-mock">Example: configuring a mock<a class="headerlink" href="#example-configuring-a-mock" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="cm">/* In test setup */</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">mock_voltage_set_rc</span><span class="p">(</span><span class="n">BATTERY_STATUS_OK</span><span class="p">);</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">mock_voltage_set_mv</span><span class="p">(</span><span class="mi">2950</span><span class="p">);</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="cm">/* Now battery_voltage_get_mv() will write 2950 and return OK */</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="cm">/* Simulate a failure */</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">mock_voltage_set_rc</span><span class="p">(</span><span class="n">BATTERY_STATUS_IO</span><span class="p">);</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="cm">/* Now battery_voltage_get_mv() will return IO error */</span>
+</code></pre></div>
+<hr />
+<h2 id="adding-a-new-test">Adding a New Test<a class="headerlink" href="#adding-a-new-test" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Create <code>tests/test_&lt;module&gt;.c</code> with Unity test functions</li>
+<li>Add to <code>tests/CMakeLists.txt</code>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">add_executable</span><span class="p">(</span><span class="s">test_&lt;module&gt;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="s">test_&lt;module&gt;.c</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="o">${</span><span class="nv">SDK_SRC</span><span class="o">}</span><span class="s">/path/to/module_under_test.c</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="c"># any mocks needed</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">)</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nb">target_include_directories</span><span class="p">(</span><span class="s">test_&lt;module&gt;</span><span class="w"> </span><span class="s">PRIVATE</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="o">${</span><span class="nv">SDK_INCLUDE</span><span class="o">}</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="o">${</span><span class="nv">SDK_SRC</span><span class="o">}</span><span class="s">/relevant/dirs</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="o">${</span><span class="nv">unity_SOURCE_DIR</span><span class="o">}</span><span class="s">/src</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">)</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">test_&lt;module&gt;</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">unity</span><span class="p">)</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="nb">add_test</span><span class="p">(</span><span class="s">NAME</span><span class="w"> </span><span class="s">&lt;module&gt;</span><span class="w"> </span><span class="s">COMMAND</span><span class="w"> </span><span class="s">test_&lt;module&gt;</span><span class="p">)</span>
+</code></pre></div></li>
+<li>Run: <code>cmake --build build_tests &amp;&amp; ctest --test-dir build_tests --output-on-failure</code></li>
+</ol>
+<hr />
+<h2 id="hardware-validation">Hardware Validation<a class="headerlink" href="#hardware-validation" title="Permanent link">&para;</a></h2>
+<p>In addition to host tests, firmware changes are validated on real hardware.</p>
+<h3 id="nrf52840-dk">nRF52840-DK<a class="headerlink" href="#nrf52840-dk" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Build: <code>west build -b nrf52840dk/nrf52840 app -d build-nrf --pristine</code></li>
+<li>Flash: <code>west flash -d build-nrf</code></li>
+<li>Monitor serial output (115200 baud) for telemetry packets</li>
+<li>Verify voltage readings match expected CR2032 range (2000-3100 mV)</li>
+<li>Verify <code>flags=0x00000000</code> (no collection errors)</li>
+<li>Verify BLE: <code>ibattery-gateway scan</code> finds "iBattery"</li>
+</ol>
+<h3 id="nucleo-l476rg-stm32">NUCLEO-L476RG (STM32)<a class="headerlink" href="#nucleo-l476rg-stm32" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Build: <code>west build -b nucleo_l476rg app -d build-stm32 --pristine -- -DZEPHYR_EXTRA_MODULES="..."</code></li>
+<li>Flash: <code>west flash -d build-stm32 --runner openocd</code></li>
+<li>Monitor serial on <code>/dev/tty.usbmodem*</code> (115200 baud)</li>
+<li>Verify boot banner shows "Platform: STM32L4 (NUCLEO-L476RG)"</li>
+<li>Verify VDD ~3300 mV (USB powered), die temp 20-40 C, <code>flags=0x00000000</code></li>
+<li>Verify state machine: ACTIVE (t=0) → IDLE (~30s) → SLEEP (~120s)</li>
+</ol>
+<h3 id="nucleo-l476rg-ble-shield">NUCLEO-L476RG + BLE Shield<a class="headerlink" href="#nucleo-l476rg-ble-shield" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Mount X-NUCLEO-IDB05A2 on Arduino headers</li>
+<li>Build with <code>-DSHIELD=x_nucleo_idb05a1 -DEXTRA_CONF_FILE=boards/nucleo_l476rg_ble.conf</code></li>
+<li>Flash and verify "iBattery-STM32" visible in <code>ibattery-gateway scan</code></li>
+<li>Verify <code>ibattery-gateway stream</code> receives v2 telemetry packets</li>
+<li>Verify full pipeline: <code>ibattery-gateway run</code> → InfluxDB → Grafana dashboard</li>
+</ol>
+<h3 id="esp32-c3-devkitm">ESP32-C3 DevKitM<a class="headerlink" href="#esp32-c3-devkitm" title="Permanent link">&para;</a></h3>
+<p>Requires a vanilla Zephyr v4.2.2 workspace (not NCS). See CLAUDE.md for build commands.</p>
+<ol>
+<li>Build: <code>west build -b esp32c3_devkitm /path/to/ibattery-sdk/app -d build-esp32c3 --pristine</code></li>
+<li>Flash: <code>west flash -d build-esp32c3</code></li>
+<li>Monitor serial on <code>/dev/tty.usbserial-*</code> (115200 baud)</li>
+<li>Verify boot banner shows "Platform: ESP32-C3 (DevKitM)"</li>
+<li>Verify die temp 30-50 C (ESP32-C3 runs warmer than nRF/STM32)</li>
+<li>Verify BLE: <code>ibattery-gateway scan</code> finds "iBattery-ESP32C3"</li>
+<li>Verify <code>ibattery-gateway stream</code> receives v2 telemetry packets</li>
+<li>Verify full pipeline: <code>ibattery-gateway run</code> → InfluxDB → Grafana dashboard</li>
+<li>Note: VDD reads floating value without voltage divider hardware (2x 100K resistors on GPIO2)</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
