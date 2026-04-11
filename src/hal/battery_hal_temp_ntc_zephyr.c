@@ -45,7 +45,11 @@
 #define NTC_ADC_RESOLUTION    12
 #define NTC_ADC_GAIN          BATTERY_ADC_NTC_GAIN
 #define NTC_ADC_REFERENCE     BATTERY_ADC_NTC_REFERENCE
+#if defined(CONFIG_SOC_SERIES_ESP32C3)
+#define NTC_ADC_ACQ_TIME      ADC_ACQ_TIME_DEFAULT
+#else
 #define NTC_ADC_ACQ_TIME      ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 40)
+#endif
 #define NTC_ADC_INPUT         BATTERY_ADC_NTC_INPUT
 
 /* ── Circuit parameters ─────────────────────────────────────────── */
@@ -88,8 +92,10 @@ int battery_hal_temp_read_c_x100(int32_t *temp_c_x100_out)
         .buffer       = &g_ntc_sample_buffer,
         .buffer_size  = sizeof(g_ntc_sample_buffer),
         .resolution   = NTC_ADC_RESOLUTION,
+#if !defined(CONFIG_SOC_SERIES_ESP32C3)
         .oversampling = 4,
         .calibrate    = true,
+#endif
     };
     int32_t adc_mv;
     uint32_t resistance;
