@@ -29,12 +29,8 @@
 	status = "okay";
 };
 
-/* I2C bus for INA219 current sensor (SDA=GPIO6, SCL=GPIO7) */
+/* INA219 current sensor on I2C0 (SDA=GPIO1, SCL=GPIO3) */
 &i2c0 {
-	status = "okay";
-	pinctrl-0 = <&i2c0_default>;
-	pinctrl-names = "default";
-
 	ina219: ina219@40 {
 		compatible = "ti,ina219";
 		reg = <0x40>;

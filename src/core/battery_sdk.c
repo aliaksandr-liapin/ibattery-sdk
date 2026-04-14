@@ -21,6 +21,14 @@
 #include "../hal/battery_hal_charger.h"
 #endif
 
+#if defined(CONFIG_BATTERY_CURRENT_SENSE)
+#include <battery_sdk/battery_hal_current.h>
+#endif
+
+#if defined(CONFIG_BATTERY_SOC_COULOMB)
+#include <battery_sdk/battery_coulomb.h>
+#endif
+
 #include "../hal/battery_hal.h"
 
 static struct battery_sdk_runtime_state g_battery_sdk_state = {
@@ -73,6 +81,20 @@ int battery_sdk_init(void)
     if (rc != BATTERY_STATUS_OK) {
         return rc;
     }
+
+#if defined(CONFIG_BATTERY_CURRENT_SENSE)
+    rc = battery_hal_current_init();
+    if (rc != BATTERY_STATUS_OK) {
+        printk("Warning: current sensor init failed (%d), continuing\n", rc);
+    }
+#endif
+
+#if defined(CONFIG_BATTERY_SOC_COULOMB)
+    rc = battery_coulomb_init();
+    if (rc != BATTERY_STATUS_OK) {
+        printk("Warning: coulomb counter init failed (%d), continuing\n", rc);
+    }
+#endif
 
     rc = battery_soc_estimator_init();
     if (rc != BATTERY_STATUS_OK) {
