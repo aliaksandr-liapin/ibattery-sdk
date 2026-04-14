@@ -29,11 +29,14 @@
 	status = "okay";
 };
 
-/* INA219 current sensor on I2C0 (SDA=GPIO1, SCL=GPIO3) */
+/* INA219 current sensor on I2C0 (SDA=GPIO1, SCL=GPIO3).
+ * Status "disabled" prevents Zephyr driver from running at boot
+ * (which corrupts the I2C bus on ESP32-C3). The SDK HAL uses raw I2C. */
 &i2c0 {
 	ina219: ina219@40 {
 		compatible = "ti,ina219";
 		reg = <0x40>;
+		status = "disabled";
 		shunt-milliohm = <100>;
 		lsb-microamp = <100>;
 		brng = <0>;
