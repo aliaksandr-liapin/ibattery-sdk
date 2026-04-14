@@ -213,6 +213,20 @@ target_include_directories(test_cycle_counter PRIVATE
 
 target_link_libraries(test_cycle_counter PRIVATE unity)
 
+# ── Current HAL stub test ──────────────────────────────────────────────────
+add_executable(test_hal_current_stub
+    test_hal_current_stub.c
+    ${SDK_SRC}/hal/battery_hal_current_stub.c
+)
+
+target_include_directories(test_hal_current_stub PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_hal_current_stub PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
@@ -226,3 +240,4 @@ add_test(NAME ntc_lut COMMAND test_ntc_lut)
 add_test(NAME serialize COMMAND test_serialize)
 add_test(NAME transport COMMAND test_transport)
 add_test(NAME cycle_counter COMMAND test_cycle_counter)
+add_test(NAME hal_current_stub COMMAND test_hal_current_stub)
