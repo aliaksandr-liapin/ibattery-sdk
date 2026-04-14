@@ -1,0 +1,57 @@
+{
+    "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
+    "name": "ibattery-sdk",
+    "version": "0.7.0",
+    "description": "Battery intelligence SDK for IoT — voltage measurement, SoC estimation, temperature monitoring, power state management, BLE telemetry. Supports CR2032 and LiPo.",
+    "keywords": "battery, soc, voltage, iot, embedded, lipo, cr2032, telemetry, ble, power-management, zephyr",
+    "homepage": "https://aliaksandr-liapin.github.io/ibattery-sdk/",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/aliaksandr-liapin/ibattery-sdk.git"
+    },
+    "authors": [
+        {
+            "name": "Aliaksandr Liapin",
+            "url": "https://github.com/aliaksandr-liapin",
+            "maintainer": true
+        }
+    ],
+    "license": "Apache-2.0",
+    "frameworks": ["zephyr"],
+    "platforms": [
+        "nordicnrf52",
+        "ststm32",
+        "espressif32"
+    ],
+    "build": {
+        "srcDir": "src",
+        "includeDir": "include"
+    },
+    "export": {
+        "include": [
+            "include/*",
+            "src/*",
+            "zephyr/*",
+            "app/Kconfig.battery",
+            "Kconfig.ibattery",
+            "CMakeLists.txt",
+            "library.json",
+            "LICENSE",
+            "README.md"
+        ],
+        "exclude": [
+            "tests/*",
+            "gateway/*",
+            "cloud/*",
+            "docs/*",
+            "app/src/*",
+            "app/boards/*",
+            "app/CMakeLists.txt",
+            "board_pins/*",
+            "launch/*",
+            ".github/*",
+            "mkdocs.yml",
+            "site/*"
+        ]
+    }
+}
