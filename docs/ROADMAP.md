@@ -121,10 +121,34 @@ Lower scale but immediate revenue with zero infrastructure cost.
 |----------|------|--------|
 | ~~9~~ | ~~Advanced SoC — temperature compensation~~ | ✅ Done (v0.5.0 — LiPo temp-compensated SoC) |
 | ~~10~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 + v0.5.1 — TP4056 GPIO driver + NVS cycle counter) |
-| 11 | Advanced SoC — coulomb counting or Kalman filter | Next accuracy improvement beyond temp compensation |
+| 8a | Advanced SoC — Coulomb Counting (current) | Current-sensor SoC with NVS persistence |
+| 8b | Advanced SoC — Voltage-LUT Correction (planned) | Software-only SoC jitter reduction |
+| 8c | Advanced SoC — Kalman Filter Fusion (planned) | Optimal multi-signal SoC estimation |
 | ~~12~~ | ~~PlatformIO library publication~~ | ✅ Done — published to registry.platformio.org |
 | ~~13~~ | ~~Documentation site — GitHub Pages with guides and API reference~~ | ✅ Done — aliaksandr-liapin.github.io/ibattery-sdk/ |
 | 14 | Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo) | Hardware reference designs drive SDK adoption |
+
+#### Phase 8a: Coulomb Counting SoC (current)
+
+- INA219 current sensor HAL (Zephyr sensor API)
+- Coulomb counter with trapezoidal integration
+- Voltage-anchored SoC estimation (coulomb primary, LUT at endpoints)
+- Telemetry v3 wire format (32 bytes: adds current + coulomb fields)
+- NVS persistence for reboot survival
+- ESP32-C3 validated first, then nRF52840 + STM32
+
+#### Phase 8b: Voltage-LUT Correction Mode (planned)
+
+- Coulomb counting as smoothing layer over existing voltage-LUT
+- Reduces SoC jitter from voltage sag during BLE TX
+- No new hardware — software-only improvement
+
+#### Phase 8c: Kalman Filter Fusion (planned)
+
+- Optimal blending of voltage + coulomb + temperature signals
+- Weighted by confidence (voltage noisy under load, coulomb drifts over time)
+- Industry-standard approach (phones, EVs, medical devices)
+- Same public API — drop-in replacement for 8a estimator
 
 ### Long-term (6+ months)
 
