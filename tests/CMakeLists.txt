@@ -227,6 +227,23 @@ target_include_directories(test_hal_current_stub PRIVATE
 
 target_link_libraries(test_hal_current_stub PRIVATE unity)
 
+# ── Coulomb counter test ──────────────────────────────────────────────────
+add_executable(test_coulomb
+    test_coulomb.c
+    ${SDK_SRC}/intelligence/battery_coulomb.c
+    mocks/mock_nvs.c
+)
+
+target_include_directories(test_coulomb PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/intelligence
+    ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_coulomb PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
@@ -241,3 +258,4 @@ add_test(NAME serialize COMMAND test_serialize)
 add_test(NAME transport COMMAND test_transport)
 add_test(NAME cycle_counter COMMAND test_cycle_counter)
 add_test(NAME hal_current_stub COMMAND test_hal_current_stub)
+add_test(NAME coulomb COMMAND test_coulomb)
