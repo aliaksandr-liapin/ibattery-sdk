@@ -8,7 +8,8 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
 - **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32), ESP32-C3 DevKitM — all hardware-verified
-- **Next milestone**: Voltage divider validation + advanced SoC (coulomb counting)
+- **Next milestone**: Advanced SoC (coulomb counting / Kalman filter)
+- **Distribution**: PlatformIO registry + Zephyr module + GitHub Pages docs
 
 ## Build Commands
 

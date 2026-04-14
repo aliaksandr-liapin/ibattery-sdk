@@ -122,8 +122,8 @@ Lower scale but immediate revenue with zero infrastructure cost.
 | ~~9~~ | ~~Advanced SoC — temperature compensation~~ | ✅ Done (v0.5.0 — LiPo temp-compensated SoC) |
 | ~~10~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 + v0.5.1 — TP4056 GPIO driver + NVS cycle counter) |
 | 11 | Advanced SoC — coulomb counting or Kalman filter | Next accuracy improvement beyond temp compensation |
-| 12 | PlatformIO library publication | Major distribution channel for Arduino/ESP32 community |
-| 13 | Documentation site — GitHub Pages with guides and API reference | Lowers barrier to adoption |
+| ~~12~~ | ~~PlatformIO library publication~~ | ✅ Done — published to registry.platformio.org |
+| ~~13~~ | ~~Documentation site — GitHub Pages with guides and API reference~~ | ✅ Done — aliaksandr-liapin.github.io/ibattery-sdk/ |
 | 14 | Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo) | Hardware reference designs drive SDK adoption |
 
 ### Long-term (6+ months)

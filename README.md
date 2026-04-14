@@ -122,6 +122,13 @@ manifest:
 
 Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 
+### Install via PlatformIO
+
+```ini
+; platformio.ini
+lib_deps = aliaksandr-liapin/ibattery-sdk@^0.7.0
+```
+
 ### Run unit tests (host, no hardware needed)
 
 ```bash

@@ -104,6 +104,31 @@ west build -b nucleo_l476rg app -d build-stm32-ble --pristine -- \
   -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
 ```
 
+### Use as a Zephyr module (in your own project)
+
+Add to your `west.yml`:
+
+```yaml
+manifest:
+  remotes:
+    - name: aliaksandr-liapin
+      url-base: https://github.com/aliaksandr-liapin
+  projects:
+    - name: ibattery-sdk
+      remote: aliaksandr-liapin
+      revision: v0.7.0
+      path: modules/lib/ibattery-sdk
+```
+
+Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
+
+### Install via PlatformIO
+
+```ini
+; platformio.ini
+lib_deps = aliaksandr-liapin/ibattery-sdk@^0.7.0
+```
+
 ### Run unit tests (host, no hardware needed)
 
 ```bash
@@ -191,7 +216,7 @@ ibattery-sdk/
 
 ## Contributing
 
-See [Contributing](contributing.md) for development setup, code style, and how to submit changes.
+See [CONTRIBUTING.md](contributing.md) for development setup, code style, and how to submit changes.
 
 ---
 
