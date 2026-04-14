@@ -52,6 +52,12 @@ static void print_platform_info(void)
     printk("Charger:   disabled\n");
 #endif
 
+#if IS_ENABLED(CONFIG_BATTERY_CURRENT_SENSE)
+    printk("Current:   INA219 (coulomb counting)\n");
+#else
+    printk("Current:   disabled\n");
+#endif
+
     printk("============================================\n\n");
 }
 
@@ -74,7 +80,7 @@ int main(void)
         if (rc != BATTERY_STATUS_OK) {
             printk("Telemetry collect failed: %d\n", rc);
         } else {
-            printk("[v%u t=%u] V=%d mV T=%d.%02d C SOC=%u.%02u%% PWR=%u CYC=%u flags=0x%08x\n",
+            printk("[v%u t=%u] V=%d mV T=%d.%02d C SOC=%u.%02u%% PWR=%u CYC=%u flags=0x%08x",
                    pkt.telemetry_version,
                    pkt.timestamp_ms,
                    pkt.voltage_mv,
@@ -87,6 +93,19 @@ int main(void)
                    pkt.power_state,
                    pkt.cycle_count,
                    pkt.status_flags);
+
+#if IS_ENABLED(CONFIG_BATTERY_CURRENT_SENSE)
+            printk(" I=%d.%02d mA Q=%d.%02d mAh",
+                   pkt.current_ma_x100 / 100,
+                   (pkt.current_ma_x100 >= 0)
+                       ? (pkt.current_ma_x100 % 100)
+                       : -(pkt.current_ma_x100 % 100),
+                   pkt.coulomb_mah_x100 / 100,
+                   (pkt.coulomb_mah_x100 >= 0)
+                       ? (pkt.coulomb_mah_x100 % 100)
+                       : -(pkt.coulomb_mah_x100 % 100));
+#endif
+            printk("\n");
 
 #if IS_ENABLED(CONFIG_BATTERY_TRANSPORT)
             rc = battery_transport_send(&pkt);
