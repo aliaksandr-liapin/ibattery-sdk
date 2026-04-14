@@ -58,6 +58,18 @@ else()
     zephyr_library_sources(src/hal/battery_hal_nvs_stub.c)
 endif()
 
+# Current sensing HAL: Zephyr sensor API or stub
+if(CONFIG_BATTERY_CURRENT_SENSE)
+    zephyr_library_sources(src/hal/battery_hal_current_zephyr.c)
+else()
+    zephyr_library_sources(src/hal/battery_hal_current_stub.c)
+endif()
+
+# Coulomb counter
+zephyr_library_sources_ifdef(CONFIG_BATTERY_SOC_COULOMB
+    src/intelligence/battery_coulomb.c
+)
+
 # Temperature HAL: NTC thermistor or internal die sensor
 if(CONFIG_BATTERY_TEMP_NTC)
     zephyr_library_sources(

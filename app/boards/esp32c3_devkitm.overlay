@@ -28,3 +28,21 @@
 &coretemp {
 	status = "okay";
 };
+
+/* I2C bus for INA219 current sensor (SDA=GPIO6, SCL=GPIO7) */
+&i2c0 {
+	status = "okay";
+	pinctrl-0 = <&i2c0_default>;
+	pinctrl-names = "default";
+
+	ina219: ina219@40 {
+		compatible = "ti,ina219";
+		reg = <0x40>;
+		shunt-milliohm = <100>;
+		lsb-microamp = <100>;
+		brng = <0>;
+		pg = <1>;
+		sadc = <13>;
+		badc = <13>;
+	};
+};

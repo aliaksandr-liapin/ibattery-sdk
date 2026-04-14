@@ -107,6 +107,45 @@ config BATTERY_CYCLE_COUNTER
       to flash via Zephyr NVS.  Requires a charger driver for meaningful
       state transitions.
 
+config BATTERY_CURRENT_SENSE
+    bool "Enable current sensing (INA219)"
+    default n
+    select SENSOR
+    select I2C
+    help
+      Enable current measurement via an INA219 I2C sensor.
+      Required for coulomb counting SoC estimation.
+      The INA219 must be defined in the board's devicetree overlay.
+
+config BATTERY_SOC_COULOMB
+    bool "Coulomb counting SoC estimation"
+    default y if BATTERY_CURRENT_SENSE
+    depends on BATTERY_CURRENT_SENSE
+    help
+      Use coulomb counting (current integration) as the primary
+      SoC estimation method, with voltage-LUT anchoring at
+      full-charge and cutoff endpoints. Falls back to voltage-LUT
+      if current sensor is unavailable at runtime.
+
+config BATTERY_CAPACITY_MAH
+    int "Battery capacity in mAh"
+    default 220 if BATTERY_CHEMISTRY_CR2032
+    default 1000 if BATTERY_CHEMISTRY_LIPO
+    depends on BATTERY_SOC_COULOMB
+    help
+      Nominal battery capacity in milliamp-hours. Used by the
+      coulomb counting estimator to convert accumulated charge
+      to SoC percentage.
+
+config BATTERY_COULOMB_NVS_INTERVAL_S
+    int "Coulomb counter NVS save interval (seconds)"
+    default 60
+    depends on BATTERY_SOC_COULOMB
+    help
+      How often to persist the coulomb accumulator to flash.
+      Lower values improve reboot accuracy at the cost of
+      flash wear. Also saves on >1% SoC change regardless.
+
 config BATTERY_CHARGER_TP4056
     bool "TP4056 charger IC GPIO status detection"
     default n
