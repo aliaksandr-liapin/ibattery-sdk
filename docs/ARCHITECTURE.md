@@ -47,6 +47,10 @@
 |                    manager.c           lut.c          |
 |                                        battery_cycle_ |
 |                                        counter.c      |
+|                                        battery_       |
+|                                        coulomb.c      |
+|                                        battery_soc_   |
+|                                        coulomb.c      |
 |                                                       |
 |                 telemetry/                             |
 |                   battery_telemetry.c                  |
@@ -54,7 +58,7 @@
 |                 transport/                             |
 |                   battery_transport.c                  |
 |                   battery_serialize.c/.h  (v1: 20B,    |
-|                                           v2: 24B)    |
+|                                 v2: 24B, v3: 32B)     |
 |                   ble/                                 |
 |                     battery_transport_ble_zephyr.c     |
 +------------------------------------------------------+
@@ -75,6 +79,9 @@
 |  battery_hal_nvs.h              NVS flash key-value store  |
 |  battery_hal_nvs_zephyr.c       Zephyr NVS backend         |
 |  battery_hal_nvs_stub.c         Host-test stub (RAM-only)  |
+|  battery_hal_current.h          Current sensor interface    |
+|  battery_hal_current_zephyr.c   INA219 via Zephyr sensor   |
+|  battery_hal_current_stub.c     Host-test stub (returns 0) |
 |  helpers/                                                   |
 |    battery_adc_platform.h       Per-SoC ADC config macros  |
 +------------------------------------------------------+
@@ -175,6 +182,20 @@
 - `battery_cycle_counter_update(power_state)` called each telemetry loop; internally tracks previous state
 - `battery_cycle_counter_get(&count)` reads current count
 - Count included in telemetry packet (`cycle_count` field) and serialized in wire v2
+
+### intelligence/battery_coulomb.c
+- Coulomb counter with trapezoidal integration of current measurements
+- `battery_coulomb_update(current_ma_x100, dt_ms)` accumulates charge using `(I_prev + I_curr) / 2 * dt`
+- Uses `int64_t` accumulator for overflow safety (units: 0.01 mAh scaled)
+- Persists accumulated mAh to NVS flash periodically (survives reboots)
+- `battery_coulomb_reset(mah_x100)` sets accumulator to a known value (e.g., after voltage-based anchor)
+
+### intelligence/battery_soc_coulomb.c
+- Voltage-anchored coulomb counting SoC estimator
+- Primary: tracks SoC via coulomb counting (`delta_mAh / capacity_mAh`)
+- Anchors to LUT-based SoC at voltage endpoints (full charge / near-empty)
+- Requires `CONFIG_BATTERY_SOC_COULOMB=y` and `CONFIG_BATTERY_CAPACITY_MAH` (battery capacity)
+- Falls back to LUT-only SoC if current sensor is unavailable
 
 ### intelligence/battery_ntc_lut.c
 - 16-point resistance-to-temperature LUT for 10K NTC (B=3950), covering -40 °C to +125 °C
@@ -277,6 +298,13 @@ charge cycle analysis.
 - Default on nRF52; STM32 defaults to die temp (override with `CONFIG_BATTERY_TEMP_NTC=y`)
 - Same interface as die sensor HAL — modules above are unchanged
 
+### hal/battery_hal_current_zephyr.c (CONFIG_BATTERY_CURRENT_SENSE)
+- Reads INA219 current sensor via Zephyr sensor API (`SENSOR_CHAN_CURRENT`)
+- Device binding via devicetree node label (`ina219`)
+- `battery_hal_current_init()` validates device ready state
+- `battery_hal_current_read_ma_x100()` fetches sample and converts `sensor_value` to 0.01 mA units
+- Returns signed current (positive = discharge, negative = charge)
+
 ### hal/battery_hal_zephyr.c
 - `battery_hal_init()` calls ADC init then temperature init in sequence
 - `battery_hal_get_uptime_ms()` wraps Zephyr `k_uptime_get()`
@@ -359,12 +387,15 @@ battery_transport_send(&pkt)           [optional, CONFIG_BATTERY_TRANSPORT]
 | Power state | 1 | Hysteresis memory (g_current_state) |
 | SDK runtime state | 7 | 7 booleans |
 | Cycle counter state | 9 | prev_state(1) + count(4) + initialized(4) |
-| Telemetry packet | 24 | Stack-allocated per call (v2) |
-| Transport wire buffer | 24 | BLE cached value (if CONFIG_BATTERY_TRANSPORT) |
+| Coulomb counter state | 20 | int64 accumulator + prev_current(4) + flags(4) |
+| Current HAL | 8 | device pointer(4) + initialized flag(4) |
+| SoC coulomb additions | 12 | coulomb_soc(4) + anchor flags(4) + capacity(4) |
+| Telemetry packet | 32 | Stack-allocated per call (v3) |
+| Transport wire buffer | 32 | BLE cached value (if CONFIG_BATTERY_TRANSPORT) |
 | SoC LUT (CR2032) | 0 (const) | 36 bytes in flash |
 | SoC LUT (LiPo) | 0 (const) | 44 bytes in flash |
 | NTC LUT (10K B3950) | 0 (const) | 128 bytes in flash (16 entries × 8 bytes) |
-| **Total static RAM** | **~48** | NTC mode; excluding Zephyr/BLE stack overhead |
+| **Total static RAM** | **~120** | NTC mode + coulomb counting; excluding Zephyr/BLE stack overhead |
 | **BLE stack overhead** | **~12 KB** | Additional when CONFIG_BATTERY_TRANSPORT_BLE (Zephyr BLE stack) |
 
 ---

@@ -1,5 +1,27 @@
 # Release Notes
 
+## v0.8.0 — Coulomb Counting SoC (Phase 8a)
+
+**New features:**
+- INA219 current sensor HAL via Zephyr sensor API
+- Coulomb counter with trapezoidal integration and NVS persistence
+- Voltage-anchored SoC estimation (coulomb primary, LUT at endpoints)
+- Telemetry v3 wire format (32 bytes: adds current_ma, coulomb_mah)
+- Gateway v3 packet decoding
+- ESP32-C3 build verified with INA219
+
+**Build system:**
+- New Kconfig: CONFIG_BATTERY_CURRENT_SENSE, CONFIG_BATTERY_SOC_COULOMB, CONFIG_BATTERY_CAPACITY_MAH
+- Conditional CMake for current HAL (Zephyr sensor or stub)
+- ESP32-C3 devicetree overlay with I2C + INA219 node
+
+**Tests:**
+- 3 new C test suites: hal_current_stub, coulomb, soc_coulomb
+- 5 new v3 serialize tests
+- 8 new gateway decoder tests (v3 packets)
+
+---
+
 ## v0.7.0 — Phase 7: ESP32-C3 HAL Port + On-Target Validation (2026-04-09)
 
 Adds ESP32-C3 as the third supported platform, making iBattery SDK a genuine 3-platform solution. Introduces a new VDD measurement strategy via external voltage divider. Native BLE — no shield needed.

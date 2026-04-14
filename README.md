@@ -9,7 +9,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 
 ---
 
-## Current Status: Phase 7 Complete (v0.7.0)
+## Current Status: Phase 8a Complete (v0.8.0)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -22,6 +22,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 | Phase 5b | Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2 | Done |
 | Phase 6 | STM32 HAL port (NUCLEO-L476RG) | Done — hardware-validated, BLE shield tested |
 | Phase 7 | ESP32-C3 HAL port (DevKitM) | Done — hardware-validated, native BLE, full pipeline |
+| Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done — ESP32-C3 verified |
 
 ---
 
@@ -48,6 +49,20 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 - **Temp**: On-chip die temperature sensor (coretemp)
 - **SDK**: Vanilla Zephyr v4.2.2 (not NCS)
 
+### INA219 Current Sensor (optional, for coulomb counting)
+
+Wire the INA219 breakout board in series on the battery high side:
+
+```
+Battery+ ── INA219 VIN+ ── INA219 VIN- ── Load/DevKit VIN
+ESP32-C3 GPIO6 (SDA) ── INA219 SDA
+ESP32-C3 GPIO7 (SCL) ── INA219 SCL
+3.3V ── INA219 VCC
+GND  ── INA219 GND
+```
+
+Enable in Kconfig: `CONFIG_BATTERY_CURRENT_SENSE=y`
+
 See [Hardware Wiring Guide](docs/WIRING.md) for pin diagrams and circuit schematics.
 
 ---
@@ -71,6 +86,7 @@ See [Hardware Wiring Guide](docs/WIRING.md) for pin diagrams and circuit schemat
 - Wire format v1 (20 bytes) and v2 (24 bytes with `cycle_count`) — backward compatible
 - Compile-time transport backend selection via Kconfig (BLE or mock)
 - Dual output: serial printk + BLE notifications (when `CONFIG_BATTERY_TRANSPORT=y`)
+- Coulomb counting SoC estimation via INA219 current sensor (voltage-anchored, NVS-persisted)
 - Charge cycle counter with NVS flash persistence (CHARGING→CHARGED transitions)
 - Python BLE gateway with auto-reconnect (bleak) → InfluxDB 2.x → Grafana dashboard
 - Docker Compose cloud stack: InfluxDB time-series storage + 11-panel Grafana dashboard
@@ -177,6 +193,13 @@ Battery SDK initialized OK
 | Offset | Field | Type | Description |
 |--------|-------|------|-------------|
 | 20 | `cycle_count` | `uint32_t` | Charge cycle count (NVS-persisted) |
+
+### v3 (32 bytes, extends v2)
+
+| Offset | Field | Type | Description |
+|--------|-------|------|-------------|
+| 24 | `current_ma_x100` | `int32_t` | Current in 0.01 mA units (from INA219) |
+| 28 | `coulomb_mah_x100` | `int32_t` | Accumulated charge in 0.01 mAh units |
 
 ---
 

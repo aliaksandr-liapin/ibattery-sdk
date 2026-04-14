@@ -433,6 +433,87 @@ Get the current charge cycle count.
 
 ---
 
+## battery_hal_current.h — Current Measurement
+
+```c
+#include <battery_sdk/battery_hal_current.h>
+
+int battery_hal_current_init(void);
+int battery_hal_current_read_ma_x100(int32_t *current_ma_x100_out);
+```
+
+Available when `CONFIG_BATTERY_CURRENT_SENSE=y`. Reads the INA219 current sensor via Zephyr sensor API.
+
+### `battery_hal_current_init`
+
+Initialize the current sensor HAL. Binds to the INA219 devicetree node and validates the device is ready. Called automatically by `battery_sdk_init()` when current sensing is enabled.
+
+**Returns:** `BATTERY_STATUS_OK`, or `BATTERY_STATUS_IO` if the device is not found or not ready.
+
+### `battery_hal_current_read_ma_x100`
+
+Read the current flowing through the INA219 shunt resistor.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `current_ma_x100_out` | out | Current in 0.01 mA units (positive = discharge, negative = charge) |
+
+**Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer), `BATTERY_STATUS_NOT_INITIALIZED`, or `BATTERY_STATUS_IO`.
+
+---
+
+## battery_coulomb.h — Coulomb Counter
+
+```c
+#include <battery_sdk/battery_coulomb.h>
+
+int battery_coulomb_init(void);
+int battery_coulomb_update(int32_t current_ma_x100, uint32_t dt_ms);
+int battery_coulomb_get_mah_x100(int32_t *mah_x100_out);
+int battery_coulomb_reset(int32_t mah_x100);
+```
+
+Tracks accumulated charge via trapezoidal integration of current measurements. Requires `CONFIG_BATTERY_CURRENT_SENSE=y`.
+
+### `battery_coulomb_init`
+
+Initialize the coulomb counter. Loads persisted accumulator value from NVS flash (starts at 0 if no stored value). Called automatically by `battery_sdk_init()`.
+
+**Returns:** `BATTERY_STATUS_OK` on success.
+
+### `battery_coulomb_update`
+
+Feed a new current measurement and time delta. The counter integrates using the trapezoidal rule: `(I_prev + I_curr) / 2 * dt`.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `current_ma_x100` | in | Current in 0.01 mA units (from `battery_hal_current_read_ma_x100`) |
+| `dt_ms` | in | Time since last update in milliseconds |
+
+**Returns:** `BATTERY_STATUS_OK`, or `BATTERY_STATUS_NOT_INITIALIZED`.
+
+### `battery_coulomb_get_mah_x100`
+
+Get the accumulated charge since last reset.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `mah_x100_out` | out | Accumulated charge in 0.01 mAh units |
+
+**Returns:** `BATTERY_STATUS_OK`, `BATTERY_STATUS_INVALID_ARG` (NULL pointer).
+
+### `battery_coulomb_reset`
+
+Reset the coulomb counter accumulator to a known value. Used by the voltage-anchored SoC estimator to re-sync at voltage endpoints.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `mah_x100` | in | New accumulator value in 0.01 mAh units |
+
+**Returns:** `BATTERY_STATUS_OK`, or `BATTERY_STATUS_NOT_INITIALIZED`.
+
+---
+
 ## Usage Example
 
 ```c
