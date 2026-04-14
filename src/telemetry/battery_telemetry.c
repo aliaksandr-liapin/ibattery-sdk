@@ -11,7 +11,18 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
+
+#if defined(CONFIG_BATTERY_CURRENT_SENSE)
+#include <battery_sdk/battery_hal_current.h>
+#include <battery_sdk/battery_coulomb.h>
+#endif
+
+#if defined(CONFIG_BATTERY_CURRENT_SENSE)
+static uint32_t g_prev_timestamp_ms;
+static bool g_prev_timestamp_valid;
+#endif
 
 int battery_telemetry_init(void)
 {
@@ -74,6 +85,32 @@ int battery_telemetry_collect(struct battery_telemetry_packet *packet)
 
     /* Cycle count — best-effort */
     (void)battery_cycle_counter_get(&packet->cycle_count);
+
+    /* Current + coulomb — best-effort (v3) */
+#if defined(CONFIG_BATTERY_CURRENT_SENSE)
+    {
+        int32_t current_ma_x100;
+        rc = battery_hal_current_read_ma_x100(&current_ma_x100);
+        if (rc == BATTERY_STATUS_OK) {
+            packet->current_ma_x100 = current_ma_x100;
+            uint32_t dt_ms = 0;
+            if (g_prev_timestamp_valid) {
+                dt_ms = packet->timestamp_ms - g_prev_timestamp_ms;
+            }
+            g_prev_timestamp_ms = packet->timestamp_ms;
+            g_prev_timestamp_valid = true;
+
+            rc = battery_coulomb_update(current_ma_x100, dt_ms);
+            if (rc == BATTERY_STATUS_OK) {
+                (void)battery_coulomb_get_mah_x100(&packet->coulomb_mah_x100);
+            } else {
+                packet->status_flags |= BATTERY_TELEMETRY_FLAG_COULOMB_ERR;
+            }
+        } else {
+            packet->status_flags |= BATTERY_TELEMETRY_FLAG_CURRENT_ERR;
+        }
+    }
+#endif
 
     /* Always succeeds — partial data is flagged, not fatal */
     return BATTERY_STATUS_OK;
