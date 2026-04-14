@@ -35,6 +35,18 @@ else()
     target_sources(app PRIVATE ../src/hal/battery_hal_nvs_stub.c)
 endif()
 
+# Current sensing HAL: Zephyr sensor API or stub
+if(CONFIG_BATTERY_CURRENT_SENSE)
+    target_sources(app PRIVATE ../src/hal/battery_hal_current_zephyr.c)
+else()
+    target_sources(app PRIVATE ../src/hal/battery_hal_current_stub.c)
+endif()
+
+# Coulomb counter
+if(CONFIG_BATTERY_SOC_COULOMB)
+    target_sources(app PRIVATE ../src/intelligence/battery_coulomb.c)
+endif()
+
 # Temperature HAL: NTC thermistor or internal die sensor
 if(CONFIG_BATTERY_TEMP_NTC)
     target_sources(app PRIVATE
