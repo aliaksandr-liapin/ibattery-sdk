@@ -244,6 +244,35 @@ target_include_directories(test_coulomb PRIVATE
 
 target_link_libraries(test_coulomb PRIVATE unity)
 
+# ── SoC coulomb test ──────────────────────────────────────────────────────
+add_executable(test_soc_coulomb
+    test_soc_coulomb.c
+    ${SDK_SRC}/intelligence/battery_soc_estimator.c
+    ${SDK_SRC}/intelligence/battery_soc_lut.c
+    ${SDK_SRC}/intelligence/battery_coulomb.c
+    mocks/mock_voltage.c
+    mocks/mock_current.c
+    mocks/mock_nvs.c
+    mocks/mock_sdk_state.c
+)
+
+target_include_directories(test_soc_coulomb PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/core
+    ${SDK_SRC}/intelligence
+    ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+
+target_compile_definitions(test_soc_coulomb PRIVATE
+    CONFIG_BATTERY_SOC_COULOMB=1
+    CONFIG_BATTERY_CHEMISTRY_LIPO=1
+    CONFIG_BATTERY_CAPACITY_MAH=1000
+)
+
+target_link_libraries(test_soc_coulomb PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
@@ -259,3 +288,4 @@ add_test(NAME transport COMMAND test_transport)
 add_test(NAME cycle_counter COMMAND test_cycle_counter)
 add_test(NAME hal_current_stub COMMAND test_hal_current_stub)
 add_test(NAME coulomb COMMAND test_coulomb)
+add_test(NAME soc_coulomb COMMAND test_soc_coulomb)

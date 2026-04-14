@@ -1,6 +1,7 @@
 #include <battery_sdk/battery_hal_current.h>
 #include <battery_sdk/battery_status.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 static int g_mock_current_init_rc = BATTERY_STATUS_OK;
 static int g_mock_current_read_rc = BATTERY_STATUS_OK;
