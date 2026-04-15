@@ -4,11 +4,11 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 
 ## Current State
 
-- **Version**: v0.7.0 (Phase 7 — ESP32-C3 port, hardware-validated)
+- **Version**: v0.8.0 (Phase 8a — Coulomb counting SoC, software-complete)
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
 - **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32), ESP32-C3 DevKitM — all hardware-verified
-- **Next milestone**: Advanced SoC (coulomb counting / Kalman filter)
+- **Next milestone**: INA219 hardware validation (I2C breadboard issue), then Phase 8b (LUT correction mode)
 - **Distribution**: PlatformIO registry + Zephyr module + GitHub Pages docs
 
 ## Build Commands
@@ -64,7 +64,7 @@ cd tests && mkdir -p build && cd build
 cmake .. && make && ctest --output-on-failure
 ```
 
-11 test suites, Unity framework.
+14 test suites, Unity framework (includes coulomb counter, current HAL stub, SoC coulomb).
 
 ### Python gateway tests
 
@@ -72,7 +72,7 @@ cmake .. && make && ctest --output-on-failure
 cd gateway && pip install -e . && pytest
 ```
 
-58 tests across 6 files.
+65 tests across 6 files (includes v3 packet decoding).
 
 ### Gateway CLI
 
@@ -107,7 +107,7 @@ HAL (platform-specific)
         → Transport (BLE GATT notifications)
 ```
 
-**Rules**: No heap allocation. Integer-only math (no FPU). ~48 bytes static RAM (core). HAL abstraction for portability.
+**Rules**: No heap allocation. Integer-only math (no FPU). ~120 bytes static RAM (core + coulomb). HAL abstraction for portability.
 
 ## Key Kconfig Options
 
@@ -118,20 +118,26 @@ HAL (platform-specific)
 | `CONFIG_BATTERY_TEMP_DIE` | `y/n` | `n` (on-chip die sensor) |
 | `CONFIG_BATTERY_CHARGER_TP4056` | `y/n` | `n` (enable for TP4056 GPIO) |
 | `CONFIG_BATTERY_TRANSPORT` | `y/n` | `y` (BLE notifications) |
+| `CONFIG_BATTERY_CURRENT_SENSE` | `y/n` | `n` (INA219 I2C current sensor) |
+| `CONFIG_BATTERY_SOC_COULOMB` | `y/n` | `y` if CURRENT_SENSE (coulomb counting SoC) |
+| `CONFIG_BATTERY_CAPACITY_MAH` | `int` | `220` (CR2032) / `1000` (LiPo) |
 
 ## Wire Format
 
 - **v1** (20 bytes): version, timestamp_ms, voltage_mv, temperature_c_x100, soc_pct_x100, power_state, status_flags
 - **v2** (24 bytes): v1 + cycle_count (uint32 LE at offset 20)
+- **v3** (32 bytes): v2 + current_ma_x100 (int32 LE at offset 24) + coulomb_mah_x100 (int32 LE at offset 28)
 
-Both formats accepted by gateway decoder (auto-detect by length).
+All three formats accepted by gateway decoder (auto-detect by length).
 
 ## Known Quirks
 
 - **SAADC channel re-setup**: nRF SAADC driver clobbers per-channel input-mux; both ADC HAL drivers call `adc_channel_setup()` before every `adc_read()`
 - **Die temp sensor noise**: ~0.2-0.3°C jitter per 2s sample = ~6-9°C/min apparent rate. Temperature rate threshold set to 15°C/min to filter this.
 - **CR2032 vs LiPo thresholds**: Anomaly detection uses chemistry-neutral thresholds (critical: 2.5V, low: 2.8V) to avoid false positives on CR2032 (~3.0V nominal)
-- **BLE MTU**: Configured for 24 bytes (v2 wire format). Single connection only.
+- **BLE MTU**: Configured for 32 bytes (v3 wire format). Single connection only.
+- **ESP32-C3 I2C + INA219**: Zephyr INA219 driver fails at boot (I2C not stable). Raw I2C fallback implemented but breadboard contacts cause NACKs. Needs soldered connections or different breadboard.
+- **nRF52840-DK I2C pull-ups**: Require Arduino power header GND connection to activate analog switch (SB32/SB33). Without this, I2C pull-ups are not enabled.
 
 ## Project Structure
 
@@ -157,7 +163,8 @@ docs/             ARCHITECTURE, SDK_API, TESTING, WIRING, BATTERY_PROFILES, ROAD
 | `docs/TESTING.md` | Test procedures, suite descriptions, running instructions |
 | `docs/BATTERY_PROFILES.md` | CR2032 + LiPo discharge curves, LUT design rationale |
 | `docs/ROADMAP.md` | Business strategy, development priorities, monetization |
-| `docs/RELEASE_NOTES.md` | Version history (v0.1.0 through v0.7.0) |
+| `docs/RELEASE_NOTES.md` | Version history (v0.1.0 through v0.8.0) |
+| `docs/plans/` | Design docs and implementation plans |
 | `CONTRIBUTING.md` | Dev setup, code style, porting guide |
 | `gateway/README.md` | Gateway CLI usage, analytics, architecture |
 | `cloud/README.md` | Docker stack setup |
