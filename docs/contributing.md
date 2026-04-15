@@ -26,7 +26,7 @@ ctest --test-dir build_tests --output-on-failure
 ```bash
 cd gateway
 pip install -e ".[dev]"       # Install with dev dependencies (pytest)
-python -m pytest tests/ -v    # Run gateway tests (58 tests)
+python -m pytest tests/ -v    # Run gateway tests (65 tests)
 ```
 
 ## Code Style
@@ -81,7 +81,7 @@ All changes must pass the test suites before merging:
 # Firmware tests (11 C suites)
 cmake --build build_tests && ctest --test-dir build_tests --output-on-failure
 
-# Gateway tests (58 Python tests)
+# Gateway tests (65 Python tests)
 cd gateway && python -m pytest tests/ -v
 ```
 

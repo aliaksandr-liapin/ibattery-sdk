@@ -217,11 +217,12 @@
 - Null-checks packet pointer before serialization
 
 ### transport/battery_serialize.c
-- Encodes/decodes `battery_telemetry_packet` to/from wire buffer (v1: 20 bytes, v2: 24 bytes)
+- Encodes/decodes `battery_telemetry_packet` to/from wire buffer (v1: 20 bytes, v2: 24 bytes, v3: 32 bytes)
 - Wire v1 (20B): version(1) + timestamp(4) + voltage(4) + temperature(4) + soc(2) + power_state(1) + flags(4)
 - Wire v2 (24B): v1 fields + cycle_count(4) at offset 20
-- `battery_serialize_pack()` writes 24 bytes for v2, 20 bytes for v1
-- `battery_serialize_unpack()` accepts both sizes — backward compatible
+- Wire v3 (32B): v2 fields + current_ma_x100(4) at offset 24 + coulomb_mah_x100(4) at offset 28
+- `battery_serialize_pack()` writes 32 bytes for v3, 24 bytes for v2, 20 bytes for v1
+- `battery_serialize_unpack()` accepts all three sizes — backward compatible
 - Explicit byte shifts (`put_u16_le`, `put_u32_le`, etc.) — fully portable, no struct packing
 
 ### transport/ble/battery_transport_ble_zephyr.c

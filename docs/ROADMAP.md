@@ -1,6 +1,6 @@
 # Roadmap & Business Strategy
 
-## Current State (Phase 7 Complete)
+## Current State (Phase 8a Complete)
 
 ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 
@@ -13,17 +13,17 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 - Full battery state machine: IDLE/SLEEP inactivity timers + TP4056 CHARGING/DISCHARGING/CHARGED
 - LiPo single-cell (3.7 V nominal) discharge curve LUT
 - BLE telemetry transport with custom GATT service + notification characteristic
-- Wire format v1 (20B) and v2 (24B with `cycle_count`) — backward compatible
+- Wire format v1 (20B), v2 (24B with `cycle_count`), and v3 (32B with `current_ma` + `coulomb_mah`) — backward compatible
 - Charge cycle counter with NVS flash persistence (CHARGING → CHARGED transitions)
 - Compile-time transport backend and chemistry selection via Kconfig
-- ~48 bytes static RAM (core), integer-only math, no heap allocation
+- ~120 bytes static RAM (core + coulomb counter), integer-only math, no heap allocation
 - HAL abstraction layer — core logic is platform-independent portable C
 - LiPo 500mAh powering nRF52840-DK via TP4056 HW-373 (USB-C) — real battery power verified
 - TP4056 charging confirmed (voltage rise on USB-C connect); CHRG/STDBY GPIO signals simulated with jumper wires (LED pad soldering pending)
 - Python BLE gateway (bleak) → InfluxDB 2.x → Grafana 11-panel dashboard (Docker Compose)
 - `ibattery-gateway` CLI: scan, stream, run, analytics (health, anomalies, rul, cycles)
 - Cloud analytics: battery health scoring, real-time + historical anomaly detection, RUL estimation, cycle analysis
-- 11 C test suites (Unity) + 58 Python tests (pytest), zero hardware required to run
+- 11 C test suites (Unity) + 65 Python tests (pytest), zero hardware required to run
 - Zephyr RTOS integration with clean layered architecture
 - Production-quality codebase: no layer violations, consistent conventions, full documentation
 

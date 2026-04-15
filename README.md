@@ -83,7 +83,7 @@ See [Hardware Wiring Guide](docs/WIRING.md) for pin diagrams and circuit schemat
 - LiPo single-cell (3.7 V nominal) discharge curve LUT (11-point, extra density in knee region)
 - `CONFIG_BATTERY_CHEMISTRY` Kconfig: selects CR2032 or LiPo LUT + gates temp compensation on LiPo only
 - BLE telemetry transport with custom GATT service and notification characteristic
-- Wire format v1 (20 bytes) and v2 (24 bytes with `cycle_count`) — backward compatible
+- Wire format v1 (20 bytes), v2 (24 bytes with `cycle_count`), and v3 (32 bytes with `current_ma` + `coulomb_mah`) — backward compatible
 - Compile-time transport backend selection via Kconfig (BLE or mock)
 - Dual output: serial printk + BLE notifications (when `CONFIG_BATTERY_TRANSPORT=y`)
 - Coulomb counting SoC estimation via INA219 current sensor (voltage-anchored, NVS-persisted)
@@ -95,7 +95,7 @@ See [Hardware Wiring Guide](docs/WIRING.md) for pin diagrams and circuit schemat
 - Battery health scoring, remaining useful life (RUL) estimation, cycle analysis
 - Full battery state machine: ACTIVE, IDLE (30s), SLEEP (120s), CRITICAL, CHARGING, DISCHARGING, CHARGED
 - TP4056 charger IC integration via GPIO (Kconfig-gated: `CONFIG_BATTERY_CHARGER_TP4056`)
-- Host-based unit tests (Unity framework, 11 C test suites + 58 Python tests)
+- Host-based unit tests (Unity framework, 11 C test suites + 65 Python tests)
 
 ---
 
@@ -132,7 +132,7 @@ manifest:
   projects:
     - name: ibattery-sdk
       remote: aliaksandr-liapin
-      revision: v0.7.0
+      revision: v0.8.0
       path: modules/lib/ibattery-sdk
 ```
 
@@ -142,7 +142,7 @@ Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 
 ```ini
 ; platformio.ini
-lib_deps = aliaksandr-liapin/ibattery-sdk@^0.7.0
+lib_deps = aliaksandr-liapin/ibattery-sdk@^0.8.0
 ```
 
 ### Run unit tests (host, no hardware needed)
