@@ -1,0 +1,1547 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/BATTERY_PROFILES/">
+      
+      
+        <link rel="prev" href="../SDK_API/">
+      
+      
+        <link rel="next" href="../TESTING/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Battery Profiles - iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#battery-profiles-research-lut-design" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Battery Profiles
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-lut-based-soc-estimation-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How LUT-Based SoC Estimation Works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#profile-1-cr2032-primary-lithium-30-v" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Profile 1: CR2032 Primary Lithium (3.0 V)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Profile 1: CR2032 Primary Lithium (3.0 V)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemistry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chemistry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discharge-characteristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discharge Characteristics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-points-9-entries-36-bytes-flash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table Points (9 entries, 36 bytes flash)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#profile-2-lipo-single-cell-37-v-nominal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Profile 2: LiPo Single-Cell (3.7 V Nominal)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Profile 2: LiPo Single-Cell (3.7 V Nominal)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemistry_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chemistry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discharge-characteristics_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discharge Characteristics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-sources_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consensus-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consensus Findings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-point-selection-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table Point Selection Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-points-11-entries-44-bytes-flash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table Points (11 entries, 44 bytes flash)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interpolation-accuracy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpolation Accuracy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-battery-profile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Battery Profile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Work
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RELEASE_NOTES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-lut-based-soc-estimation-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How LUT-Based SoC Estimation Works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#profile-1-cr2032-primary-lithium-30-v" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Profile 1: CR2032 Primary Lithium (3.0 V)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Profile 1: CR2032 Primary Lithium (3.0 V)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemistry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chemistry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discharge-characteristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discharge Characteristics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-points-9-entries-36-bytes-flash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table Points (9 entries, 36 bytes flash)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#profile-2-lipo-single-cell-37-v-nominal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Profile 2: LiPo Single-Cell (3.7 V Nominal)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Profile 2: LiPo Single-Cell (3.7 V Nominal)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemistry_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chemistry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#discharge-characteristics_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discharge Characteristics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-sources_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consensus-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consensus Findings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-point-selection-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table Point Selection Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-points-11-entries-44-bytes-flash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table Points (11 entries, 44 bytes flash)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interpolation-accuracy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interpolation Accuracy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-battery-profile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Battery Profile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Work
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="battery-profiles-research-lut-design">Battery Profiles — Research &amp; LUT Design<a class="headerlink" href="#battery-profiles-research-lut-design" title="Permanent link">&para;</a></h1>
+<p>This document records the research behind each voltage-to-SoC lookup table shipped in the SDK: what data was collected, how table points were chosen, and the known limitations of each profile.</p>
+<hr />
+<h2 id="how-lut-based-soc-estimation-works">How LUT-Based SoC Estimation Works<a class="headerlink" href="#how-lut-based-soc-estimation-works" title="Permanent link">&para;</a></h2>
+<p>The SDK estimates state-of-charge by mapping a measured open-circuit voltage (OCV) to a percentage via a piecewise-linear lookup table. Given a voltage reading, the interpolation engine finds the two nearest table entries and linearly interpolates between them.</p>
+<p><strong>Key properties:</strong>
+- Integer-only math (no FPU required)
+- O(n) lookup where n = number of table entries (typically 9-11)
+- SoC expressed in 0.01% units (<code>soc_pct_x100</code>): 10000 = 100.00%, 0 = 0.00%
+- Table entries sorted by voltage descending (highest voltage first)
+- Clamped at boundaries: above max → 100%, below min → 0%
+- Each entry costs 4 bytes flash (two <code>uint16_t</code> fields)</p>
+<p><strong>Chemistry selection at compile time:</strong></p>
+<p>The active LUT is selected via <code>CONFIG_BATTERY_CHEMISTRY</code> in <code>app/Kconfig</code>:
+- <code>CONFIG_BATTERY_CHEMISTRY_CR2032</code> (default) — CR2032 9-point LUT, no temperature compensation
+- <code>CONFIG_BATTERY_CHEMISTRY_LIPO</code> — LiPo 11-point LUT + temperature compensation via <code>battery_soc_temp_comp.c</code></p>
+<p>Temperature compensation (Phase 5a) applies correction factors to the LUT-based SoC estimate based on measured temperature. It is only active for LiPo chemistry — CR2032 primary cells use the raw LUT because temperature compensation is not meaningful for non-rechargeable cells with relatively stable voltage curves.</p>
+<p><strong>Accuracy depends on:</strong>
+1. How well the table matches the real discharge curve
+2. Number and placement of table points (more points in non-linear regions = less interpolation error)
+3. Measurement conditions matching table assumptions (temperature, discharge rate, cell age)</p>
+<hr />
+<h2 id="profile-1-cr2032-primary-lithium-30-v">Profile 1: CR2032 Primary Lithium (3.0 V)<a class="headerlink" href="#profile-1-cr2032-primary-lithium-30-v" title="Permanent link">&para;</a></h2>
+<h3 id="chemistry">Chemistry<a class="headerlink" href="#chemistry" title="Permanent link">&para;</a></h3>
+<p>CR2032 is a primary (non-rechargeable) lithium manganese dioxide coin cell. Nominal voltage 3.0 V, typical capacity 210-240 mAh.</p>
+<h3 id="discharge-characteristics">Discharge Characteristics<a class="headerlink" href="#discharge-characteristics" title="Permanent link">&para;</a></h3>
+<p>The CR2032 discharge curve has two distinct regions:</p>
+<ol>
+<li>
+<p><strong>Gradual slope</strong> (3000-2600 mV): Covers ~70% of capacity. Voltage drops slowly and roughly linearly, making this region well-suited to LUT interpolation with moderate point density.</p>
+</li>
+<li>
+<p><strong>Accelerating drop</strong> (2600-2000 mV): Covers the remaining ~30%. Voltage falls increasingly fast as the cell is exhausted. Higher point density is needed here but the practical value is limited — at these voltages the device should be in low-power or shutdown mode.</p>
+</li>
+</ol>
+<h3 id="data-sources">Data Sources<a class="headerlink" href="#data-sources" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Energizer CR2032 datasheet (discharge curves at various loads)</li>
+<li>Empirical measurements on nRF52840-DK with fresh Energizer CR2032</li>
+</ul>
+<h3 id="table-points-9-entries-36-bytes-flash">Table Points (9 entries, 36 bytes flash)<a class="headerlink" href="#table-points-9-entries-36-bytes-flash" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>mV</th>
+<th>SoC%</th>
+<th>Region</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3000</td>
+<td>100%</td>
+<td>Full</td>
+<td>Nominal fresh cell voltage</td>
+</tr>
+<tr>
+<td>2900</td>
+<td>90%</td>
+<td>Slope</td>
+<td>Linear region, 100 mV spacing</td>
+</tr>
+<tr>
+<td>2800</td>
+<td>70%</td>
+<td>Slope</td>
+<td>Voltage starts curving, SoC drops faster per mV</td>
+</tr>
+<tr>
+<td>2700</td>
+<td>50%</td>
+<td>Slope</td>
+<td>Midpoint of usable range</td>
+</tr>
+<tr>
+<td>2600</td>
+<td>30%</td>
+<td>Slope</td>
+<td>End of gradual region</td>
+</tr>
+<tr>
+<td>2500</td>
+<td>20%</td>
+<td>Knee</td>
+<td>Transition to steeper drop</td>
+</tr>
+<tr>
+<td>2400</td>
+<td>10%</td>
+<td>Drop</td>
+<td>Low battery warning zone</td>
+</tr>
+<tr>
+<td>2200</td>
+<td>5%</td>
+<td>Drop</td>
+<td>Near-empty, 200 mV gap captures steep curve</td>
+</tr>
+<tr>
+<td>2000</td>
+<td>0%</td>
+<td>Cutoff</td>
+<td>Below this voltage most MCUs brown out</td>
+</tr>
+</tbody>
+</table>
+<h3 id="known-limitations">Known Limitations<a class="headerlink" href="#known-limitations" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Based on room-temperature, low-current discharge (~1 mA average). High-pulse loads (BLE TX bursts) cause voltage sag that temporarily understates SoC.</li>
+<li>CR2032 capacity drops significantly below 0 °C. The table does not compensate for temperature.</li>
+<li>Self-discharge and cell age are not accounted for.</li>
+<li>The 3000 mV = 100% assumption is conservative; fresh cells can read 3.1-3.2 V under light load.</li>
+</ul>
+<hr />
+<h2 id="profile-2-lipo-single-cell-37-v-nominal">Profile 2: LiPo Single-Cell (3.7 V Nominal)<a class="headerlink" href="#profile-2-lipo-single-cell-37-v-nominal" title="Permanent link">&para;</a></h2>
+<h3 id="chemistry_1">Chemistry<a class="headerlink" href="#chemistry_1" title="Permanent link">&para;</a></h3>
+<p>Lithium polymer (LiCoO2/graphite), single cell. Nominal voltage 3.7 V, charge cutoff 4.2 V, discharge cutoff 3.0 V. This is the most common rechargeable chemistry in consumer IoT, wearables, and hobbyist electronics.</p>
+<h3 id="discharge-characteristics_1">Discharge Characteristics<a class="headerlink" href="#discharge-characteristics_1" title="Permanent link">&para;</a></h3>
+<p>The LiPo single-cell OCV curve is distinctly non-linear with three regions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Voltage (mV)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>4200 ┤ ●
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>4150 ┤  ●                          Region 1: Initial drop
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>4060 ┤    ●                         4200-4050 mV → 100%-85%
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>3980 ┤      ●                       Fast voltage fall after full charge
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>3920 ┤        ●
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>3870 ┤          ●                   Region 2: Flat plateau
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>3830 ┤            ●                 4050-3700 mV → 85%-10%
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>3790 ┤              ●               Most usable energy (~75% of capacity)
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>     │                ·             Small voltage change = large SoC change
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>3700 ┤                  ●           Region 3: Steep cliff
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>     │                    ·         3700-3000 mV → 10%-0%
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>3500 ┤                      ●       Rapid voltage collapse
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>     │                        ·     Cell is nearly empty
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>3000 ┤                          ●   Hard cutoff — going below risks damage
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>     └────────────────────────────
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>       100  90  80  60  40  20  0   SoC (%)
+</code></pre></div>
+<p><strong>Region 1 — Initial drop (4200-4050 mV, ~100%-85%):</strong> After a full charge at 4.2 V the cell quickly drops 100-150 mV under load. This region is traversed fast and covers only ~15% of capacity.</p>
+<p><strong>Region 2 — Flat plateau (4050-3700 mV, ~85%-10%):</strong> The voltage changes only ~350 mV while delivering roughly 75% of the cell's total capacity. This is both the most useful region and the hardest for voltage-based SoC estimation — a 10 mV measurement error can translate to 5-10% SoC error.</p>
+<p><strong>Region 3 — Steep cliff (3700-3000 mV, ~10%-0%):</strong> Voltage drops rapidly. A cell at 3.5 V has only ~3% remaining and at 3.0 V is at the hard cutoff. Discharging below 3.0 V risks permanent capacity loss.</p>
+<h3 id="data-sources_1">Data Sources<a class="headerlink" href="#data-sources_1" title="Permanent link">&para;</a></h3>
+<p>Multiple sources were cross-referenced to build a consensus curve. No single source was used in isolation because published curves vary with discharge rate, temperature, and cell age.</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Key Data Points</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Grepow LiPo voltage guide</td>
+<td>Full percentage-to-voltage mapping table</td>
+<td>Manufacturer data, well-cited in hobbyist community</td>
+</tr>
+<tr>
+<td>RC community resting-voltage tables</td>
+<td>OCV measurements at various SoC levels</td>
+<td>Practical measurements across many cell brands</td>
+</tr>
+<tr>
+<td>Adafruit Li-Ion/LiPoly documentation</td>
+<td>Charge/discharge curves, safe operating limits</td>
+<td>Widely used reference for maker/IoT projects</td>
+</tr>
+<tr>
+<td>General lithium-ion electrochemistry</td>
+<td>Three-region curve shape, 4.2 V/3.0 V bounds</td>
+<td>Textbook knowledge, validates source data</td>
+</tr>
+</tbody>
+</table>
+<h3 id="consensus-findings">Consensus Findings<a class="headerlink" href="#consensus-findings" title="Permanent link">&para;</a></h3>
+<p>Cross-referencing the sources produced consistent agreement on these key points:</p>
+<ul>
+<li><strong>4.20 V = 100%</strong> — universal charge termination voltage</li>
+<li><strong>4.10-4.15 V = 90-95%</strong> — initial fast drop after removing charger</li>
+<li><strong>3.80-3.85 V ≈ 50%</strong> — rough midpoint of usable capacity</li>
+<li><strong>3.70 V ≈ 10%</strong> — onset of steep cliff, low-battery threshold</li>
+<li><strong>3.50 V ≈ 3%</strong> — critically low, should trigger shutdown</li>
+<li><strong>3.00 V = 0%</strong> — hard cutoff, below this risks cell damage</li>
+</ul>
+<p>The sources diverged most in the plateau region (3.8-4.0 V) where small voltage differences correspond to large SoC swings. This is an inherent limitation of voltage-based SoC estimation for LiPo cells.</p>
+<h3 id="table-point-selection-strategy">Table Point Selection Strategy<a class="headerlink" href="#table-point-selection-strategy" title="Permanent link">&para;</a></h3>
+<p>With 11 points (44 bytes flash), the goal was to minimise worst-case interpolation error across all three curve regions:</p>
+<p><strong>Plateau region (7 points, 60-80 mV spacing):</strong> Dense spacing because the curve is nearly flat — small voltage measurement errors produce large SoC errors. More points reduce the maximum interpolation error between any two adjacent entries.</p>
+<p><strong>Knee/cliff region (3 points, 90-200 mV spacing):</strong> The curve is steep so voltage changes rapidly with SoC. Wider spacing is acceptable because interpolation error per-mV is naturally lower. An extra point at 3500 mV captures the cliff shape.</p>
+<p><strong>Endpoints (2 points):</strong> Fixed at 4200 mV (full charge) and 3000 mV (cutoff).</p>
+<h3 id="table-points-11-entries-44-bytes-flash">Table Points (11 entries, 44 bytes flash)<a class="headerlink" href="#table-points-11-entries-44-bytes-flash" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>mV</th>
+<th>SoC%</th>
+<th>Region</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4200</td>
+<td>100%</td>
+<td>Full charge</td>
+<td>CC/CV charge termination voltage</td>
+</tr>
+<tr>
+<td>4150</td>
+<td>95%</td>
+<td>Initial drop</td>
+<td>Captures fast initial voltage fall</td>
+</tr>
+<tr>
+<td>4060</td>
+<td>85%</td>
+<td>Initial drop</td>
+<td>Transition into plateau</td>
+</tr>
+<tr>
+<td>3980</td>
+<td>75%</td>
+<td>Plateau</td>
+<td>Upper plateau, 60 mV spacing</td>
+</tr>
+<tr>
+<td>3920</td>
+<td>65%</td>
+<td>Plateau</td>
+<td>Mid-upper plateau</td>
+</tr>
+<tr>
+<td>3870</td>
+<td>55%</td>
+<td>Plateau</td>
+<td>Center of plateau, ~50% marker</td>
+</tr>
+<tr>
+<td>3830</td>
+<td>45%</td>
+<td>Plateau</td>
+<td>Mid-lower plateau</td>
+</tr>
+<tr>
+<td>3790</td>
+<td>30%</td>
+<td>Plateau end</td>
+<td>Plateau-to-knee transition</td>
+</tr>
+<tr>
+<td>3700</td>
+<td>10%</td>
+<td>Knee</td>
+<td>Low battery threshold, cliff onset</td>
+</tr>
+<tr>
+<td>3500</td>
+<td>3%</td>
+<td>Steep cliff</td>
+<td>Critically low, 200 mV from cutoff</td>
+</tr>
+<tr>
+<td>3000</td>
+<td>0%</td>
+<td>Cutoff</td>
+<td>Hard discharge limit</td>
+</tr>
+</tbody>
+</table>
+<h3 id="interpolation-accuracy">Interpolation Accuracy<a class="headerlink" href="#interpolation-accuracy" title="Permanent link">&para;</a></h3>
+<p>The piecewise-linear approach introduces error wherever the real curve deviates from a straight line between two adjacent table points. Worst-case error by region:</p>
+<table>
+<thead>
+<tr>
+<th>Region</th>
+<th>Max interpolation error</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Initial drop (4200-4060 mV)</td>
+<td>~2-3% SoC</td>
+<td>Curve is slightly concave, linear is good enough</td>
+</tr>
+<tr>
+<td>Plateau (4060-3790 mV)</td>
+<td>~3-5% SoC</td>
+<td>Flatness makes voltage-based SoC inherently imprecise here</td>
+</tr>
+<tr>
+<td>Knee (3790-3700 mV)</td>
+<td>~2-3% SoC</td>
+<td>Steep but fairly linear</td>
+</tr>
+<tr>
+<td>Cliff (3700-3000 mV)</td>
+<td>~1-2% SoC</td>
+<td>Very steep, large mV per %SoC, low absolute error</td>
+</tr>
+</tbody>
+</table>
+<p>The plateau region is where voltage-based estimation is fundamentally weakest. Future improvements (coulomb counting, Kalman filter, temperature compensation) will primarily target this region.</p>
+<h3 id="known-limitations_1">Known Limitations<a class="headerlink" href="#known-limitations_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>OCV only:</strong> The table assumes open-circuit or very-low-current measurements. Under load, voltage sag understates SoC. A 500 mAh cell drawing 100 mA can sag 50-100 mV.</li>
+<li><strong>Room temperature only:</strong> LiPo capacity and voltage both decrease at low temperatures. At 0 °C the same cell might show 3.7 V at 20% SoC instead of 10%.</li>
+<li><strong>Cell age not modelled:</strong> As LiPo cells age (&gt;300 cycles), internal resistance increases and the plateau flattens further, reducing accuracy.</li>
+<li><strong>No hysteresis compensation:</strong> Charge and discharge OCV curves differ slightly (charge curve is ~20-50 mV higher at same SoC). The table represents discharge only.</li>
+<li><strong>Generic profile:</strong> This is a consensus curve for typical LiCoO2/graphite cells. Specific cells (different manufacturer, chemistry variant, or capacity) may deviate by 20-50 mV at certain SoC levels.</li>
+</ul>
+<hr />
+<h2 id="adding-a-new-battery-profile">Adding a New Battery Profile<a class="headerlink" href="#adding-a-new-battery-profile" title="Permanent link">&para;</a></h2>
+<p>To add a profile for a new chemistry or cell type:</p>
+<ol>
+<li>
+<p><strong>Research the discharge curve.</strong> Cross-reference at least 2-3 sources (datasheets, community measurements, electrochemistry references). Prefer OCV data at room temperature and low discharge rates.</p>
+</li>
+<li>
+<p><strong>Identify curve regions.</strong> Most chemistries have distinct regions (plateau, knee, cliff). Understanding these guides point placement.</p>
+</li>
+<li>
+<p><strong>Pick table points.</strong> Place more points in non-linear regions where interpolation error is highest. Aim for 9-15 entries (36-60 bytes flash). Endpoints must match the cell's charge termination and discharge cutoff voltages.</p>
+</li>
+<li>
+<p><strong>Add the data.</strong> In <code>battery_soc_lut.c</code>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">battery_soc_lut_entry_t</span><span class="w"> </span><span class="n">my_entries</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="n">voltage_mv</span><span class="p">,</span><span class="w"> </span><span class="n">soc_pct_x100</span><span class="w"> </span><span class="p">},</span><span class="w">  </span><span class="cm">/* highest voltage first */</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">...</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="n">voltage_mv</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w">              </span><span class="cm">/* cutoff */</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">};</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">const</span><span class="w"> </span><span class="n">battery_soc_lut_t</span><span class="w"> </span><span class="n">battery_soc_lut_my_chemistry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="p">.</span><span class="n">entries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_entries</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="p">.</span><span class="n">count</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">my_entries</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">my_entries</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">};</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Declare in header.</strong> Add <code>extern const battery_soc_lut_t battery_soc_lut_my_chemistry;</code> to <code>battery_soc_lut.h</code>.</p>
+</li>
+<li>
+<p><strong>Write tests.</strong> Add tests to <code>test_soc_lut.c</code> covering:</p>
+</li>
+<li>Exact table points (at least top, bottom, and one midpoint)</li>
+<li>Clamping above max and below min</li>
+<li>
+<p>Interpolation in each distinct curve region</p>
+</li>
+<li>
+<p><strong>Document.</strong> Add a section to this file with sources, rationale, and known limitations.</p>
+</li>
+</ol>
+<hr />
+<h2 id="future-work">Future Work<a class="headerlink" href="#future-work" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Temperature-compensated tables:</strong> ✅ Basic temperature compensation added for LiPo (Phase 5a) via correction factors. Future: ship multiple LUTs per chemistry (e.g., -10 °C, 0 °C, 25 °C, 45 °C) and interpolate between them based on measured temperature for higher accuracy.</li>
+<li><strong>Lab-validated profiles:</strong> Replace synthesised data with lab-measured discharge curves on specific cells at controlled discharge rates and temperatures.</li>
+<li><strong>LiFePO4 profile:</strong> Flat 3.2-3.3 V plateau makes voltage-based SoC especially challenging — may need coulomb counting or combined estimator.</li>
+<li><strong>NiMH profile:</strong> 1.2 V nominal, very flat discharge curve, similar challenges to LiFePO4.</li>
+<li><strong>Runtime profile selection:</strong> Allow the application to select a battery profile at init time instead of compile-time hardcoding.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

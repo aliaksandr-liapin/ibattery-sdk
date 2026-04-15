@@ -1,0 +1,1607 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/">
+      
+      
+      
+        <link rel="next" href="WIRING/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#battery-sdk" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Home
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#current-status-phase-8a-complete-v080" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Status: Phase 8a Complete (v0.8.0)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hardware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nrf52840-dk-primary-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nRF52840-DK (primary target)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nucleo-l476rg-stm32-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NUCLEO-L476RG (STM32 port)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esp32-c3-devkitm-esp32-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESP32-C3 DevKitM (ESP32 port)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ina219-current-sensor-optional-for-coulomb-counting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        INA219 Current Sensor (optional, for coulomb counting)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build firmware
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-as-a-zephyr-module-in-your-own-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use as a Zephyr module (in your own project)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-via-platformio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install via PlatformIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-unit-tests-host-no-hardware-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run unit tests (host, no hardware needed)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloud-telemetry-ble-influxdb-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud telemetry (BLE → InfluxDB → Grafana)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serial-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serial output
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#telemetry-packet-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Telemetry Packet Format
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Telemetry Packet Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v1-20-bytes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1 (20 bytes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v2-24-bytes-extends-v1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v2 (24 bytes, extends v1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v3-32-bytes-extends-v2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v3 (32 bytes, extends v2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contributing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        License
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="BATTERY_PROFILES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="RELEASE_NOTES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#current-status-phase-8a-complete-v080" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Status: Phase 8a Complete (v0.8.0)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hardware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nrf52840-dk-primary-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nRF52840-DK (primary target)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nucleo-l476rg-stm32-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NUCLEO-L476RG (STM32 port)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esp32-c3-devkitm-esp32-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ESP32-C3 DevKitM (ESP32 port)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ina219-current-sensor-optional-for-coulomb-counting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        INA219 Current Sensor (optional, for coulomb counting)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build firmware
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-as-a-zephyr-module-in-your-own-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use as a Zephyr module (in your own project)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-via-platformio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install via PlatformIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-unit-tests-host-no-hardware-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run unit tests (host, no hardware needed)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloud-telemetry-ble-influxdb-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud telemetry (BLE → InfluxDB → Grafana)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serial-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serial output
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#telemetry-packet-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Telemetry Packet Format
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Telemetry Packet Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v1-20-bytes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1 (20 bytes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v2-24-bytes-extends-v1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v2 (24 bytes, extends v1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v3-32-bytes-extends-v2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v3 (32 bytes, extends v2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contributing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contributing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        License
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="battery-sdk">Battery SDK<a class="headerlink" href="#battery-sdk" title="Permanent link">&para;</a></h1>
+<p><a href="https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml/badge.svg" /></a>
+<a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" /></a></p>
+<p>Embedded firmware library providing a <strong>standardized battery intelligence layer</strong> for battery-powered IoT devices. Measures voltage, estimates state-of-charge, monitors temperature and power state, and packages everything into structured telemetry packets.</p>
+<p>Currently targets the <strong>nRF52840</strong>, <strong>STM32L476</strong>, and <strong>ESP32-C3</strong> (Zephyr RTOS) with <strong>CR2032</strong> coin cell and <strong>LiPo 500mAh</strong> (via TP4056 USB-C charger). All three platforms hardware-validated with full BLE telemetry pipeline. Designed to scale to other MCUs and battery chemistries.</p>
+<hr />
+<h2 id="current-status-phase-8a-complete-v080">Current Status: Phase 8a Complete (v0.8.0)<a class="headerlink" href="#current-status-phase-8a-complete-v080" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Description</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 0</td>
+<td>Hardware setup, firmware skeleton</td>
+<td>Done</td>
+</tr>
+<tr>
+<td>Phase 1</td>
+<td>Core battery intelligence (voltage, SoC, telemetry)</td>
+<td>Done</td>
+</tr>
+<tr>
+<td>Phase 2</td>
+<td>Real temperature sensor + power state machine</td>
+<td>Done</td>
+</tr>
+<tr>
+<td>Phase 3</td>
+<td>BLE telemetry transport</td>
+<td>Done</td>
+</tr>
+<tr>
+<td>Phase 4</td>
+<td>Cloud telemetry (BLE gateway + InfluxDB + Grafana)</td>
+<td>Done</td>
+</tr>
+<tr>
+<td>Phase 5a</td>
+<td>Temperature-compensated SoC + cloud analytics (health score, anomaly detection)</td>
+<td>Done</td>
+</tr>
+<tr>
+<td>Phase 5b</td>
+<td>Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2</td>
+<td>Done</td>
+</tr>
+<tr>
+<td>Phase 6</td>
+<td>STM32 HAL port (NUCLEO-L476RG)</td>
+<td>Done — hardware-validated, BLE shield tested</td>
+</tr>
+<tr>
+<td>Phase 7</td>
+<td>ESP32-C3 HAL port (DevKitM)</td>
+<td>Done — hardware-validated, native BLE, full pipeline</td>
+</tr>
+<tr>
+<td>Phase 8a</td>
+<td>Coulomb counting SoC (INA219 current sensor)</td>
+<td>Done — ESP32-C3 verified</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="hardware">Hardware<a class="headerlink" href="#hardware" title="Permanent link">&para;</a></h2>
+<h3 id="nrf52840-dk-primary-target">nRF52840-DK (primary target)<a class="headerlink" href="#nrf52840-dk-primary-target" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Board</strong>: nRF52840-DK (PCA10056 rev 3.0.3)</li>
+<li><strong>Battery</strong>: CR2032 Energizer (3V primary lithium) or LiPo 500mAh PL602535 (3.7V)</li>
+<li><strong>Charger</strong>: TP4056 HW-373 V1.2.1 (USB-C, with DW01A battery protection)</li>
+<li><strong>Power switch</strong>: VDD position</li>
+<li><strong>SDK</strong>: nRF Connect SDK v3.2.2 / Zephyr OS v4.2.99</li>
+<li><strong>ADC</strong>: SAADC Ch0 measuring VDD rail, Ch1 measuring NTC thermistor (AIN1/P0.03); 12-bit, 1/6 gain, 0.6V internal reference</li>
+</ul>
+<h3 id="nucleo-l476rg-stm32-port">NUCLEO-L476RG (STM32 port)<a class="headerlink" href="#nucleo-l476rg-stm32-port" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Board</strong>: NUCLEO-L476RG (STM32L476RGT6, Cortex-M4F, 80 MHz, 1 MB Flash)</li>
+<li><strong>BLE shield</strong>: X-NUCLEO-IDB05A2 (BlueNRG-M0, optional)</li>
+<li><strong>ADC</strong>: ADC1 Ch0 = VREFINT (VDD measurement via factory calibration), Ch5 = PA0/A0 (NTC)</li>
+<li><strong>Charger GPIO</strong>: PC6 (CHRG), PC7 (STDBY) on Morpho connector</li>
+</ul>
+<h3 id="esp32-c3-devkitm-esp32-port">ESP32-C3 DevKitM (ESP32 port)<a class="headerlink" href="#esp32-c3-devkitm-esp32-port" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Board</strong>: ESP32-C3-DevKitM-1-N4X (RISC-V, 160 MHz, 4 MB Flash)</li>
+<li><strong>BLE</strong>: Native BLE 5.0 (no shield needed)</li>
+<li><strong>ADC</strong>: ADC1 Ch2 = GPIO2 (battery voltage via external divider), Ch3 = GPIO3 (NTC)</li>
+<li><strong>Temp</strong>: On-chip die temperature sensor (coretemp)</li>
+<li><strong>SDK</strong>: Vanilla Zephyr v4.2.2 (not NCS)</li>
+</ul>
+<h3 id="ina219-current-sensor-optional-for-coulomb-counting">INA219 Current Sensor (optional, for coulomb counting)<a class="headerlink" href="#ina219-current-sensor-optional-for-coulomb-counting" title="Permanent link">&para;</a></h3>
+<p>Wire the INA219 breakout board in series on the battery high side:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Battery+ ── INA219 VIN+ ── INA219 VIN- ── Load/DevKit VIN
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>ESP32-C3 GPIO6 (SDA) ── INA219 SDA
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>ESP32-C3 GPIO7 (SCL) ── INA219 SCL
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>3.3V ── INA219 VCC
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>GND  ── INA219 GND
+</code></pre></div>
+<p>Enable in Kconfig: <code>CONFIG_BATTERY_CURRENT_SENSE=y</code></p>
+<p>See <a href="docs/WIRING.md">Hardware Wiring Guide</a> for pin diagrams and circuit schematics.</p>
+<hr />
+<h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Real voltage measurement via nRF52840 SAADC (VDD input)</li>
+<li>Moving average voltage filter (window=12, O(1), 28 bytes RAM)</li>
+<li>CR2032 voltage-to-SoC lookup table with linear interpolation (integer math only)</li>
+<li>External NTC thermistor support (10K B3950 on AIN1) with 16-point resistance-to-temperature LUT (-40 °C to +125 °C)</li>
+<li>On-chip die temperature sensor via nRF52840 TEMP peripheral (±2 °C accuracy, alternative)</li>
+<li>Compile-time temperature source selection via Kconfig (<code>CONFIG_BATTERY_TEMP_NTC</code> default, <code>CONFIG_BATTERY_TEMP_DIE</code> alternative)</li>
+<li>Voltage-threshold power state detection with 100 mV hysteresis (CRITICAL below 2100 mV)</li>
+<li>Resilient telemetry collection with per-field error flags</li>
+<li>Graceful degradation — power state survives voltage read failures</li>
+<li>Unified error codes (<code>battery_status.h</code>)</li>
+<li>Centralized SDK initialization (<code>battery_sdk_init()</code>)</li>
+<li>LiPo single-cell (3.7 V nominal) discharge curve LUT (11-point, extra density in knee region)</li>
+<li><code>CONFIG_BATTERY_CHEMISTRY</code> Kconfig: selects CR2032 or LiPo LUT + gates temp compensation on LiPo only</li>
+<li>BLE telemetry transport with custom GATT service and notification characteristic</li>
+<li>Wire format v1 (20 bytes), v2 (24 bytes with <code>cycle_count</code>), and v3 (32 bytes with <code>current_ma</code> + <code>coulomb_mah</code>) — backward compatible</li>
+<li>Compile-time transport backend selection via Kconfig (BLE or mock)</li>
+<li>Dual output: serial printk + BLE notifications (when <code>CONFIG_BATTERY_TRANSPORT=y</code>)</li>
+<li>Coulomb counting SoC estimation via INA219 current sensor (voltage-anchored, NVS-persisted)</li>
+<li>Charge cycle counter with NVS flash persistence (CHARGING→CHARGED transitions)</li>
+<li>Python BLE gateway with auto-reconnect (bleak) → InfluxDB 2.x → Grafana dashboard</li>
+<li>Docker Compose cloud stack: InfluxDB time-series storage + 11-panel Grafana dashboard</li>
+<li><code>ibattery-gateway</code> CLI: scan, stream, run, analytics (health, anomalies, rul, cycles)</li>
+<li>Real-time and historical anomaly detection (voltage, temperature, SoC inconsistency)</li>
+<li>Battery health scoring, remaining useful life (RUL) estimation, cycle analysis</li>
+<li>Full battery state machine: ACTIVE, IDLE (30s), SLEEP (120s), CRITICAL, CHARGING, DISCHARGING, CHARGED</li>
+<li>TP4056 charger IC integration via GPIO (Kconfig-gated: <code>CONFIG_BATTERY_CHARGER_TP4056</code>)</li>
+<li>Host-based unit tests (Unity framework, 11 C test suites + 65 Python tests)</li>
+</ul>
+<hr />
+<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<h3 id="build-firmware">Build firmware<a class="headerlink" href="#build-firmware" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># nRF52840-DK</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>west<span class="w"> </span>build<span class="w"> </span>-b<span class="w"> </span>nrf52840dk/nrf52840<span class="w"> </span>app<span class="w"> </span>-d<span class="w"> </span>build-nrf<span class="w"> </span>--pristine
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>west<span class="w"> </span>flash<span class="w"> </span>-d<span class="w"> </span>build-nrf
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># NUCLEO-L476RG (STM32, no BLE)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>west<span class="w"> </span>build<span class="w"> </span>-b<span class="w"> </span>nucleo_l476rg<span class="w"> </span>app<span class="w"> </span>-d<span class="w"> </span>build-stm32<span class="w"> </span>--pristine<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span>-DZEPHYR_EXTRA_MODULES<span class="o">=</span><span class="s2">&quot;/opt/nordic/ncs/v3.2.2/modules/hal/stm32&quot;</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>west<span class="w"> </span>flash<span class="w"> </span>-d<span class="w"> </span>build-stm32
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># NUCLEO-L476RG with BLE shield (X-NUCLEO-IDB05A2)</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>west<span class="w"> </span>build<span class="w"> </span>-b<span class="w"> </span>nucleo_l476rg<span class="w"> </span>app<span class="w"> </span>-d<span class="w"> </span>build-stm32-ble<span class="w"> </span>--pristine<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span>-DSHIELD<span class="o">=</span>x_nucleo_idb05a1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span>-DEXTRA_CONF_FILE<span class="o">=</span>boards/nucleo_l476rg_ble.conf<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span>-DZEPHYR_EXTRA_MODULES<span class="o">=</span><span class="s2">&quot;/opt/nordic/ncs/v3.2.2/modules/hal/stm32&quot;</span>
+</code></pre></div>
+<h3 id="use-as-a-zephyr-module-in-your-own-project">Use as a Zephyr module (in your own project)<a class="headerlink" href="#use-as-a-zephyr-module-in-your-own-project" title="Permanent link">&para;</a></h3>
+<p>Add to your <code>west.yml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">manifest</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">remotes</span><span class="p">:</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aliaksandr-liapin</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">      </span><span class="nt">url-base</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/aliaksandr-liapin</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">projects</span><span class="p">:</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ibattery-sdk</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">      </span><span class="nt">remote</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aliaksandr-liapin</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">      </span><span class="nt">revision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v0.8.0</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">modules/lib/ibattery-sdk</span>
+</code></pre></div>
+<p>Then <code>west update</code> and add <code>CONFIG_BATTERY_SDK=y</code> to your <code>prj.conf</code>.</p>
+<h3 id="install-via-platformio">Install via PlatformIO<a class="headerlink" href="#install-via-platformio" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">; platformio.ini</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">lib_deps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">aliaksandr-liapin/ibattery-sdk@^0.8.0</span>
+</code></pre></div>
+<h3 id="run-unit-tests-host-no-hardware-needed">Run unit tests (host, no hardware needed)<a class="headerlink" href="#run-unit-tests-host-no-hardware-needed" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>cmake<span class="w"> </span>-B<span class="w"> </span>build_tests<span class="w"> </span>tests
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>build_tests
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>ctest<span class="w"> </span>--test-dir<span class="w"> </span>build_tests<span class="w"> </span>--output-on-failure
+</code></pre></div>
+<h3 id="cloud-telemetry-ble-influxdb-grafana">Cloud telemetry (BLE → InfluxDB → Grafana)<a class="headerlink" href="#cloud-telemetry-ble-influxdb-grafana" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">cd</span><span class="w"> </span>cloud<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w">          </span><span class="c1"># Start InfluxDB + Grafana</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>gateway<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w">            </span><span class="c1"># Install Python gateway</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>ibattery-gateway<span class="w"> </span>run<span class="w">                      </span><span class="c1"># Connect to iBattery device → write to InfluxDB</span>
+</code></pre></div>
+<p>Open http://localhost:3000 → "iBattery Telemetry" dashboard with live voltage, temperature, SoC, and power state panels.</p>
+<h3 id="serial-output">Serial output<a class="headerlink" href="#serial-output" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Battery SDK initialized OK
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>[v2 t=11]   V=3019 mV T=30.89 C SOC=100.00% PWR=6 CYC=0 flags=0x00000000
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>[v2 t=2030] V=3014 mV T=31.00 C SOC=100.00% PWR=6 CYC=0 flags=0x00000000
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>[v2 t=4049] V=3014 mV T=30.82 C SOC=100.00% PWR=6 CYC=0 flags=0x00000000
+</code></pre></div>
+<hr />
+<h2 id="telemetry-packet-format">Telemetry Packet Format<a class="headerlink" href="#telemetry-packet-format" title="Permanent link">&para;</a></h2>
+<h3 id="v1-20-bytes">v1 (20 bytes)<a class="headerlink" href="#v1-20-bytes" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Offset</th>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><code>telemetry_version</code></td>
+<td><code>uint8_t</code></td>
+<td>Protocol version (1 or 2)</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>timestamp_ms</code></td>
+<td><code>uint32_t</code></td>
+<td>Uptime in milliseconds</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>voltage_mv</code></td>
+<td><code>int32_t</code></td>
+<td>Filtered battery voltage in mV</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>temperature_c_x100</code></td>
+<td><code>int32_t</code></td>
+<td>Temperature in 0.01 C units</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>soc_pct_x100</code></td>
+<td><code>uint16_t</code></td>
+<td>State of charge in 0.01% units</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>power_state</code></td>
+<td><code>uint8_t</code></td>
+<td>Power state enum</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>status_flags</code></td>
+<td><code>uint32_t</code></td>
+<td>Per-field error bits</td>
+</tr>
+</tbody>
+</table>
+<h3 id="v2-24-bytes-extends-v1">v2 (24 bytes, extends v1)<a class="headerlink" href="#v2-24-bytes-extends-v1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Offset</th>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>20</td>
+<td><code>cycle_count</code></td>
+<td><code>uint32_t</code></td>
+<td>Charge cycle count (NVS-persisted)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="v3-32-bytes-extends-v2">v3 (32 bytes, extends v2)<a class="headerlink" href="#v3-32-bytes-extends-v2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Offset</th>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>24</td>
+<td><code>current_ma_x100</code></td>
+<td><code>int32_t</code></td>
+<td>Current in 0.01 mA units (from INA219)</td>
+</tr>
+<tr>
+<td>28</td>
+<td><code>coulomb_mah_x100</code></td>
+<td><code>int32_t</code></td>
+<td>Accumulated charge in 0.01 mAh units</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="repository-structure">Repository Structure<a class="headerlink" href="#repository-structure" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>ibattery-sdk/
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>  app/                          Zephyr application (main.c, CMake, overlay)
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>  include/battery_sdk/          Public SDK headers
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  src/
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    core/                       SDK init, internal state
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    core_modules/               Voltage, temperature, ADC, filter
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    hal/                        Hardware abstraction (Zephyr/nRF)
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    intelligence/               SoC estimation, LUT
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    telemetry/                  Telemetry collection
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    transport/                  Wire serialization + BLE backend
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>  tests/                        Host-based unit tests (Unity)
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    mocks/                      Configurable test doubles
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>  gateway/                      Python BLE gateway (bleak → InfluxDB)
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>  cloud/                        Docker Compose (InfluxDB + Grafana)
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>  docs/                         Documentation
+</code></pre></div>
+<hr />
+<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="docs/SDK_API.md">SDK API Reference</a></li>
+<li><a href="docs/ARCHITECTURE.md">Architecture</a></li>
+<li><a href="docs/WIRING.md">Hardware Wiring Guide</a></li>
+<li><a href="docs/BATTERY_PROFILES.md">Battery Profiles</a></li>
+<li><a href="docs/TESTING.md">Testing Guide</a></li>
+<li><a href="docs/RELEASE_NOTES.md">Release Notes</a></li>
+<li><a href="docs/ROADMAP.md">Roadmap &amp; Strategy</a></li>
+</ul>
+<hr />
+<h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
+<p>See <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> for development setup, code style, and how to submit changes.</p>
+<hr />
+<h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
+<p>Licensed under the <a href="LICENSE">Apache License 2.0</a>.</p>
+<p>Copyright 2026 Aliaksandr Liapin</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
