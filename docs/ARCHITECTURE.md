@@ -136,6 +136,14 @@
 - O(1) update: maintains running sum, circular buffer index
 - Memory: `4 + 2*window + 2 + 4 + 4 = 28` bytes for window=12
 - No heap allocation, no floating point
+- Default filter; selected via `CONFIG_BATTERY_VOLTAGE_FILTER_MEAN=y`
+
+### core_modules/battery_voltage_filter_median.c
+- Alternative median filter (drop-in replacement, same struct + API)
+- Selected via `CONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN=y`
+- Insertion sort over scratch buffer (~32 bytes), integer-only
+- Same RAM footprint as mean filter; rejects single-sample outliers
+  (BLE TX voltage sag, transient load spikes)
 
 ### core_modules/battery_temperature.c
 - Reads die temperature through the temperature HAL
@@ -161,6 +169,13 @@
 ### intelligence/battery_soc_estimator.c
 - Reads current voltage, passes to LUT interpolator
 - Returns SoC in 0.01% units (0-10000)
+- Optional slew-rate limiter (gated by `CONFIG_BATTERY_SOC_SLEW_LIMIT`,
+  default y) caps reported SoC change rate
+  (`CONFIG_BATTERY_SOC_SLEW_RATE_PCT_PER_MIN`, default 5%/min). First
+  sample after init bypasses the limiter for an instant initial reading.
+  When coulomb counting is enabled (Phase 8a), the limiter applies to
+  the final SoC value after coulomb correction; anchor events (full
+  charge / cutoff) bypass it for instant reset to LUT value.
 
 ### intelligence/battery_soc_lut.c
 - CR2032 9-point voltage-to-SoC lookup table
@@ -333,9 +348,15 @@ battery_telemetry_collect(&pkt)
   |     +-> pkt.temperature_c_x100
   |
   +-> battery_soc_estimator_get_pct_x100()
-  |     +-> battery_voltage_get_mv()
-  |     +-> battery_soc_lut_interpolate() [LUT + lerp]
+  |     +-> battery_voltage_get_mv()         [mean | median filter]
+  |     +-> battery_soc_lut_interpolate()    [LUT + lerp]
+  |     +-> [optional] coulomb correction    [Phase 8a]
+  |     +-> [optional] slew_limiter          [Phase 8b, %/min cap]
   |     +-> pkt.soc_pct_x100
+  |
+  | Pipeline:
+  | ADC -> voltage_filter (mean|median) -> LUT
+  |        -> coulomb_correction (opt.) -> slew_limiter (opt.) -> telemetry
   |
   +-> battery_power_manager_get_state()
   |     +-> battery_voltage_get_mv()        [threshold check]
@@ -382,7 +403,8 @@ battery_transport_send(&pkt)           [optional, CONFIG_BATTERY_TRANSPORT]
 
 | Component | RAM (bytes) | Notes |
 |-----------|-------------|-------|
-| Voltage filter | 28 | Window=12, circular buffer |
+| Voltage filter | 28 | Window=12, circular buffer (mean or median — same RAM) |
+| SoC slew limiter state | 6 | last_soc(2) + last_ms(4), if `CONFIG_BATTERY_SOC_SLEW_LIMIT` |
 | ADC sample buffer (VDD) | 2 | Single int16_t |
 | ADC sample buffer (NTC) | 2 | Single int16_t (NTC mode only) |
 | Power state | 1 | Hysteresis memory (g_current_state) |

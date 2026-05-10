@@ -390,6 +390,15 @@ Query whether a remote client is connected.
 | `CONFIG_BATTERY_BLE_DEVICE_NAME` | string | "iBattery" | Advertised device name |
 | `CONFIG_BATTERY_BLE_ADV_INTERVAL_MS` | int | 1000 | Advertising interval (20-10240 ms) |
 
+### Voltage Filter & SoC Smoothing (Kconfig)
+
+| Config | Type | Default | Description |
+|--------|------|---------|-------------|
+| `CONFIG_BATTERY_VOLTAGE_FILTER_MEAN` | bool | y | Moving average filter (default) |
+| `CONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN` | bool | n | Median filter (rejects single-sample outliers) |
+| `CONFIG_BATTERY_SOC_SLEW_LIMIT` | bool | y | Enable SoC slew-rate limiter |
+| `CONFIG_BATTERY_SOC_SLEW_RATE_PCT_PER_MIN` | int | 5 | Max SoC %/min change when slew limiter enabled |
+
 ### BLE Service Details
 
 | Property | Value |

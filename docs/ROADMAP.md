@@ -122,7 +122,7 @@ Lower scale but immediate revenue with zero infrastructure cost.
 | ~~9~~ | ~~Advanced SoC — temperature compensation~~ | ✅ Done (v0.5.0 — LiPo temp-compensated SoC) |
 | ~~10~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 + v0.5.1 — TP4056 GPIO driver + NVS cycle counter) |
 | 8a | Advanced SoC — Coulomb Counting (current) | Current-sensor SoC with NVS persistence |
-| 8b | Advanced SoC — Voltage-LUT Correction (planned) | Software-only SoC jitter reduction |
+| 8b | Advanced SoC — Voltage-LUT Correction (complete in v0.9.0) | Software-only SoC jitter reduction |
 | 8c | Advanced SoC — Kalman Filter Fusion (planned) | Optimal multi-signal SoC estimation |
 | ~~12~~ | ~~PlatformIO library publication~~ | ✅ Done — published to registry.platformio.org |
 | ~~13~~ | ~~Documentation site — GitHub Pages with guides and API reference~~ | ✅ Done — aliaksandr-liapin.github.io/ibattery-sdk/ |
@@ -137,11 +137,12 @@ Lower scale but immediate revenue with zero infrastructure cost.
 - NVS persistence for reboot survival
 - ESP32-C3 validated first, then nRF52840 + STM32
 
-#### Phase 8b: Voltage-LUT Correction Mode (planned)
+#### Phase 8b: Voltage-LUT Correction Mode (complete in v0.9.0)
 
 - Coulomb counting as smoothing layer over existing voltage-LUT
 - Reduces SoC jitter from voltage sag during BLE TX
 - No new hardware — software-only improvement
+- Delivered: median voltage filter (Kconfig-selectable) + SoC slew-rate limiter
 
 #### Phase 8c: Kalman Filter Fusion (planned)
 
