@@ -23,7 +23,6 @@ target_sources(app PRIVATE
     $<$<BOOL:${CONFIG_BATTERY_TRANSPORT_BLE}>:../src/transport/ble/battery_transport_ble_zephyr.c>
     ../src/hal/battery_hal_zephyr.c
     ../src/hal/battery_hal_adc_zephyr.c
-    ../src/core_modules/battery_voltage_filter.c
     $<$<BOOL:${CONFIG_BATTERY_CHARGER_TP4056}>:../src/hal/battery_hal_charger_tp4056_zephyr.c>
     ../src/intelligence/battery_cycle_counter.c
 )
@@ -45,6 +44,13 @@ endif()
 # Coulomb counter
 if(CONFIG_BATTERY_SOC_COULOMB)
     target_sources(app PRIVATE ../src/intelligence/battery_coulomb.c)
+endif()
+
+# Voltage filter: moving-average (default) or median
+if(CONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN)
+    target_sources(app PRIVATE ../src/core_modules/battery_voltage_filter_median.c)
+else()
+    target_sources(app PRIVATE ../src/core_modules/battery_voltage_filter.c)
 endif()
 
 # Temperature HAL: NTC thermistor or internal die sensor

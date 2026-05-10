@@ -44,6 +44,24 @@ config BATTERY_TEMP_DIE
 
 endchoice
 
+choice BATTERY_VOLTAGE_FILTER_TYPE
+    prompt "Voltage filter algorithm"
+    default BATTERY_VOLTAGE_FILTER_MEAN
+
+config BATTERY_VOLTAGE_FILTER_MEAN
+    bool "Moving average (legacy)"
+    help
+      Simple moving average over the configured window. Smooths
+      gradual changes but lets short voltage sags through.
+
+config BATTERY_VOLTAGE_FILTER_MEDIAN
+    bool "Median (rejects load-induced sags)"
+    help
+      Sorted median over the configured window. Single-sample
+      outliers (e.g. BLE TX voltage sag) are completely rejected.
+
+endchoice
+
 config BATTERY_TRANSPORT
     bool "Enable telemetry transport"
     default n
