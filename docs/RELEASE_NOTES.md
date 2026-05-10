@@ -1,24 +1,106 @@
 # Release Notes
 
-## v0.8.0 — Coulomb Counting SoC (Phase 8a)
+## v0.8.0 — Coulomb Counting SoC (Phase 8a) — 2026-04-14
 
-**New features:**
-- INA219 current sensor HAL via Zephyr sensor API
-- Coulomb counter with trapezoidal integration and NVS persistence
-- Voltage-anchored SoC estimation (coulomb primary, LUT at endpoints)
-- Telemetry v3 wire format (32 bytes: adds current_ma, coulomb_mah)
-- Gateway v3 packet decoding
-- ESP32-C3 build verified with INA219
+Adds full coulomb counting infrastructure for advanced SoC estimation.
+Software-complete release; on-target hardware validation pending
+(see Known Issues).
 
-**Build system:**
-- New Kconfig: CONFIG_BATTERY_CURRENT_SENSE, CONFIG_BATTERY_SOC_COULOMB, CONFIG_BATTERY_CAPACITY_MAH
-- Conditional CMake for current HAL (Zephyr sensor or stub)
-- ESP32-C3 devicetree overlay with I2C + INA219 node
+### New Features
 
-**Tests:**
-- 3 new C test suites: hal_current_stub, coulomb, soc_coulomb
-- 5 new v3 serialize tests
-- 8 new gateway decoder tests (v3 packets)
+**Current Sensing HAL**
+- New `battery_hal_current` interface — abstract current measurement
+- INA219 backend via Zephyr sensor API (with raw I2C fallback for ESP32-C3)
+- Stub backend for builds without current sensing — zero overhead
+- Sign convention: positive = discharging, negative = charging
+
+**Coulomb Counter**
+- Trapezoidal integration with `int64_t` accumulator (sub-mAh precision)
+- Remainder tracking eliminates truncation drift over multi-day runs
+- NVS persistence: saves every 60s or on >1 mAh change
+- Survives reboot — accumulator restored from flash on init
+
+**SoC Estimator v2**
+- Coulomb counting as primary tracker, voltage-LUT as calibration anchor
+- Anchors at full charge (4180mV LiPo, low current) and cutoff (3000mV LiPo)
+- Graceful fallback to voltage-LUT if current sensor unavailable
+- Same public API — no breaking changes for existing callers
+
+**Telemetry v3 Wire Format (32 bytes)**
+- Adds `current_ma_x100` (signed int32) at offset 24
+- Adds `coulomb_mah_x100` (signed int32) at offset 28
+- Two new status flags: CURRENT_ERR (bit 5), COULOMB_ERR (bit 6)
+- Backward compatible: gateway auto-detects v1 (20B), v2 (24B), v3 (32B)
+
+**Gateway v3 Decoder**
+- Python decoder extended for 32-byte v3 packets
+- Reports `current_ma` (float) and `coulomb_mah` (float) in result dict
+- 8 new tests covering encode/decode/edge cases
+
+### Build System
+
+**New Kconfig Options**
+- `CONFIG_BATTERY_CURRENT_SENSE` — enable INA219 + I2C
+- `CONFIG_BATTERY_SOC_COULOMB` — enable coulomb-based SoC
+- `CONFIG_BATTERY_CAPACITY_MAH` — battery capacity (220 for CR2032, 1000 for LiPo)
+- `CONFIG_BATTERY_COULOMB_NVS_INTERVAL_S` — NVS save interval (default 60s)
+
+**CMake**
+- Conditional sources for current HAL (Zephyr/stub) and coulomb counter
+- Same pattern in both root `CMakeLists.txt` (Zephyr module) and `app/CMakeLists.txt`
+
+**Board Configs**
+- `app/boards/esp32c3_devkitm_current.conf` — ESP32-C3 with current sensing
+- `app/boards/nrf52840dk_nrf52840_current.conf` — nRF52840-DK with current sensing
+- Devicetree overlays for both platforms include INA219 node at I2C 0x40
+
+### Tests
+
+- 14/14 C unit tests pass (3 new: `hal_current_stub`, `coulomb`, `soc_coulomb`)
+- 65/65 gateway tests pass (8 new for v3 decoding)
+- ESP32-C3 and nRF52840-DK both build cleanly with and without current sensing
+
+### Hardware Setup (INA219)
+
+```
+Battery+ ── INA219 VIN+ ── INA219 VIN- ── Load (VDD)
+                I2C: SDA, SCL → board's I2C0 pins
+                3.3V power, GND
+```
+
+| Platform | SDA | SCL | I2C Address |
+|----------|-----|-----|-------------|
+| ESP32-C3 | GPIO1 | GPIO3 | 0x40 |
+| nRF52840-DK | P0.26 | P0.27 | 0x40 |
+
+### Known Issues
+
+**Hardware validation pending**
+- INA219 detection failed on both ESP32-C3 (write NACK -14) and
+  nRF52840-DK (no devices on bus) during initial bring-up.
+- Root cause appears to be physical (breadboard contacts, header solder
+  joints, or pull-up resistor configuration on nRF52840-DK without
+  Arduino shield).
+- Software is verified via host tests (no hardware required).
+- v0.8.1 will follow with on-target hardware validation once a working
+  INA219 setup is confirmed (recommend logic analyzer for diagnosis).
+
+**ESP32-C3 I2C driver quirk**
+- Zephyr 4.2.2's `i2c_write` function fails on ESP32-C3 with EFAULT (-14).
+- Workaround already in code: use `i2c_burst_write` and separate
+  `i2c_write` + `i2c_read` calls instead of `i2c_write_read`.
+
+### Roadmap Split
+
+Phase 8 Advanced SoC is now three sub-phases:
+
+- **Phase 8a (this release)**: Coulomb counting with voltage anchoring
+- **Phase 8b (next)**: Voltage-LUT correction mode — coulomb as smoothing layer
+- **Phase 8c (future)**: Kalman filter fusion — optimal blending
+
+Each phase reuses the HAL and telemetry from 8a — same public API throughout.
+
+---
 
 ---
 
