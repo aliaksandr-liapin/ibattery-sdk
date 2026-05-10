@@ -287,6 +287,31 @@ target_include_directories(test_voltage_filter_median PRIVATE
 
 target_link_libraries(test_voltage_filter_median PRIVATE unity)
 
+# ── SoC slew limit test ──────────────────────────────────────────────────
+add_executable(test_soc_slew_limit
+    test_soc_slew_limit.c
+    ${SDK_SRC}/intelligence/battery_soc_estimator.c
+    ${SDK_SRC}/intelligence/battery_soc_lut.c
+    mocks/mock_voltage.c
+    mocks/mock_sdk_state.c
+)
+
+target_include_directories(test_soc_slew_limit PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/core
+    ${SDK_SRC}/intelligence
+    ${unity_SOURCE_DIR}/src
+)
+
+target_compile_definitions(test_soc_slew_limit PRIVATE
+    CONFIG_BATTERY_SOC_SLEW_LIMIT=1
+    CONFIG_BATTERY_SOC_SLEW_RATE_PCT_PER_MIN=5
+    CONFIG_BATTERY_CHEMISTRY_LIPO=1
+)
+
+target_link_libraries(test_soc_slew_limit PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
@@ -304,3 +329,4 @@ add_test(NAME cycle_counter COMMAND test_cycle_counter)
 add_test(NAME hal_current_stub COMMAND test_hal_current_stub)
 add_test(NAME coulomb COMMAND test_coulomb)
 add_test(NAME soc_coulomb COMMAND test_soc_coulomb)
+add_test(NAME soc_slew_limit COMMAND test_soc_slew_limit)
