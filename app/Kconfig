@@ -155,6 +155,22 @@ config BATTERY_CAPACITY_MAH
       coulomb counting estimator to convert accumulated charge
       to SoC percentage.
 
+config BATTERY_SOC_SLEW_LIMIT
+    bool "Limit SoC change rate (smooths reported value)"
+    default y
+    help
+      Caps the SoC change rate to a configurable maximum percent per
+      minute. Filters transient SoC swings from voltage sag or LUT
+      plateau cliffs. Bypassed on first sample after init.
+
+config BATTERY_SOC_SLEW_RATE_PCT_PER_MIN
+    int "Max SoC change per minute (percent)"
+    default 5
+    range 1 100
+    depends on BATTERY_SOC_SLEW_LIMIT
+    help
+      Maximum allowed SoC change per minute.
+
 config BATTERY_COULOMB_NVS_INTERVAL_S
     int "Coulomb counter NVS save interval (seconds)"
     default 60

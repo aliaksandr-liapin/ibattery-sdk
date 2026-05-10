@@ -1,6 +1,7 @@
 #include <battery_sdk/battery_soc_estimator.h>
 #include <battery_sdk/battery_voltage.h>
 #include <battery_sdk/battery_status.h>
+#include <battery_sdk/battery_sdk.h>
 
 #include "../core/battery_internal.h"
 #include "battery_soc_lut.h"
@@ -37,6 +38,18 @@ static bool     g_coulomb_soc_valid;
 #include <stddef.h>
 #include <stdint.h>
 
+#if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
+
+#ifndef CONFIG_BATTERY_SOC_SLEW_RATE_PCT_PER_MIN
+#define CONFIG_BATTERY_SOC_SLEW_RATE_PCT_PER_MIN 5
+#endif
+
+static uint16_t g_prev_soc_x100;
+static uint32_t g_prev_uptime_ms;
+static bool     g_slew_initialized;
+
+#endif  /* CONFIG_BATTERY_SOC_SLEW_LIMIT */
+
 /**
  * Compute LUT-based SoC from voltage (always available as baseline).
  */
@@ -53,12 +66,60 @@ static int soc_from_lut(uint16_t voltage_mv, uint16_t *soc_pct_x100)
 #endif
 }
 
+#if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
+/**
+ * Apply slew-rate limit. First call seeds state and returns input unchanged.
+ * Subsequent calls cap delta to (rate * dt_ms) / 60000 in x100 units.
+ */
+static uint16_t apply_slew_limit(uint16_t new_soc_x100)
+{
+    uint32_t now_ms;
+    if (battery_sdk_get_uptime_ms(&now_ms) != BATTERY_STATUS_OK) {
+        return new_soc_x100;  /* Cannot compute dt — bypass */
+    }
+
+    if (!g_slew_initialized) {
+        g_prev_soc_x100 = new_soc_x100;
+        g_prev_uptime_ms = now_ms;
+        g_slew_initialized = true;
+        return new_soc_x100;
+    }
+
+    uint32_t dt_ms = now_ms - g_prev_uptime_ms;
+
+    /* max delta in x100 units: rate_pct_per_min * 100 * dt_ms / 60000 */
+    int32_t max_delta = (int32_t)(((uint64_t)CONFIG_BATTERY_SOC_SLEW_RATE_PCT_PER_MIN
+                                   * 100ULL * dt_ms) / 60000ULL);
+
+    int32_t delta = (int32_t)new_soc_x100 - (int32_t)g_prev_soc_x100;
+    int32_t result = (int32_t)g_prev_soc_x100;
+
+    if (delta > max_delta) {
+        result += max_delta;
+    } else if (delta < -max_delta) {
+        result -= max_delta;
+    } else {
+        result += delta;
+    }
+
+    if (result < 0) result = 0;
+    if (result > 10000) result = 10000;
+
+    g_prev_soc_x100 = (uint16_t)result;
+    g_prev_uptime_ms = now_ms;
+    return g_prev_soc_x100;
+}
+#endif  /* CONFIG_BATTERY_SOC_SLEW_LIMIT */
+
 int battery_soc_estimator_init(void)
 {
     struct battery_sdk_runtime_state *state = battery_sdk_state();
     state->soc_initialized = true;
 #if defined(CONFIG_BATTERY_SOC_COULOMB)
     g_coulomb_soc_valid = false;
+#endif
+#if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
+    g_slew_initialized = false;
 #endif
     return BATTERY_STATUS_OK;
 }
@@ -103,7 +164,11 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
         rc = battery_hal_current_read_ma_x100(&current_x100);
         if (rc != BATTERY_STATUS_OK) {
             /* Current sensor unavailable — graceful fallback to LUT */
+#if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
+            *soc_pct_x100 = apply_slew_limit(lut_soc);
+#else
             *soc_pct_x100 = lut_soc;
+#endif
             return BATTERY_STATUS_OK;
         }
 
@@ -137,7 +202,11 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
         int32_t mah_x100;
         rc = battery_coulomb_get_mah_x100(&mah_x100);
         if (rc != BATTERY_STATUS_OK) {
+#if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
+            *soc_pct_x100 = apply_slew_limit(lut_soc);
+#else
             *soc_pct_x100 = lut_soc;
+#endif
             return BATTERY_STATUS_OK;
         }
 
@@ -153,11 +222,18 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
         }
 
         g_coulomb_soc_x100 = (uint16_t)soc;
+#if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
+        g_coulomb_soc_x100 = apply_slew_limit(g_coulomb_soc_x100);
+#endif
         *soc_pct_x100 = g_coulomb_soc_x100;
         return BATTERY_STATUS_OK;
     }
 #else
+#if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
+    *soc_pct_x100 = apply_slew_limit(lut_soc);
+#else
     *soc_pct_x100 = lut_soc;
+#endif
     return BATTERY_STATUS_OK;
 #endif
 }
