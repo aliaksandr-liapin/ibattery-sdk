@@ -1,7 +1,7 @@
 # Battery SDK
 
 [![CI](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml)
-[![Firmware](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/firmware.yml/badge.svg)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/firmware.yml)
+[![Firmware (ESP32-C3)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/firmware.yml/badge.svg)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/firmware.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/aliaksandr-liapin/ibattery-sdk)](https://github.com/aliaksandr-liapin/ibattery-sdk/releases)
 
