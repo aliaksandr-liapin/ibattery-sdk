@@ -55,6 +55,13 @@ jobs:
         working-directory: ${{ github.workspace }}/zephyrproject
         run: pip3 install --break-system-packages -r zephyr/scripts/requirements.txt
 
+      - name: Verify paths
+        run: |
+          echo "Workspace: ${{ github.workspace }}"
+          ls -la ${{ github.workspace }}
+          ls -la ${{ github.workspace }}/ibattery-sdk
+          ls -la ${{ github.workspace }}/ibattery-sdk/app
+
       - name: Build
         working-directory: ${{ github.workspace }}/zephyrproject
         env:
@@ -63,5 +70,5 @@ jobs:
           west build \
             -b ${{ matrix.board }} \
             ${{ github.workspace }}/ibattery-sdk/app \
-            -d build-${{ matrix.board }} \
+            -d build_output \
             --pristine -- ${{ matrix.extra_args }}
