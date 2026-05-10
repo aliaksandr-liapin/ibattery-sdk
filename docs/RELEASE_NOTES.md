@@ -1,5 +1,65 @@
 # Release Notes
 
+## v0.9.0 — Voltage Smoothing & SoC Slew Limiter (Phase 8b) — 2026-04-14
+
+Software-only accuracy improvement for SoC estimation. Two
+defense-in-depth layers against load-induced voltage sag and
+LUT plateau cliffs. No hardware required — works on every
+existing platform.
+
+### New Features
+
+**Median Voltage Filter**
+- Alternative to existing moving-average filter
+- Selected via `CONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN=y`
+- Single-sample outliers (BLE TX sag, etc.) completely rejected
+- Same struct, same API — drop-in replacement at compile time
+- Insertion sort, integer-only, ~32 bytes scratch buffer
+
+**SoC Slew-Rate Limiter**
+- Caps reported SoC change rate (default 5%/min)
+- Bypassed on first sample after init for instant initial reading
+- Filters LUT plateau cliffs and any remaining voltage outliers
+- New Kconfig: `CONFIG_BATTERY_SOC_SLEW_LIMIT` (default y),
+  `CONFIG_BATTERY_SOC_SLEW_RATE_PCT_PER_MIN` (default 5)
+
+### Tests
+
+- 12 new median filter tests (`test_voltage_filter_median`)
+- 6 new slew limiter tests (`test_soc_slew_limit`)
+- All 16 C test suites pass + 65 gateway tests
+
+### Build Verification
+
+- ESP32-C3 with median: 8.51% flash, clean
+- nRF52840-DK with median: 14.59% flash, clean
+- nRF52840-DK default (mean): 14.58% flash, clean (regression-free)
+- Median filter overhead: ~80 bytes flash vs mean
+
+### Composition with Phase 8a
+
+When both `BATTERY_SOC_COULOMB` and `BATTERY_SOC_SLEW_LIMIT` are
+enabled, slew limiter applies to the final SoC value (after coulomb
+correction). Anchor events (full charge / cutoff) bypass the slew
+limiter for instant reset to LUT value.
+
+### Files Added
+
+- `src/core_modules/battery_voltage_filter_median.c`
+- `tests/test_voltage_filter_median.c`
+- `tests/test_soc_slew_limit.c`
+- `app/boards/esp32c3_devkitm_median.conf`
+
+### Files Modified
+
+- `app/Kconfig` — filter type choice + slew options
+- `CMakeLists.txt` — conditional voltage filter source
+- `app/CMakeLists.txt` — same conditional
+- `src/intelligence/battery_soc_estimator.c` — slew limiter integration
+- `tests/CMakeLists.txt` — new test targets
+
+---
+
 ## v0.8.0 — Coulomb Counting SoC (Phase 8a) — 2026-04-14
 
 Adds full coulomb counting infrastructure for advanced SoC estimation.
