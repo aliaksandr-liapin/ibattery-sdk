@@ -1,7 +1,9 @@
 # Battery SDK
 
 [![CI](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml)
+[![Firmware](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/firmware.yml/badge.svg)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/firmware.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/aliaksandr-liapin/ibattery-sdk)](https://github.com/aliaksandr-liapin/ibattery-sdk/releases)
 
 Embedded firmware library providing a **standardized battery intelligence layer** for battery-powered IoT devices. Measures voltage, estimates state-of-charge, monitors temperature and power state, and packages everything into structured telemetry packets.
 
@@ -9,7 +11,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 
 ---
 
-## Current Status: Phase 8a Complete (v0.8.0)
+## Current Status: Phase 8b Complete (v0.9.0)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -22,7 +24,8 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 | Phase 5b | Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2 | Done |
 | Phase 6 | STM32 HAL port (NUCLEO-L476RG) | Done — hardware-validated, BLE shield tested |
 | Phase 7 | ESP32-C3 HAL port (DevKitM) | Done — hardware-validated, native BLE, full pipeline |
-| Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done — ESP32-C3 verified |
+| Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done — software complete, hardware validation pending |
+| Phase 8b | Median voltage filter + SoC slew-rate limiter | Done — software-only, no hardware needed |
 
 ---
 
