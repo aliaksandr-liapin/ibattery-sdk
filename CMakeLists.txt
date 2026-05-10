@@ -25,7 +25,6 @@ zephyr_library_sources(
     src/core_modules/battery_power_manager.c
     src/core_modules/battery_temperature.c
     src/core_modules/battery_voltage.c
-    src/core_modules/battery_voltage_filter.c
     src/intelligence/battery_soc_estimator.c
     src/intelligence/battery_soc_lut.c
     src/intelligence/battery_cycle_counter.c
@@ -69,6 +68,13 @@ endif()
 zephyr_library_sources_ifdef(CONFIG_BATTERY_SOC_COULOMB
     src/intelligence/battery_coulomb.c
 )
+
+# Voltage filter: moving-average (default) or median
+if(CONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN)
+    zephyr_library_sources(src/core_modules/battery_voltage_filter_median.c)
+else()
+    zephyr_library_sources(src/core_modules/battery_voltage_filter.c)
+endif()
 
 # Temperature HAL: NTC thermistor or internal die sensor
 if(CONFIG_BATTERY_TEMP_NTC)
