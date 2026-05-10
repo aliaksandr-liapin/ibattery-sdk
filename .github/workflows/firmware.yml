@@ -6,29 +6,25 @@ on:
   pull_request:
     branches: [main]
 
+# Note: Only ESP32-C3 is built in CI because it uses vanilla Zephyr.
+# nRF52840-DK builds require Nordic Connect SDK (NCS) which is verified
+# locally during development. STM32 builds require ZEPHYR_EXTRA_MODULES
+# pointing to NCS hal_stm32.
+
 jobs:
-  zephyr-build:
-    name: ${{ matrix.name }}
+  esp32c3:
+    name: ESP32-C3 (${{ matrix.config }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: nRF52840-DK (default)
-            board: nrf52840dk/nrf52840
+          - config: default
             extra_args: ''
-          - name: nRF52840-DK (median filter)
-            board: nrf52840dk/nrf52840
+          - config: median filter
             extra_args: '-DCONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN=y'
-          - name: nRF52840-DK (current sensing)
-            board: nrf52840dk/nrf52840
-            extra_args: '-DEXTRA_CONF_FILE=boards/nrf52840dk_nrf52840_current.conf'
-          - name: ESP32-C3 (default)
-            board: esp32c3_devkitm
-            extra_args: ''
-          - name: ESP32-C3 (current sensing)
-            board: esp32c3_devkitm
+          - config: current sensing
             extra_args: '-DEXTRA_CONF_FILE=boards/esp32c3_devkitm_current.conf'
 
     steps:
@@ -47,7 +43,7 @@ jobs:
             libsdl2-dev libmagic1
           pip3 install west
 
-      - name: Initialize Zephyr workspace
+      - name: Initialize Zephyr workspace (vanilla)
         run: |
           west init --mr v4.2.2 zephyrproject
           cd zephyrproject
@@ -55,23 +51,29 @@ jobs:
           west zephyr-export
           pip3 install -r zephyr/scripts/requirements-base.txt
 
-      - name: Install Zephyr SDK
+      - name: Install Zephyr SDK (riscv64 only for ESP32-C3)
         run: |
           cd zephyrproject
           ZEPHYR_SDK_VERSION=0.16.8
           wget -q https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz
           tar xf zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz
+          rm zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz
           cd zephyr-sdk-${ZEPHYR_SDK_VERSION}
-          ./setup.sh -t arm-zephyr-eabi -t riscv64-zephyr-elf -h -c
+          ./setup.sh -t riscv64-zephyr-elf -h -c
 
-      - name: Build firmware
+      - name: Install ESP32 blobs
+        run: |
+          cd zephyrproject
+          west blobs fetch hal_espressif
+
+      - name: Build ESP32-C3 firmware
         env:
           ZEPHYR_BASE: ${{ github.workspace }}/zephyrproject/zephyr
           ZEPHYR_SDK_INSTALL_DIR: ${{ github.workspace }}/zephyrproject/zephyr-sdk-0.16.8
         run: |
           cd zephyrproject
           west build \
-            -b ${{ matrix.board }} \
+            -b esp32c3_devkitm \
             ${{ github.workspace }}/ibattery-sdk/app \
             -d build-output \
             --pristine -- ${{ matrix.extra_args }}
