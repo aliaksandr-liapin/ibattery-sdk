@@ -273,9 +273,24 @@ target_compile_definitions(test_soc_coulomb PRIVATE
 
 target_link_libraries(test_soc_coulomb PRIVATE unity)
 
+# ── Median voltage filter test ─────────────────────────────────────────────
+add_executable(test_voltage_filter_median
+    test_voltage_filter_median.c
+    ${SDK_SRC}/core_modules/battery_voltage_filter_median.c
+)
+
+target_include_directories(test_voltage_filter_median PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}/core_modules
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_voltage_filter_median PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
+add_test(NAME voltage_filter_median COMMAND test_voltage_filter_median)
 add_test(NAME soc_lut COMMAND test_soc_lut)
 add_test(NAME soc_temp_comp COMMAND test_soc_temp_comp)
 add_test(NAME telemetry COMMAND test_telemetry)
