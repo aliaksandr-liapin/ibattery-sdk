@@ -1,8 +1,11 @@
 # INA219 I2C Diagnostic Tools
 
 Captures and decodes the I2C bus during boot using a HiLetgo / Saleae-clone
-USB logic analyzer. Used to diagnose why the INA219 isn't responding to
-register writes on ESP32-C3 / nRF52840-DK.
+USB logic analyzer. Used to diagnose I2C peripheral issues during the SDK's
+Phase 8a hardware bring-up.
+
+For the full diagnostic methodology, see
+**[docs/HARDWARE_TROUBLESHOOTING.md](../../docs/HARDWARE_TROUBLESHOOTING.md)**.
 
 ## Prerequisites (one-time setup)
 

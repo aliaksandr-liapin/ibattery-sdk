@@ -1,6 +1,6 @@
 # Roadmap & Business Strategy
 
-## Current State (Phase 8a Complete)
+## Current State (v0.9.0 — Phases 8a + 8b shipped; 8a hardware validation pending)
 
 ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 
@@ -121,21 +121,30 @@ Lower scale but immediate revenue with zero infrastructure cost.
 |----------|------|--------|
 | ~~9~~ | ~~Advanced SoC — temperature compensation~~ | ✅ Done (v0.5.0 — LiPo temp-compensated SoC) |
 | ~~10~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 + v0.5.1 — TP4056 GPIO driver + NVS cycle counter) |
-| 8a | Advanced SoC — Coulomb Counting (current) | Current-sensor SoC with NVS persistence |
+| 8a | Advanced SoC — Coulomb Counting (v0.8.0/v0.8.1 — software complete, on-target validation pending) | Current-sensor SoC with NVS persistence |
 | 8b | Advanced SoC — Voltage-LUT Correction (complete in v0.9.0) | Software-only SoC jitter reduction |
 | 8c | Advanced SoC — Kalman Filter Fusion (planned) | Optimal multi-signal SoC estimation |
 | ~~12~~ | ~~PlatformIO library publication~~ | ✅ Done — published to registry.platformio.org |
 | ~~13~~ | ~~Documentation site — GitHub Pages with guides and API reference~~ | ✅ Done — aliaksandr-liapin.github.io/ibattery-sdk/ |
 | 14 | Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo) | Hardware reference designs drive SDK adoption |
 
-#### Phase 8a: Coulomb Counting SoC (current)
+#### Phase 8a: Coulomb Counting SoC (v0.8.0 + v0.8.1)
 
-- INA219 current sensor HAL (Zephyr sensor API)
-- Coulomb counter with trapezoidal integration
+**Software-complete in v0.8.0; v0.8.1 adds hardware diagnostic tooling.**
+
+- INA219 current sensor HAL (Zephyr sensor API + raw I2C fallback)
+- Coulomb counter with trapezoidal integration (int64 accumulator, sub-mAh precision)
 - Voltage-anchored SoC estimation (coulomb primary, LUT at endpoints)
 - Telemetry v3 wire format (32 bytes: adds current + coulomb fields)
 - NVS persistence for reboot survival
-- ESP32-C3 validated first, then nRF52840 + STM32
+- `tools/i2c-analyzer/capture.sh` — sigrok-cli wrapper for I2C bus debugging
+- `docs/HARDWARE_TROUBLESHOOTING.md` — 4-phase diagnostic methodology
+
+**Status:** Firmware verified end-to-end via logic-analyzer capture (master
+correctly drives `START → 0x40 → STOP`; bus pull-ups active; signals clean).
+On-target validation with a verified-genuine INA219 board pending — two
+HiLetgo INA219 clones from one batch failed at all 128 I2C addresses;
+recommend Adafruit product #904 from a trusted source.
 
 #### Phase 8b: Voltage-LUT Correction Mode (complete in v0.9.0)
 
