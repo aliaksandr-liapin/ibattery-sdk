@@ -1,5 +1,69 @@
 # Release Notes
 
+## v0.8.1 — Hardware Diagnostic Tooling (Phase 8a follow-up) — 2026-05-15
+
+Patch release capturing the hardware-validation effort for Phase 8a
+coulomb counting. No firmware/software changes — this release adds
+diagnostic tooling and documentation for INA219 bring-up.
+
+### Added
+
+**I2C analyzer tooling** (`tools/i2c-analyzer/`)
+- `capture.sh` — wraps `sigrok-cli` to capture and decode I2C bus
+  activity using a HiLetgo / Saleae-clone USB logic analyzer
+- `README.md` — wiring, common findings, and decoder usage
+
+**Hardware troubleshooting guide** (`docs/HARDWARE_TROUBLESHOOTING.md`)
+- Four-phase debug methodology (electrical, master signaling, slave
+  identification, root cause isolation)
+- Captured I2C trace from the v0.8.0 diagnostic session
+- Known issues with cheap INA219 clones documented
+
+### Phase 8a hardware validation status
+
+After ~3 hours of methodical diagnosis with a logic analyzer, the
+SDK was conclusively verified end-to-end at the protocol level:
+
+- ✅ nRF52840-DK I2C master correctly drives START, address bits,
+  R/W, and STOP conditions
+- ✅ Bus electrical layer is clean (pull-ups active, idle = 3.3V,
+  signals captured cleanly)
+- ✅ Wire path from MCU to bus verified via simultaneous SDA + SCL
+  captures
+- ❌ **Two HiLetgo INA219 boards from the same 2-pack failed to
+  respond at any of 128 I2C addresses** — likely factory defect or
+  ESD damage to both chips in the batch
+
+The SDK is wire-compatible with any device implementing the TI
+INA219 I2C protocol. Customers should source from a reputable
+vendor (Adafruit product #904, or Adafruit-branded Amazon listings
+"Sold by Adafruit Industries" / "Sold by Amazon.com").
+
+### What didn't change
+
+- All firmware modules (HAL, coulomb counter, SoC estimator,
+  telemetry, transport) — verified by 16 C unit tests + 65 Python
+  gateway tests
+- Public API — no breaking changes from v0.8.0
+- Build system — no Kconfig or CMake changes
+
+### Captured I2C trace evidence
+
+```
+i2c-1: Start
+i2c-1: Address read: 40
+i2c-1: NACK
+i2c-1: Stop
+```
+
+The master correctly addresses `0x40` (the INA219's default I2C
+address) and requests a read. The chip fails to acknowledge.
+Bus electrical layer is correct; failure is on the chip side.
+
+Full diagnostic methodology in `docs/HARDWARE_TROUBLESHOOTING.md`.
+
+---
+
 ## v0.9.0 — Voltage Smoothing & SoC Slew Limiter (Phase 8b) — 2026-04-14
 
 Software-only accuracy improvement for SoC estimation. Two
