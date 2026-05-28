@@ -183,6 +183,68 @@ peripheral are correct. The fault is on the slave side.
 
 ---
 
+## RESOLVED (v0.8.2): root cause was breadboard column misalignment
+
+The "0 devices found" failures from v0.8.0/v0.8.1 were **not** chip defects.
+The logic analyzer pinpointed the real cause:
+
+**One I2C jumper was plugged into a different breadboard column than its
+INA219 pin.** On a breadboard, only holes in the *same vertical column* are
+connected. The nRF's SCL wire was one column off from the INA219's SCL pin,
+so the clock signal left the nRF but dead-ended in an unconnected column.
+
+### The signature that revealed it
+
+Capturing both lines during a scan:
+
+```
+D3 (one line): 951 transition-blocks   → master actively driving it
+D4 (other):      0 transition-blocks   → pull-up present (idle HIGH),
+                                          but NO master signal
+```
+
+A line that idles HIGH (has a pull-up = chip pin connected) but shows zero
+master activity means: **the chip's pin is on that breadboard column, but
+the MCU's wire is not.** The two ends never meet. Re-aligning the wire to
+share the INA219 pin's exact column immediately produced ACKs:
+
+```
+Start
+Address write: 40
+ACK            ← chip responds once both lines are truly connected
+```
+
+### Lesson: breadboard column alignment
+
+For every connection, the MCU jumper and the peripheral pin must be in the
+**same numbered column** (the vertical group of 5 connected holes). Stack
+them: peripheral pin in row `a`, jumper in row `b`, probe in row `c` — all
+in the same column. A wire in a different region of the breadboard, however
+close it looks, is electrically isolated.
+
+### Secondary issue: "analyzer sees ACK, firmware reads NACK"
+
+After fixing alignment, the analyzer captured clean ACKs but the nRF's
+`i2c scan` still intermittently reported 0 devices. This is a classic
+**signal-integrity symptom**: worn breadboard contacts add series resistance,
+so when the chip pulls SDA low for the ACK, the voltage at the MCU's pin
+doesn't reach a clean logic-low at the exact sampling instant. The analyzer
+(continuous sampling, high input impedance) catches the low; the MCU's
+one-shot sample misses it.
+
+Fix: a **permanent connection** — soldered header, or a fresh breadboard
+with unworn contacts. The nRF52840 TWIM is already at its minimum 100 kHz,
+so there is no slower-clock software workaround.
+
+### Cheap-clone postscript
+
+The two HiLetgo INA219 boards blamed earlier were most likely fine — they
+were victims of the same column-alignment error, not defective. Final
+confirmation used a genuine Adafruit INA219 (#904), but the lesson stands:
+**verify wiring with a logic analyzer before condemning a chip.**
+
+---
+
 ## Why we shipped v0.8.1 without on-target validation
 
 The full software stack (HAL, coulomb counter, SoC estimator,

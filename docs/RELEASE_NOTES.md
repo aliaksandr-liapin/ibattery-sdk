@@ -1,5 +1,71 @@
 # Release Notes
 
+## v0.8.2 — INA219 Confirmed Responding on Hardware (Phase 8a) — 2026-05-24
+
+Milestone patch: the INA219 current sensor was **confirmed responding at
+I2C address 0x40 on the nRF52840-DK**, verified by logic-analyzer capture
+of a clean ACK. This closes the core question from v0.8.0/v0.8.1 — the
+SDK firmware, the nRF I2C master, and the INA219 chip all work together.
+
+### What was validated
+
+Using a USB logic analyzer probing SDA + SCL simultaneously during a live
+I2C scan, we captured the decoded transaction:
+
+```
+Start
+Address write: 40
+ACK            ← INA219 acknowledges its address
+...
+```
+
+This was reproduced across multiple scans (3 clean ACKs at 0x40 in one
+capture window). Combined with the 80+ host tests, this confirms:
+
+- ✅ SDK firmware drives I2C correctly (`START → 0x40 → ACK → STOP`)
+- ✅ nRF52840 TWIM master functions correctly
+- ✅ INA219 chip is alive and ACKs at its default address
+- ✅ Bus pull-ups and signal framing are correct
+
+### The debugging journey (documented for posterity)
+
+The root cause of earlier failures (v0.8.0/v0.8.1, "0 devices found") was
+**not** chip defects — it was a **breadboard column-alignment error**: one
+I2C jumper sat in a different breadboard column than its INA219 pin, so the
+signal left the nRF but never reached the chip. The logic analyzer pinpointed
+this: one line showed 951 transitions (master active) while the other showed
+0 (pull-up present but no master signal). Re-aligning the wire to share the
+INA219 pin's column immediately produced the first ACKs.
+
+Two HiLetgo INA219 clones tested earlier were likely fine all along — they
+were victims of the same wiring error, not defective. (A genuine Adafruit
+INA219 #904 was used for final confirmation.)
+
+### Known limitation — stable firmware-level read pending
+
+The breadboard/jumper connection proved **intermittent**: the analyzer
+captured clean ACKs, but the nRF's firmware-level `i2c scan` did not yet
+report the device consistently, due to marginal contact resistance degrading
+the SDA signal at the sampling instant. A **soldered or otherwise permanent
+connection** is needed for a stable end-to-end current-reading run.
+
+This does not affect the SDK code — it is purely a bench-wiring quality issue.
+
+### Updated docs
+
+- `docs/HARDWARE_TROUBLESHOOTING.md` — added the column-alignment root cause,
+  the captured ACK trace, and the "analyzer sees ACK but firmware reads NACK"
+  signal-integrity signature
+- `README.md` / `docs/ROADMAP.md` — Phase 8a marked hardware-confirmed
+  (chip ACKs); final live-reading run noted as pending permanent wiring
+
+### What didn't change
+
+- No firmware/software changes. All 16 C tests + 65 gateway tests still pass.
+- No API or build-system changes from v0.8.1.
+
+---
+
 ## v0.8.1 — Hardware Diagnostic Tooling (Phase 8a follow-up) — 2026-05-15
 
 Patch release capturing the hardware-validation effort for Phase 8a

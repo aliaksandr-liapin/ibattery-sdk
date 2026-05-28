@@ -140,11 +140,13 @@ Lower scale but immediate revenue with zero infrastructure cost.
 - `tools/i2c-analyzer/capture.sh` — sigrok-cli wrapper for I2C bus debugging
 - `docs/HARDWARE_TROUBLESHOOTING.md` — 4-phase diagnostic methodology
 
-**Status:** Firmware verified end-to-end via logic-analyzer capture (master
-correctly drives `START → 0x40 → STOP`; bus pull-ups active; signals clean).
-On-target validation with a verified-genuine INA219 board pending — two
-HiLetgo INA219 clones from one batch failed at all 128 I2C addresses;
-recommend Adafruit product #904 from a trusted source.
+**Status (v0.8.2):** INA219 **confirmed responding at 0x40** on nRF52840-DK,
+verified by logic-analyzer capture of a clean ACK (`START → 0x40 → ACK → STOP`).
+Firmware, I2C master, and chip all work together. The earlier "0 devices"
+failures traced to a breadboard column-alignment error (one I2C jumper in the
+wrong column), not chip defects. A stable firmware-level current-reading run
+is pending a permanent (soldered) connection — bench jumper contacts proved
+intermittent. See `docs/HARDWARE_TROUBLESHOOTING.md` for the full diagnosis.
 
 #### Phase 8b: Voltage-LUT Correction Mode (complete in v0.9.0)
 

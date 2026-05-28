@@ -24,7 +24,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 | Phase 5b | Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2 | Done |
 | Phase 6 | STM32 HAL port (NUCLEO-L476RG) | Done — hardware-validated, BLE shield tested |
 | Phase 7 | ESP32-C3 HAL port (DevKitM) | Done — hardware-validated, native BLE, full pipeline |
-| Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done — software verified end-to-end via logic analyzer; final on-target validation pending verified-genuine INA219 board |
+| Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done — INA219 confirmed responding at 0x40 (logic-analyzer verified); stable live-reading run pending a permanent (soldered) connection |
 | Phase 8b | Median voltage filter + SoC slew-rate limiter | Done — software-only, no hardware needed |
 
 ---
