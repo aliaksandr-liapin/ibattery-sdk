@@ -236,6 +236,23 @@ Fix: a **permanent connection** — soldered header, or a fresh breadboard
 with unworn contacts. The nRF52840 TWIM is already at its minimum 100 kHz,
 so there is no slower-clock software workaround.
 
+### Note: cheap analyzer probe ribbons have bad wires
+
+During this debug session, ~50% of the probe wires in a HiLetgo USB
+Logic Analyzer's ribbon cable were found to have broken internal crimps
+(the green, yellow, red, and white wires consistently read flat regardless
+of what they were clipped to; amber and one other were good). **Always
+verify each probe wire on a known HIGH signal before trusting it** — clip
+it to Vcc and check for a HIGH reading. A flat-LOW reading on a wire
+clipped to Vcc means the wire is broken, not the bus.
+
+### Note: matching channel quirks
+
+In the same analyzer, CH0 itself was found defective — even the known-good
+amber probe read flat when plugged into CH0. CH3 and CH4 worked. **If a
+probe reads flat after passing the Vcc-clip test, try a different channel
+on the analyzer.**
+
 ### Cheap-clone postscript
 
 The two HiLetgo INA219 boards blamed earlier were most likely fine — they
