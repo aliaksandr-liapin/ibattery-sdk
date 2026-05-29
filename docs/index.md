@@ -9,7 +9,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 
 ---
 
-## Current Status: Phase 8a Complete (v0.8.0)
+## Current Status: Phase 8a + 8b Complete (v0.8.5 / v0.9.0)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -22,7 +22,8 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 | Phase 5b | Cycle counter, wire v2, RUL estimation, cycle analysis, Grafana dashboard v2 | Done |
 | Phase 6 | STM32 HAL port (NUCLEO-L476RG) | Done — hardware-validated, BLE shield tested |
 | Phase 7 | ESP32-C3 HAL port (DevKitM) | Done — hardware-validated, native BLE, full pipeline |
-| Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done — ESP32-C3 verified |
+| Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done (v0.8.5) — hardware-validated on NUCLEO-L476RG; Q ticks down under load; gateway + Grafana panels for `current_ma` and `coulomb_mah` |
+| Phase 8b | Median voltage filter + SoC slew-rate limiter | Done (v0.9.0) — software-only, no hardware needed |
 
 ---
 
@@ -117,7 +118,7 @@ manifest:
   projects:
     - name: ibattery-sdk
       remote: aliaksandr-liapin
-      revision: v0.8.0
+      revision: v0.8.5
       path: modules/lib/ibattery-sdk
 ```
 

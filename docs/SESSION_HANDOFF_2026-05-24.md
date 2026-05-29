@@ -282,3 +282,44 @@ permanent connection. See docs/SESSION_HANDOFF_2026-05-24.md for full context."*
 That gives the new session everything it needs to skip the debug loop and
 jump to either: (a) finish the live-reading run with a soldered INA219, or
 (b) begin Phase 8c design while waiting for hardware.
+
+---
+
+## ✅ RESOLVED on 2026-05-29 (v0.8.3 → v0.8.4 → v0.8.5)
+
+This document is preserved for historical record. The path forward turned
+out to be neither (a) nor (b) as written above:
+
+- **Soldering didn't fix the nRF DK** (v0.8.3). Even with the INA219 male
+  headers soldered and both I2C jumpers replaced with fresh wires, the
+  nRF52840-DK PCA10056 SN 1050258557 still returned 0/6 ACKs. Swapping in
+  a second INA219 chip also failed at every address. The defect is local
+  to this DK unit — most likely damaged P0.26/P0.27 GPIOs from repeated
+  plug-cycle wear.
+
+- **Phase 8a closed via swap-the-MCU isolation** (v0.8.3). The same chip
+  and same wires were moved to a **NUCLEO-L476RG** and ACKed 6/6
+  immediately. STM32 became the validated Phase 8a platform.
+
+- **Bug #1 discovered + fixed** (v0.8.4). The 5-min loaded-telemetry
+  capture on STM32 revealed Q stayed pinned at 220.00 mAh despite a clear
+  I=2.80 mA load — pointing to two compounding coulomb-counter bugs (full
+  anchor fired every sample on CR2032; integrator semantics mismatched the
+  SoC estimator). Both fixed; Q now ticks down 219.98 → 219.75 mAh over 5
+  minutes (matches theory).
+
+- **Cloud-side closed** (v0.8.5). Gateway now persists `current_ma` and
+  `coulomb_mah` to InfluxDB; Grafana dashboard has dedicated "Live Current"
+  and "Remaining Charge" panels.
+
+### Evidence archived in this repo
+
+- `docs/captures/2026-05-29-v0.8.3-q-pinned-bug-evidence.log` — pre-fix
+  5-min capture showing Q stuck at 220.00 mAh
+- `docs/captures/2026-05-29-v0.8.4-q-ticks-down-fix-evidence.log` —
+  post-fix 5-min capture showing Q monotonically decreasing
+- `docs/HARDWARE_TROUBLESHOOTING.md` — new "swap-the-MCU isolation"
+  section with full diagnostic flow
+- GitHub releases v0.8.3, v0.8.4, v0.8.5 — all with detailed notes
+- Closed issues [#1](https://github.com/aliaksandr-liapin/ibattery-sdk/issues/1)
+  and [#2](https://github.com/aliaksandr-liapin/ibattery-sdk/issues/2)

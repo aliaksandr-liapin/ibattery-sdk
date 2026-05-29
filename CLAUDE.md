@@ -4,11 +4,13 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 
 ## Current State
 
-- **Version**: v0.8.0 (Phase 8a — Coulomb counting SoC, software-complete)
+- **Version**: v0.8.5 (latest patch in the Phase 8a hardware-validation line; v0.9.0 is the parallel software-feature branch with Phase 8b)
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
 - **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32), ESP32-C3 DevKitM — all hardware-verified
-- **Next milestone**: INA219 hardware validation (I2C breadboard issue), then Phase 8b (LUT correction mode)
+- **Phase 8a status**: ✅ Hardware-validated end-to-end on NUCLEO-L476RG. Coulomb counter ticks correctly under load (Q-as-remaining semantics, one-shot anchor); gateway persists `current_ma` and `coulomb_mah` to InfluxDB; Grafana dashboard has dedicated panels.
+- **Known hardware limitation**: nRF52840-DK PCA10056 SN 1050258557 has a per-unit GPIO defect on P0.26/P0.27 — see `docs/HARDWARE_TROUBLESHOOTING.md` "swap-the-MCU" section.
+- **Next milestone**: Phase 8c (Kalman filter fusion) — coulomb signal now works (v0.8.4) and is observable (v0.8.5), ready to tune against real data.
 - **Distribution**: PlatformIO registry + Zephyr module + GitHub Pages docs
 
 ## Build Commands
@@ -163,7 +165,7 @@ docs/             ARCHITECTURE, SDK_API, TESTING, WIRING, BATTERY_PROFILES, ROAD
 | `docs/TESTING.md` | Test procedures, suite descriptions, running instructions |
 | `docs/BATTERY_PROFILES.md` | CR2032 + LiPo discharge curves, LUT design rationale |
 | `docs/ROADMAP.md` | Business strategy, development priorities, monetization |
-| `docs/RELEASE_NOTES.md` | Version history (v0.1.0 through v0.8.0) |
+| `docs/RELEASE_NOTES.md` | Version history (v0.1.0 through v0.8.5 + v0.9.0) |
 | `docs/plans/` | Design docs and implementation plans |
 | `CONTRIBUTING.md` | Dev setup, code style, porting guide |
 | `gateway/README.md` | Gateway CLI usage, analytics, architecture |
