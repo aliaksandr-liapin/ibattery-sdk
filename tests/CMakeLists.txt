@@ -273,6 +273,37 @@ target_compile_definitions(test_soc_coulomb PRIVATE
 
 target_link_libraries(test_soc_coulomb PRIVATE unity)
 
+# ── SoC coulomb test (CR2032 chemistry) ───────────────────────────────────
+# Regression test for issue #1 (v0.8.4): full anchor must be one-shot, not
+# re-fire on every sample when V > SOC_ANCHOR_FULL_MV. Uses CR2032 anchor
+# thresholds (2950 mV full, no |I| gate).
+add_executable(test_soc_coulomb_cr2032
+    test_soc_coulomb_cr2032.c
+    ${SDK_SRC}/intelligence/battery_soc_estimator.c
+    ${SDK_SRC}/intelligence/battery_soc_lut.c
+    ${SDK_SRC}/intelligence/battery_coulomb.c
+    mocks/mock_voltage.c
+    mocks/mock_current.c
+    mocks/mock_nvs.c
+    mocks/mock_sdk_state.c
+)
+
+target_include_directories(test_soc_coulomb_cr2032 PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/core
+    ${SDK_SRC}/intelligence
+    ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+
+target_compile_definitions(test_soc_coulomb_cr2032 PRIVATE
+    CONFIG_BATTERY_SOC_COULOMB=1
+    CONFIG_BATTERY_CAPACITY_MAH=220
+)
+
+target_link_libraries(test_soc_coulomb_cr2032 PRIVATE unity)
+
 # ── Median voltage filter test ─────────────────────────────────────────────
 add_executable(test_voltage_filter_median
     test_voltage_filter_median.c
@@ -329,4 +360,5 @@ add_test(NAME cycle_counter COMMAND test_cycle_counter)
 add_test(NAME hal_current_stub COMMAND test_hal_current_stub)
 add_test(NAME coulomb COMMAND test_coulomb)
 add_test(NAME soc_coulomb COMMAND test_soc_coulomb)
+add_test(NAME soc_coulomb_cr2032 COMMAND test_soc_coulomb_cr2032)
 add_test(NAME soc_slew_limit COMMAND test_soc_slew_limit)

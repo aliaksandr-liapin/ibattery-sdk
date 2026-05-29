@@ -32,6 +32,16 @@
 
 static uint16_t g_coulomb_soc_x100;
 static bool     g_coulomb_soc_valid;
+/*
+ * Anchor edge-detect state (issue #1, v0.8.4):
+ * The full / empty anchors are one-shot calibration events that fire on
+ * *transition* into the anchor voltage region, not on every sample while
+ * voltage stays there. Without this, on a CR2032 (where the anchor's
+ * |I| gate is disabled) the full anchor re-fires every sample and pins
+ * the coulomb counter at capacity forever.
+ */
+static bool     g_full_anchor_active;
+static bool     g_empty_anchor_active;
 #endif /* CONFIG_BATTERY_SOC_COULOMB */
 
 #include <stdbool.h>
@@ -117,6 +127,8 @@ int battery_soc_estimator_init(void)
     state->soc_initialized = true;
 #if defined(CONFIG_BATTERY_SOC_COULOMB)
     g_coulomb_soc_valid = false;
+    g_full_anchor_active = false;
+    g_empty_anchor_active = false;
 #endif
 #if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
     g_slew_initialized = false;
@@ -172,22 +184,46 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
             return BATTERY_STATUS_OK;
         }
 
-        /* Check anchor conditions */
+        /*
+         * Check anchor conditions.
+         *
+         * Anchors are one-shot calibration events (issue #1, v0.8.4): the
+         * coulomb counter is reset to the anchor value only when the
+         * voltage *transitions into* the anchor region, not while it stays
+         * there. Once anchored, the integrator is allowed to track current
+         * draw without being clobbered every sample. The anchor re-arms
+         * when voltage leaves the region, so a battery that recovers from
+         * a brief sag can re-anchor at the next idle.
+         */
         int32_t abs_current = current_x100 < 0 ? -current_x100 : current_x100;
+        bool in_empty_region = (voltage_mv <= SOC_ANCHOR_EMPTY_MV);
+        bool in_full_region  = (voltage_mv >= SOC_ANCHOR_FULL_MV) &&
+                               (SOC_ANCHOR_FULL_I_X100 == 0 ||
+                                abs_current < SOC_ANCHOR_FULL_I_X100);
 
-        if (voltage_mv <= SOC_ANCHOR_EMPTY_MV) {
-            /* Empty anchor — reset coulomb counter to 0 */
-            g_coulomb_soc_x100 = 0;
-            g_coulomb_soc_valid = true;
-            (void)battery_coulomb_reset(0);
-        } else if (voltage_mv >= SOC_ANCHOR_FULL_MV &&
-                   (SOC_ANCHOR_FULL_I_X100 == 0 ||
-                    abs_current < SOC_ANCHOR_FULL_I_X100)) {
-            /* Full anchor — reset coulomb counter to capacity */
-            int32_t full_mah_x100 = (int32_t)CONFIG_BATTERY_CAPACITY_MAH * 100;
-            g_coulomb_soc_x100 = 10000;
-            g_coulomb_soc_valid = true;
-            (void)battery_coulomb_reset(full_mah_x100);
+        if (in_empty_region) {
+            if (!g_empty_anchor_active) {
+                /* Edge into empty region — calibrate to 0 mAh. */
+                g_coulomb_soc_x100 = 0;
+                g_coulomb_soc_valid = true;
+                (void)battery_coulomb_reset(0);
+                g_empty_anchor_active = true;
+            }
+            g_full_anchor_active = false;  /* re-arm opposite anchor */
+        } else if (in_full_region) {
+            if (!g_full_anchor_active) {
+                /* Edge into full region — calibrate to capacity. */
+                int32_t full_mah_x100 = (int32_t)CONFIG_BATTERY_CAPACITY_MAH * 100;
+                g_coulomb_soc_x100 = 10000;
+                g_coulomb_soc_valid = true;
+                (void)battery_coulomb_reset(full_mah_x100);
+                g_full_anchor_active = true;
+            }
+            g_empty_anchor_active = false;
+        } else {
+            /* Mid-range — re-arm both anchors so the next edge fires. */
+            g_full_anchor_active = false;
+            g_empty_anchor_active = false;
         }
 
         if (!g_coulomb_soc_valid) {

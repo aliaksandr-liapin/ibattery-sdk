@@ -1,6 +1,12 @@
 /*
  * Coulomb counter — trapezoidal integration of current over time.
  *
+ * Semantics (issue #1, v0.8.4): the accumulator represents *remaining
+ * battery charge* in mAh. Positive INA219 current is discharge, so
+ * positive current decreases the accumulator; negative current (charge)
+ * increases it. This matches the SoC estimator which reads the
+ * accumulator as remaining capacity to compute SoC = Q / capacity.
+ *
  * Internal accumulator uses int64_t in 0.001 mAh units (sub-mAh precision).
  * External API uses 0.01 mAh units (x100 convention).
  * NVS stores accumulated_mah_x1000 / 10 as int32 (giving x100 precision).
@@ -8,6 +14,7 @@
  * Integration math (integer-only):
  *   avg_current_x100 = (prev_current_x100 + current_x100) / 2
  *   delta_mah_x1000  = avg_current_x100 * dt_ms / 360000
+ *   Q                = Q - delta_mah_x1000   (Q is remaining; discharge subtracts)
  */
 
 #include <battery_sdk/battery_coulomb.h>
@@ -103,7 +110,13 @@ int battery_coulomb_update(int32_t current_ma_x100, uint32_t dt_ms)
     int64_t delta_mah_x1000 = numerator / 360000;
     g_remainder = numerator - delta_mah_x1000 * 360000;
 
-    g_accumulated_mah_x1000 += delta_mah_x1000;
+    /*
+     * Q-as-remaining semantics (issue #1, v0.8.4): positive current is
+     * discharge → subtract from the accumulator. The remainder above is
+     * intentionally NOT negated; it's the truncation residual of the
+     * integer division, independent of sign convention.
+     */
+    g_accumulated_mah_x1000 -= delta_mah_x1000;
     g_prev_current_x100 = current_ma_x100;
 
     /* Check if NVS persistence is needed */

@@ -65,40 +65,38 @@ void test_get_null_returns_invalid_arg(void)
 void test_constant_discharge_1_hour(void)
 {
     /*
-     * 100.00 mA (= 10000 x100) for 3600 seconds = 100.00 mAh (= 10000 x100)
-     * Feed 1800 samples at 2s intervals.
-     * First sample consumed to initialize prev_current.
+     * Q-as-remaining semantics: 100 mA discharge for 1 hour starting from
+     * a 220 mAh full baseline should leave 120 mAh remaining (= 12000 x100).
      */
-    int32_t current_x100 = 10000; /* 100.00 mA */
+    int32_t current_x100 = 10000; /* 100.00 mA discharge */
     uint32_t dt_ms = 2000;        /* 2 seconds */
+
+    battery_coulomb_reset(22000); /* 220.00 mAh full CR2032 baseline */
 
     /* First call: sets prev, no integration */
     battery_coulomb_update(current_x100, dt_ms);
 
-    /* Remaining 1799 intervals of 2s = 3598s.
-     * But we need full 3600s of integration.
-     * Total integration time = 1800 intervals * 2s = 3600s
-     * First call sets prev (no integration).
-     * So we need 1800 more calls to get 1800 * 2s = 3600s of integration.
-     */
+    /* 1800 intervals of 2s = 3600s of integration. */
     for (int i = 0; i < 1800; i++) {
         battery_coulomb_update(current_x100, dt_ms);
     }
 
     int32_t mah;
     battery_coulomb_get_mah_x100(&mah);
-    /* 100 mA * 1 hour = 100 mAh = 10000 in x100 */
-    TEST_ASSERT_INT32_WITHIN(50, 10000, mah);
+    /* 22000 - (100 mA * 1 h) = 22000 - 10000 = 12000 in x100 */
+    TEST_ASSERT_INT32_WITHIN(50, 12000, mah);
 }
 
 void test_constant_charge_negative_current(void)
 {
     /*
-     * -50.00 mA (= -5000 x100) for 3600 seconds = -50.00 mAh (= -5000 x100)
-     * Feed 1800 intervals at 2s.
+     * Q-as-remaining: -50 mA (negative = charge) for 1 hour starting from
+     * a 220 mAh baseline should leave 270 mAh remaining (= 27000 x100).
      */
-    int32_t current_x100 = -5000; /* -50.00 mA */
+    int32_t current_x100 = -5000; /* -50.00 mA charge */
     uint32_t dt_ms = 2000;
+
+    battery_coulomb_reset(22000); /* 220.00 mAh baseline */
 
     battery_coulomb_update(current_x100, dt_ms); /* init prev */
 
@@ -108,7 +106,8 @@ void test_constant_charge_negative_current(void)
 
     int32_t mah;
     battery_coulomb_get_mah_x100(&mah);
-    TEST_ASSERT_INT32_WITHIN(50, -5000, mah);
+    /* 22000 + (50 mA * 1 h) = 22000 + 5000 = 27000 in x100 */
+    TEST_ASSERT_INT32_WITHIN(50, 27000, mah);
 }
 
 void test_zero_current_no_accumulation(void)
@@ -138,13 +137,14 @@ void test_zero_dt_no_accumulation(void)
 void test_trapezoidal_ramp(void)
 {
     /*
-     * Ramp from 0 mA to 100 mA over 1 hour.
-     * Expected: ~50 mAh (average of ramp) = 5000 in x100.
-     *
-     * Use 1800 steps of 2s. Current ramps linearly from 0 to 10000 x100.
+     * Q-as-remaining: ramp discharge from 0 to 100 mA over 1 hour.
+     * Average current = 50 mA over 1 h = 50 mAh consumed. From a 220 mAh
+     * baseline, Q ends at 170 mAh = 17000 x100.
      */
     uint32_t dt_ms = 2000;
     int steps = 1800;
+
+    battery_coulomb_reset(22000); /* 220.00 mAh baseline */
 
     /* First call at 0 mA — sets prev, no integration */
     battery_coulomb_update(0, dt_ms);
@@ -157,8 +157,52 @@ void test_trapezoidal_ramp(void)
 
     int32_t mah;
     battery_coulomb_get_mah_x100(&mah);
-    /* Average current = 50 mA, time = 3600s = 1hr → 50 mAh = 5000 x100 */
-    TEST_ASSERT_INT32_WITHIN(50, 5000, mah);
+    /* 22000 - 5000 (avg 50 mA * 1 h) = 17000 in x100 */
+    TEST_ASSERT_INT32_WITHIN(50, 17000, mah);
+}
+
+/* ── Q-as-remaining semantics (issue #1, v0.8.4) ──────────────────── */
+
+void test_positive_current_decreases_q_as_remaining(void)
+{
+    /*
+     * Explicit guard: with Q-as-remaining semantics, positive (discharge)
+     * current MUST strictly decrease Q. This is the assertion that flipped
+     * vs v0.8.3, and is the core invariant the SoC estimator relies on.
+     */
+    int32_t mah_before;
+    int32_t mah_after;
+
+    battery_coulomb_reset(22000);
+    battery_coulomb_get_mah_x100(&mah_before);
+
+    battery_coulomb_update(280, 0);     /* init prev at 2.80 mA */
+    for (int i = 0; i < 100; i++) {
+        battery_coulomb_update(280, 2000);  /* 200 s @ 2.80 mA */
+    }
+
+    battery_coulomb_get_mah_x100(&mah_after);
+    TEST_ASSERT_LESS_THAN_INT32(mah_before, mah_after);
+}
+
+void test_negative_current_increases_q_as_remaining(void)
+{
+    /*
+     * Negative current (charge) MUST strictly increase Q-as-remaining.
+     */
+    int32_t mah_before;
+    int32_t mah_after;
+
+    battery_coulomb_reset(22000);
+    battery_coulomb_get_mah_x100(&mah_before);
+
+    battery_coulomb_update(-280, 0);
+    for (int i = 0; i < 100; i++) {
+        battery_coulomb_update(-280, 2000);
+    }
+
+    battery_coulomb_get_mah_x100(&mah_after);
+    TEST_ASSERT_GREATER_THAN_INT32(mah_before, mah_after);
 }
 
 /* ── Reset tests ─────────────────────────────────────────────────── */
@@ -198,6 +242,10 @@ int main(void)
     RUN_TEST(test_zero_current_no_accumulation);
     RUN_TEST(test_zero_dt_no_accumulation);
     RUN_TEST(test_trapezoidal_ramp);
+
+    /* Q-as-remaining semantics */
+    RUN_TEST(test_positive_current_decreases_q_as_remaining);
+    RUN_TEST(test_negative_current_increases_q_as_remaining);
 
     /* Reset */
     RUN_TEST(test_reset_sets_value);

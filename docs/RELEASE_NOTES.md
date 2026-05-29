@@ -1,5 +1,108 @@
 # Release Notes
 
+## v0.8.4 — Phase 8a Coulomb Counter Bug Fix — 2026-05-29
+
+Closes [#1](https://github.com/aliaksandr-liapin/ibattery-sdk/issues/1). Two
+compounding bugs made Phase 8a coulomb counting functionally inert on CR2032
+(the default chemistry and v0.8.3's validated hardware): Q stayed pinned at
+capacity regardless of load, and the integrator's semantics didn't match the
+SoC estimator's. Both fixed; Q now ticks down as expected under real load.
+
+### What was broken
+
+**Bug B (definite) — Full anchor fired on every sample.** For CR2032, the
+anchor-arming condition `(SOC_ANCHOR_FULL_I_X100 == 0 || abs_current < ...)`
+short-circuited to true (because the macro is `0`), collapsing the full
+anchor gate to just `V >= 2950 mV`. The estimator then called
+`battery_coulomb_reset(full_mah_x100)` on every poll, wiping any
+integration delta. A fresh CR2032 never exits `V > 2.95 V` under any
+realistic load, so Q stayed pinned at capacity forever.
+
+**Bug A (latent, masked by B) — Integrator/estimator semantics mismatch.**
+The integrator at `battery_coulomb.c` treated positive current (INA219
+discharge convention) as adding to Q — Q-as-cumulative-throughput. The
+SoC estimator treated Q as remaining capacity (`soc = Q * 10000 / capacity`,
+anchor sets Q to `full_mah_x100`). Even if Bug B were fixed in isolation,
+positive-current discharge would have grown Q above capacity (clamped to
+100% by SoC math), not ticked it down.
+
+### What was fixed
+
+**`src/intelligence/battery_soc_estimator.c`**
+- Anchors are now **one-shot edge-detected calibration events**. Two new
+  static flags (`g_full_anchor_active`, `g_empty_anchor_active`) gate the
+  resets to fire only on transition into the anchor voltage region. The
+  anchor re-arms when voltage leaves the region, so a sag-and-recover
+  cycle can re-calibrate at the next idle. `battery_soc_estimator_init()`
+  clears both flags.
+
+**`src/intelligence/battery_coulomb.c`**
+- Integrator flipped to **Q-as-remaining semantics**: positive (discharge)
+  current now subtracts from the accumulator; negative (charge) current
+  adds to it. Matches the SoC estimator's reading of Q as remaining mAh.
+- File header comment + integration math comment updated to document the
+  semantics convention.
+
+### Hardware validation on NUCLEO-L476RG
+
+Same test rig as v0.8.3: NUCLEO-L476RG + Adafruit INA219 + ~1 kΩ load
+across Vin+/Vin-. Captured 5 min of telemetry (151 samples):
+
+```
+v0.8.3 (broken):   Q = 220.00 mAh stuck    SoC = 100.00% stuck
+v0.8.4 (fixed):    Q = 219.98 → 219.75 mAh SoC = 99.99% → 99.88%
+                   Δ = -0.23 mAh over 5 min @ 2.80 mA  (matches theory ≈ 0.233 mAh)
+```
+
+The anchor calibration is visible in the first sample: Q starts at 219.98
+(not 220.00), confirming that the anchor fired once at boot and Q then
+immediately started tracking the 2.80 mA load. Across the next 5 minutes
+the discharge is monotonic, smooth, and within < 0.5% of the theoretical
+discharge rate.
+
+### Tests
+
+- All previous 16 host tests still pass (no regressions)
+- **New test:** `tests/test_soc_coulomb_cr2032.c` — TDD regression test
+  capturing Bug B (anchor must be one-shot, not every-sample). This test
+  failed deterministically on v0.8.3, passes on v0.8.4.
+- **New tests in `tests/test_coulomb.c`:**
+  - `test_positive_current_decreases_q_as_remaining` — explicit guard for
+    Q-as-remaining semantics under discharge
+  - `test_negative_current_increases_q_as_remaining` — same for charge
+- **Updated tests in `tests/test_coulomb.c`:** the three integration tests
+  (`test_constant_discharge_1_hour`, `test_constant_charge_negative_current`,
+  `test_trapezoidal_ramp`) were updated to reset to a 220 mAh baseline and
+  assert against Q-as-remaining expectations. The old assertions matched
+  the old buggy semantics by definition; updating them is part of the fix.
+
+**Total: 17 host tests pass (was 16; new CR2032 anchor test).**
+
+### Public API and wire format
+
+- **No API breakage.** All public functions keep the same signatures.
+- **No wire format change.** `coulomb_mah_x100` in the v3 packet is the
+  same byte layout; only its semantic meaning is clarified to "remaining
+  mAh" (was undefined / implementation-dependent before).
+
+### Updated docs
+
+- `docs/RELEASE_NOTES.md` — this entry
+- `docs/ROADMAP.md` — Phase 8a entry now reflects both v0.8.3 hardware
+  validation and the v0.8.4 fix
+- `docs/SDK_API.md` — to be updated alongside the gateway-side dashboard
+  enrichment in [#2](https://github.com/aliaksandr-liapin/ibattery-sdk/issues/2)
+
+### Follow-ups
+
+- [#2](https://github.com/aliaksandr-liapin/ibattery-sdk/issues/2) —
+  Persist `current_ma` and `coulomb_mah` to InfluxDB and add Grafana panels.
+  Now unblocked.
+- Phase 8c (Kalman filter fusion) — unblocked; can now consume a working
+  coulomb signal.
+
+---
+
 ## v0.8.3 — Phase 8a Hardware-Validated on NUCLEO-L476RG — 2026-05-29
 
 Milestone: **Phase 8a coulomb counting is fully end-to-end hardware-validated.**
