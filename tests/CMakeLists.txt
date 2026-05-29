@@ -304,6 +304,32 @@ target_compile_definitions(test_soc_coulomb_cr2032 PRIVATE
 
 target_link_libraries(test_soc_coulomb_cr2032 PRIVATE unity)
 
+# ── SoC fusion unit tests (Phase 8c) ──────────────────────────────────────
+# NOTE (TDD red): the implementation source is intentionally omitted here so
+# the target compiles but fails at LINK with "undefined reference" — the
+# canonical red signal. Task 4 adds:
+#     ${SDK_SRC}/intelligence/battery_soc_fusion.c
+# to this source list once the .c file lands.
+add_executable(test_soc_fusion
+    test_soc_fusion.c
+)
+
+target_include_directories(test_soc_fusion PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/intelligence
+    ${unity_SOURCE_DIR}/src
+)
+
+target_compile_definitions(test_soc_fusion PRIVATE
+    CONFIG_BATTERY_SOC_FUSION=1
+    CONFIG_BATTERY_SOC_FUSION_ALPHA_REST_X1000=50
+    CONFIG_BATTERY_SOC_FUSION_ALPHA_LOAD_X1000=5
+    CONFIG_BATTERY_SOC_FUSION_I_THRESH_X100=200
+)
+
+target_link_libraries(test_soc_fusion PRIVATE unity)
+
 # ── Median voltage filter test ─────────────────────────────────────────────
 add_executable(test_voltage_filter_median
     test_voltage_filter_median.c
@@ -362,3 +388,4 @@ add_test(NAME coulomb COMMAND test_coulomb)
 add_test(NAME soc_coulomb COMMAND test_soc_coulomb)
 add_test(NAME soc_coulomb_cr2032 COMMAND test_soc_coulomb_cr2032)
 add_test(NAME soc_slew_limit COMMAND test_soc_slew_limit)
+add_test(NAME soc_fusion COMMAND test_soc_fusion)
