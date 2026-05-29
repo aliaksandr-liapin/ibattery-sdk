@@ -182,8 +182,8 @@ config BATTERY_COULOMB_NVS_INTERVAL_S
 
 config BATTERY_SOC_FUSION
     bool "Phase 8c: voltage + coulomb signal fusion"
-    depends on BATTERY_SOC_COULOMB
     default n
+    depends on BATTERY_SOC_COULOMB
     help
       Continuously fuses voltage-LUT SoC with coulomb-counter SoC to
       correct mid-discharge drift in the coulomb integrator. Trust
@@ -207,6 +207,8 @@ config BATTERY_SOC_FUSION_ALPHA_REST_X1000
       Per-sample pull toward voltage-LUT SoC when |I| < I_THRESH.
       Larger = faster drift correction. Default 5.0% per sample (CR2032)
       gives ~95% convergence in ~60 samples at 2s intervals.
+      LiPo default is 3.0% (LUT is flatter in the middle plateau, so
+      voltage is less informative even at rest).
 
 config BATTERY_SOC_FUSION_ALPHA_LOAD_X1000
     int "Fusion alpha (x1000) under load"
@@ -214,7 +216,7 @@ config BATTERY_SOC_FUSION_ALPHA_LOAD_X1000
     range 0 1000
     help
       Per-sample pull toward voltage-LUT SoC when |I| >= I_THRESH.
-      Should be small — voltage is unreliable under load (IR drop).
+      Should be small -- voltage is unreliable under load (IR drop).
       Default 0.5% per sample, both chemistries.
 
 config BATTERY_SOC_FUSION_I_THRESH_X100
