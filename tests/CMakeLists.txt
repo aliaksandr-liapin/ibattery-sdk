@@ -305,13 +305,9 @@ target_compile_definitions(test_soc_coulomb_cr2032 PRIVATE
 target_link_libraries(test_soc_coulomb_cr2032 PRIVATE unity)
 
 # ── SoC fusion unit tests (Phase 8c) ──────────────────────────────────────
-# NOTE (TDD red): the implementation source is intentionally omitted here so
-# the target compiles but fails at LINK with "undefined reference" — the
-# canonical red signal. Task 4 adds:
-#     ${SDK_SRC}/intelligence/battery_soc_fusion.c
-# to this source list once the .c file lands.
 add_executable(test_soc_fusion
     test_soc_fusion.c
+    ${SDK_SRC}/intelligence/battery_soc_fusion.c
 )
 
 target_include_directories(test_soc_fusion PRIVATE
