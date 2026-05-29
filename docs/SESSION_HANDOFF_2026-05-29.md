@@ -1,8 +1,17 @@
 # Session Handoff — Phase 8 Series Complete
 
+> **UPDATE (later, 2026-05-29): v0.10.1 shipped.** A follow-up session closed
+> the BLE-on-NUCLEO E2E loop (was listed below as "blocked on shield"). v3
+> telemetry now flows firmware → BLE → gateway → InfluxDB → Grafana on real
+> hardware, with real current/coulomb. Fixed three latent BLE bugs (MTU 27→35,
+> gateway service-UUID matching, re-advertise after disconnect). Tagged
+> `v0.10.1`, GitHub released, PlatformIO published. Evidence:
+> `docs/captures/2026-05-29-v0.10.1-ble-on-nucleo-e2e.log`. The menu item below
+> is struck through; everything else here is still accurate history.
+
 **Date:** 2026-05-29
-**Last release:** v0.10.0 (tagged, GitHub released, PlatformIO published — 4 hours after v0.9.1 which was 1 hour after v0.8.5 which was 1 hour after v0.8.4 which was 2 hours after v0.8.3)
-**Status:** All work for today wrapped. Repo + remotes + registry + memory all synchronized. **Ready for any next direction.**
+**Last release:** v0.10.1 (tagged, GitHub released, PlatformIO published) — followed v0.10.0 the same day
+**Status:** All work wrapped. Repo + remotes + registry + memory all synchronized. **Ready for any next direction.**
 
 This document is the cold-start brief for the next chat session. Open the next chat with the one-line summary at the bottom, and that session will know enough to pick up cleanly without re-deriving context.
 
@@ -116,7 +125,7 @@ Ranked roughly by leverage. None of these are urgent.
 |---|---|---|
 | **Phase 8d brainstorm** — capacity-aging learning + coulomb drift correction | 1–2 hr design + days of implementation | Natural next big-picture step. The "Phase 8 series" is closed; Phase 8d would be a new chapter focused on parameter estimation (vs. state estimation). Demand-driven — only do if there's a real use case. |
 | **nRF I2C remap experiment** | ~30 min | Closes v0.8.5's "known limitation" on the broken nRF52840-DK PCA10056 SN 1050258557. Definitive yes/no on whether the GPIO damage is isolated to P0.26/P0.27 or wider. If it works, the nRF DK becomes a backup validation platform. |
-| **BLE-on-NUCLEO E2E loop** | depends on shield arrival | Closes the deferred end-to-end validation from v0.8.5 — confirming gateway/Grafana panels work with real BLE telemetry. Blocked on `x_nucleo_idb05a1` shield. |
+| ~~**BLE-on-NUCLEO E2E loop**~~ | ✅ Done in v0.10.1 | Shield arrived; v3 telemetry validated firmware → BLE → gateway → InfluxDB → Grafana. Fixed three latent BLE bugs. See RELEASE_NOTES v0.10.1 + `docs/captures/2026-05-29-v0.10.1-ble-on-nucleo-e2e.log`. |
 | **v0.10.0 promotional follow-up** | 1–2 hr | dev.to blog post on Phase 8c. Angle: "Fusing voltage and coulomb without going full Kalman" or "Why current-adaptive α is honest physics." |
 | **Polish / Minor findings deferred from code reviews** | <30 min | Things like the `\|I\|` notation in Kconfig help text, the loose `range 0 1000000` on `I_THRESH_X100`, the "Phase 8c:" prefix on the prompt aging poorly. All in the v0.10.0 review threads. |
 | **Hackaday coverage check** | 5 min/day | Watch inbox for ~2 weeks; if no response, the tip didn't land — that's fine. |
@@ -165,7 +174,7 @@ Ranked roughly by leverage. None of these are urgent.
 
 Paste this opener into the new chat to get the next session up to speed in one message:
 
-> *"ibattery-sdk v0.10.0 shipped — Phase 8 series complete end-to-end (8a + 8b + 8c all hardware-validated on NUCLEO-L476RG, live on PlatformIO). Repo + remotes + memory all synchronized. See `docs/SESSION_HANDOFF_2026-05-29.md` for the full handoff. No urgent work pending; pick from the available-options menu in that doc."*
+> *"ibattery-sdk v0.10.1 shipped — Phase 8 series complete AND the BLE-on-NUCLEO E2E loop is now validated end-to-end (firmware → BLE → gateway → InfluxDB → Grafana on real hardware, three latent BLE bugs fixed). Tagged, GitHub released, PlatformIO published. Repo + remotes + memory all synchronized. See `docs/SESSION_HANDOFF_2026-05-29.md` for the full handoff. No urgent work pending; pick from the available-options menu in that doc."*
 
 That gives a fresh chat:
 - The state it can rely on without re-deriving (v0.10.0, Phase 8 done, no urgent items)

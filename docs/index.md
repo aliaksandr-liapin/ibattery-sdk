@@ -9,7 +9,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 
 ---
 
-## Current Status: Phase 8a + 8b + 8c Complete (v0.10.0)
+## Current Status: Phase 8 Complete + BLE-on-NUCLEO E2E validated (v0.10.1)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -25,6 +25,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 | Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done (v0.8.5) — hardware-validated on NUCLEO-L476RG; Q ticks down under load; gateway + Grafana panels for `current_ma` and `coulomb_mah` |
 | Phase 8b | Median voltage filter + SoC slew-rate limiter | Done (v0.9.0) — software-only, no hardware needed |
 | Phase 8c | Voltage + coulomb signal fusion (current-adaptive α) | Done (v0.10.0) — opt-in via `CONFIG_BATTERY_SOC_FUSION`; +56 B flash, 0 new RAM; hardware-validated with 3 captures |
+| BLE E2E | v3 telemetry over BLE: firmware → gateway → InfluxDB → Grafana | Done (v0.10.1) — validated on NUCLEO-L476RG + X-NUCLEO-IDB05A1 shield; fixed BLE MTU (27→35), gateway service-UUID matching, and re-advertise-after-disconnect |
 
 ---
 
@@ -119,7 +120,7 @@ manifest:
   projects:
     - name: ibattery-sdk
       remote: aliaksandr-liapin
-      revision: v0.10.0
+      revision: v0.10.1
       path: modules/lib/ibattery-sdk
 ```
 
@@ -129,7 +130,7 @@ Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 
 ```ini
 ; platformio.ini
-lib_deps = aliaksandr-liapin/ibattery-sdk@^0.10.0
+lib_deps = aliaksandr-liapin/ibattery-sdk@^0.10.1
 ```
 
 v0.10.0 adds Phase 8c (voltage+coulomb signal fusion, opt-in) on top of the working Phase 8a coulomb counter (v0.8.4) and Phase 8b voltage smoothing (v0.9.0).

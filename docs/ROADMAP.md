@@ -1,6 +1,12 @@
 # Roadmap & Business Strategy
 
-## Current State (v0.10.0 — Phases 8a + 8b + 8c shipped end-to-end, all hardware-validated on NUCLEO-L476RG)
+## Current State (v0.10.1 — Phase 8 complete + BLE-on-NUCLEO E2E validated, all hardware-validated on NUCLEO-L476RG)
+
+v0.10.1 closed the deferred BLE end-to-end loop: v3 telemetry now flows
+firmware → BLE → gateway → InfluxDB → Grafana on real hardware (X-NUCLEO-IDB05A1
+shield). Fixed three latent BLE bugs (MTU too small for v3, gateway name-matching
+unreliable on macOS, no re-advertise after disconnect) — see RELEASE_NOTES and
+`docs/captures/2026-05-29-v0.10.1-ble-on-nucleo-e2e.log`.
 
 ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 
