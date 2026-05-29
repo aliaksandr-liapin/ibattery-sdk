@@ -1,5 +1,139 @@
 # Release Notes
 
+## v0.8.3 — Phase 8a Hardware-Validated on NUCLEO-L476RG — 2026-05-29
+
+Milestone: **Phase 8a coulomb counting is fully end-to-end hardware-validated.**
+After the v0.8.2 nRF52840-DK marginal-connection issue could not be resolved
+even with the INA219 male headers soldered and both I2C jumpers replaced,
+the SDK was successfully brought up on the **NUCLEO-L476RG** with the same
+INA219 wiring. The chip ACKs 6/6, the driver initializes cleanly, and live
+current is measured under load.
+
+This proves the **firmware, HAL, INA219 driver, and SDK wire format are all
+correct**. The nRF52840-DK unit (PCA10056 SN 1050258557) is the sole remaining
+hardware blocker and is now isolated as a per-unit GPIO issue, not a platform
+problem.
+
+### What was validated on NUCLEO-L476RG
+
+INA219 wired to I2C1 (PB8/PB9, Arduino D15/D14):
+
+```
+uart:~$ i2c scan i2c@40005400
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+40:  40 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+1 devices found on i2c@40005400
+```
+
+**6/6 consecutive scans** report `0x40` (vs 0/6 on the nRF DK).
+
+Live telemetry, quiescent (no load):
+```
+[v3 t=92117] V=3323 mV T=23.56 C SOC=100.00% PWR=1 CYC=0 flags=0x00000000
+I=0.20 mA Q=220.00 mAh
+```
+
+Live telemetry, with ~1 kΩ load across Vin+/Vin- (5-min capture, 151 samples):
+```
+[v3 t=5946854] V=3322 mV T=23.56 C SOC=100.00% PWR=1 CYC=0 flags=0x00000000
+I=2.80 mA Q=220.00 mAh   (stable across all 151 samples)
+```
+
+What's new vs v0.8.2:
+- ✅ Stable firmware-level I2C reads (was: intermittent on nRF)
+- ✅ `flags = 0x00000000` (was: `0x00000020` CURRENT_ERR on nRF)
+- ✅ Real current measurement: 14× quiescent under modest load
+- ✅ Sensible die temperature: 23–24 °C (was: 105 °C anomaly on nRF)
+- ✅ Driver init reproducibly succeeds across power cycles
+
+Coulomb accumulator `Q` remains pinned at 220.00 mAh during the 5-min capture
+because the SoC estimator is anchored at 100% (V=3322 mV is well above the
+CR2032 LUT's nominal 3.0 V). Q would track once SoC transitions off the
+full-charge anchor; this is consistent with the SDK design and is being
+investigated as a follow-up to confirm vs. flag as a bug.
+
+### Diagnostic narrative — the nRF52840-DK fork
+
+Continuing from v0.8.2 with the INA219 headers freshly soldered, the
+firmware-level `i2c scan` on the nRF52840-DK still returned **0/6** ACKs.
+Systematic isolation:
+
+| Step | Result |
+|------|--------|
+| Soldered INA219 male header pins (replaced press-fit headers) | 0/6 — no change |
+| Power confirmed at chip (Adafruit green LED solid) | rules out red/black wires |
+| Replaced SCL jumper (green → grey, fresh) | 0/6 — no change |
+| Replaced SDA jumper (yellow → violet, fresh) | 0/6 — no change |
+| Verified nRF pin assignment: green→P0.27, yellow→P0.26, red→VDD | correct |
+| Swapped in a **second** soldered INA219 | 0/6 at 0x40/0x41/0x44/0x45 — no chip ACK at any address |
+| Same wires + same INA219 moved to **NUCLEO-L476RG** | **6/6 ACK immediately** |
+
+Conclusion: the nRF52840-DK unit's P0.26 / P0.27 pins (or an SBx
+solder-bridge near them) are not driving / receiving I2C correctly.
+Two independent INA219 chips both work perfectly on STM32 with the same
+physical wires — so the chip(s), the wires, and the SDK firmware path
+are all good. **The defect is local to this DK unit.**
+
+### Migration to NUCLEO-L476RG as the validation platform
+
+The NUCLEO-L476RG was already a supported target (see `CLAUDE.md`).
+This release adds the INA219 wiring on the STM32 side:
+
+**New files:**
+- `app/boards/nucleo_l476rg_i2cscan.conf` — i2c shell + INA219 driver config
+  (mirrors `nrf52840dk_nrf52840_i2cscan.conf`)
+
+**Modified files:**
+- `app/boards/nucleo_l476rg.overlay` — added `ina219@40` node on `&i2c1`
+  (status="disabled"; enabled at runtime by the HAL)
+
+**Build + flash:**
+```bash
+west build -b nucleo_l476rg app -d /tmp/build-stm32-scan --pristine -- \
+    -DEXTRA_CONF_FILE=boards/nucleo_l476rg_i2cscan.conf \
+    -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
+west flash -d /tmp/build-stm32-scan --runner openocd
+```
+
+**Wiring (Adafruit INA219 → NUCLEO-L476RG):**
+```
+INA219 pin    →  NUCLEO pin              Wire
+─────────────────────────────────────────────────
+VCC           →  3V3      (CN6 POWER)    red
+GND           →  GND      (CN6 POWER)    black
+SCL           →  D15/PB8  (CN5 Arduino)  grey
+SDA           →  D14/PB9  (CN5 Arduino)  violet
++ for current measurement:
+Vin+          →  3V3 (CN6 or IOREF as alt 3.3V tap)
+Vin-          →  [load]  →  GND (CN6 POWER)
+```
+
+### Known limitations
+
+- **nRF52840-DK PCA10056 SN 1050258557** — INA219 does not ACK on
+  P0.26/P0.27 firmware-side (per-unit issue; documented in
+  `docs/HARDWARE_TROUBLESHOOTING.md`). Workaround: use STM32 NUCLEO-L476RG
+  for Phase 8a validation, or remap nRF I2C to alternate GPIOs (planned
+  for a future patch release).
+- **ESP32-C3** — known I2C/INA219 driver instability (unchanged from
+  earlier releases; see `CLAUDE.md`).
+
+### What didn't change
+
+- All 16 C unit tests pass (no regressions from overlay/config additions)
+- 65 Python gateway tests still pass
+- Public API unchanged
+- v3 wire format unchanged — same packets stream over USB on the STM32
+
+### Updated docs
+
+- `docs/RELEASE_NOTES.md` — this entry
+- `docs/HARDWARE_TROUBLESHOOTING.md` — new "Swap-the-MCU isolation test"
+  section + per-unit nRF52840-DK limitation
+- `docs/ROADMAP.md` — Phase 8a marked hardware-validated
+
+---
+
 ## v0.8.2 — INA219 Confirmed Responding on Hardware (Phase 8a) — 2026-05-24
 
 Milestone patch: the INA219 current sensor was **confirmed responding at

@@ -262,6 +262,98 @@ confirmation used a genuine Adafruit INA219 (#904), but the lesson stands:
 
 ---
 
+## v0.8.3 follow-up: when soldering doesn't fix it, swap the MCU
+
+The v0.8.2 conclusion said only a soldered/permanent connection was needed
+for stable firmware-level reads on the nRF52840-DK. In v0.8.3 we soldered
+the male headers onto the INA219 PCB (eliminating the press-fit contact
+class of failure), but the firmware-level `i2c scan` on the **specific
+nRF52840-DK unit (PCA10056 SN 1050258557)** still returned **0/6** ACKs.
+Reseating, multiple wire swaps, and even swapping in a second known-good
+INA219 chip did not change the result.
+
+The diagnostic that finally closed the case was a **swap-the-MCU isolation
+test**: move the same INA219 (with the same wires) onto a different
+platform and see if it works there.
+
+### The systematic isolation
+
+After v0.8.2 soldering, on the **same** nRF52840-DK unit:
+
+| Step | Result |
+|------|--------|
+| Soldered INA219 male header pins (replaced press-fit) | 0/6 — no change |
+| Adafruit "on" LED confirmed solid green | rules out VCC + GND wires |
+| Replaced SCL jumper (fresh wire) | 0/6 |
+| Replaced SDA jumper (fresh wire) | 0/6 |
+| Verified nRF pins: SCL→P0.27, SDA→P0.26, red→VDD | correct |
+| Swapped in a second soldered INA219 | 0/6 at all addresses (0x40, 0x41, 0x44, 0x45) |
+| Same INA219 + same wires → NUCLEO-L476RG | **6/6 immediately** |
+
+The swap-the-MCU result was definitive: two independent chips, three
+fresh wires, and the SDK firmware (compiled for STM32 from the same source
+tree) all worked perfectly together on a different MCU. The defect is
+**local to that nRF52840-DK unit** — most likely damaged P0.26/P0.27 GPIO
+pins (sustained from repeated plug-cycle wear), or an SBx solder-bridge
+misconfiguration on the board.
+
+### Performing a swap-the-MCU test
+
+The SDK's multi-platform support makes this isolation cheap. If a chip
+won't ACK on the nRF52840-DK after the bus is verified clean (analyzer
+captures showing master-driven SDA/SCL transitions), and after wiring,
+chip, and solder joints have been ruled out, do the following:
+
+1. **Build the i2c-shell firmware for STM32:**
+   ```bash
+   west build -b nucleo_l476rg app -d /tmp/build-stm32-scan --pristine -- \
+       -DEXTRA_CONF_FILE=boards/nucleo_l476rg_i2cscan.conf \
+       -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
+   ```
+
+2. **Move the INA219 wires** to the NUCLEO Arduino-compatible header:
+   - VCC → 3V3 (CN6)
+   - GND → GND (CN6)
+   - SCL → D15 / PB8 (CN5)
+   - SDA → D14 / PB9 (CN5)
+
+3. **Flash and scan:**
+   ```bash
+   west flash -d /tmp/build-stm32-scan --runner openocd
+   # then via serial shell:
+   i2c scan i2c@40005400
+   ```
+
+4. **Interpret:**
+   - **Works on STM32, fails on nRF** → the nRF DK unit (or the specific
+     GPIOs in use) is the defect. Consider remapping the nRF I2C to
+     alternate GPIOs (overlay change + rebuild), or switching to STM32
+     as your validation platform.
+   - **Fails on STM32 too** → the failure is in the chip, wires, or
+     firmware. Re-examine those (do not blame the MCU).
+
+### Lesson: have a second platform path
+
+The cost of swapping to a different MCU once the SDK is portable is
+~30 minutes (overlay edit + build + flash + rewire). The cost of
+chasing a per-unit GPIO defect on a single board can be days. When
+in doubt, **swap the MCU and reload the data**.
+
+This isolation step has now been added to the diagnostic flow as a
+recommended Phase 5 of the methodology (after Phase 4 root-cause
+isolation fails to converge).
+
+### Known per-unit limitation
+
+- **nRF52840-DK PCA10056 SN 1050258557** — INA219 does not ACK on
+  P0.26 / P0.27 firmware-side, despite verified-correct wiring, fresh
+  jumpers, soldered INA219 headers, and two independent chips. The
+  same chips and wires work perfectly on NUCLEO-L476RG. Use STM32 as
+  the Phase 8a validation platform for this unit, or migrate to a
+  different DK.
+
+---
+
 ## Why we shipped v0.8.1 without on-target validation
 
 The full software stack (HAL, coulomb counter, SoC estimator,

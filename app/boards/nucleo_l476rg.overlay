@@ -25,3 +25,18 @@
 &die_temp {
 	status = "okay";
 };
+
+/* INA219 current sensor on I2C1 (SCL=PB8 / D15, SDA=PB9 / D14 — Arduino header) */
+&i2c1 {
+	ina219: ina219@40 {
+		compatible = "ti,ina219";
+		reg = <0x40>;
+		status = "disabled";
+		shunt-milliohm = <100>;
+		lsb-microamp = <100>;
+		brng = <0>;
+		pg = <1>;
+		sadc = <13>;
+		badc = <13>;
+	};
+};

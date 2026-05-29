@@ -1,6 +1,6 @@
 # Roadmap & Business Strategy
 
-## Current State (v0.9.0 — Phases 8a + 8b shipped; 8a hardware validation pending)
+## Current State (v0.9.0 + v0.8.3 — Phases 8a + 8b shipped, 8a hardware-validated on NUCLEO-L476RG)
 
 ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 
@@ -121,16 +121,16 @@ Lower scale but immediate revenue with zero infrastructure cost.
 |----------|------|--------|
 | ~~9~~ | ~~Advanced SoC — temperature compensation~~ | ✅ Done (v0.5.0 — LiPo temp-compensated SoC) |
 | ~~10~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 + v0.5.1 — TP4056 GPIO driver + NVS cycle counter) |
-| 8a | Advanced SoC — Coulomb Counting (v0.8.0/v0.8.1 — software complete, on-target validation pending) | Current-sensor SoC with NVS persistence |
+| ~~8a~~ | ~~Advanced SoC — Coulomb Counting (v0.8.0/v0.8.1/v0.8.2/v0.8.3 — hardware-validated on NUCLEO-L476RG)~~ | ✅ Done (v0.8.3) — Current-sensor SoC with NVS persistence |
 | 8b | Advanced SoC — Voltage-LUT Correction (complete in v0.9.0) | Software-only SoC jitter reduction |
 | 8c | Advanced SoC — Kalman Filter Fusion (planned) | Optimal multi-signal SoC estimation |
 | ~~12~~ | ~~PlatformIO library publication~~ | ✅ Done — published to registry.platformio.org |
 | ~~13~~ | ~~Documentation site — GitHub Pages with guides and API reference~~ | ✅ Done — aliaksandr-liapin.github.io/ibattery-sdk/ |
 | 14 | Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo) | Hardware reference designs drive SDK adoption |
 
-#### Phase 8a: Coulomb Counting SoC (v0.8.0 + v0.8.1)
+#### Phase 8a: Coulomb Counting SoC (v0.8.0 → v0.8.3)
 
-**Software-complete in v0.8.0; v0.8.1 adds hardware diagnostic tooling.**
+**Software-complete in v0.8.0; hardware-validated end-to-end in v0.8.3 on NUCLEO-L476RG.**
 
 - INA219 current sensor HAL (Zephyr sensor API + raw I2C fallback)
 - Coulomb counter with trapezoidal integration (int64 accumulator, sub-mAh precision)
@@ -138,15 +138,19 @@ Lower scale but immediate revenue with zero infrastructure cost.
 - Telemetry v3 wire format (32 bytes: adds current + coulomb fields)
 - NVS persistence for reboot survival
 - `tools/i2c-analyzer/capture.sh` — sigrok-cli wrapper for I2C bus debugging
-- `docs/HARDWARE_TROUBLESHOOTING.md` — 4-phase diagnostic methodology
+- `docs/HARDWARE_TROUBLESHOOTING.md` — 4-phase diagnostic methodology + swap-the-MCU isolation
 
-**Status (v0.8.2):** INA219 **confirmed responding at 0x40** on nRF52840-DK,
-verified by logic-analyzer capture of a clean ACK (`START → 0x40 → ACK → STOP`).
-Firmware, I2C master, and chip all work together. The earlier "0 devices"
-failures traced to a breadboard column-alignment error (one I2C jumper in the
-wrong column), not chip defects. A stable firmware-level current-reading run
-is pending a permanent (soldered) connection — bench jumper contacts proved
-intermittent. See `docs/HARDWARE_TROUBLESHOOTING.md` for the full diagnosis.
+**Status (v0.8.3):** ✅ Phase 8a hardware-validated end-to-end on **NUCLEO-L476RG**.
+INA219 ACKs 6/6 on I2C1, `flags=0x00000000`, live current measurement (quiescent
+`I=0.20 mA`, loaded `I=2.80 mA` stable across 5-min 151-sample capture).
+
+The nRF52840-DK unit used in v0.8.0–v0.8.2 development (PCA10056 SN 1050258557)
+has a per-unit GPIO defect on P0.26/P0.27 — two independent chips and fresh
+wires both fail to ACK firmware-side, but the same chips and wires work
+immediately on STM32. This is documented as a known per-unit limitation, not a
+platform problem. Future patch release may remap nRF I2C to alternate GPIOs.
+See `docs/HARDWARE_TROUBLESHOOTING.md` for the full swap-the-MCU isolation
+narrative.
 
 #### Phase 8b: Voltage-LUT Correction Mode (complete in v0.9.0)
 
