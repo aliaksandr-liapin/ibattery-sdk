@@ -44,6 +44,12 @@ class TelemetryWriter:
             .field("power_state", decoded["power_state_raw"])
             .field("status_flags", decoded["status_flags"])
             .field("cycle_count", decoded.get("cycle_count", 0))
+            # v3 telemetry (Phase 8a coulomb counting). Backward-compatible:
+            # v1/v2 packets omit these keys, decoder.decode_packet() returns
+            # 0.0 defaults, and v3 publishes the real values. Tracked from
+            # v0.8.5 (issue #2) once v0.8.4 made Q-as-remaining usable.
+            .field("current_ma", decoded.get("current_ma", 0.0))
+            .field("coulomb_mah", decoded.get("coulomb_mah", 0.0))
             .time(datetime.now(timezone.utc), WritePrecision.MS)
         )
 

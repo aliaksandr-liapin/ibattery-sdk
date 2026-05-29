@@ -211,6 +211,65 @@
           "refId": "A"
         }
       ]
+    },
+    {
+      "title": "Live Current (mA)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "datasource": { "type": "influxdb", "uid": "" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "mamp",
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "single" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "" },
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"current_ma\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"current\")",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Remaining Charge (mAh)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "datasource": { "type": "influxdb", "uid": "" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": false
+          },
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "single" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "" },
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"coulomb_mah\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"coulomb\")",
+          "refId": "A"
+        }
+      ]
     }
   ],
   "refresh": "5s",
@@ -222,5 +281,5 @@
   "timezone": "",
   "title": "iBattery Telemetry",
   "uid": "ibattery-telemetry",
-  "version": 1
+  "version": 2
 }

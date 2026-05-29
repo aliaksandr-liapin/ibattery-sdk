@@ -83,6 +83,59 @@ class TestTelemetryWriter:
         assert "power_state=1i" in line
         assert "status_flags=0i" in line
 
+    def test_write_v3_current_and_coulomb_fields(self, mock_influx):
+        """v3 telemetry packets persist current_ma and coulomb_mah to InfluxDB.
+
+        Regression guard for issue #2 (v0.8.5): before this release the
+        gateway decoded these fields from the v3 wire format but never
+        wrote them to the database, so neither Grafana nor analytics
+        could see them.
+        """
+        from gateway.influxdb_writer import TelemetryWriter
+
+        v3_decoded = {
+            "version": 3,
+            "timestamp_ms": 240000,
+            "voltage_mv": 3322,
+            "voltage_v": 3.322,
+            "temperature_c": 23.56,
+            "soc_pct": 99.88,
+            "power_state": "ACTIVE",
+            "power_state_raw": 1,
+            "status_flags": 0,
+            "cycle_count": 0,
+            "current_ma": 2.80,
+            "coulomb_mah": 219.75,
+            "received_at": "2026-05-29T18:55:00+00:00",
+        }
+
+        writer = TelemetryWriter()
+        writer.write(v3_decoded)
+
+        point = mock_influx["write_api"].write.call_args.kwargs["record"]
+        line = point.to_line_protocol()
+
+        assert "current_ma=2.8" in line
+        assert "coulomb_mah=219.75" in line
+
+    def test_write_v1_packets_default_current_and_coulomb_to_zero(
+        self, mock_influx, sample_decoded
+    ):
+        """v1 packets omit current_ma and coulomb_mah — writer defaults to 0.0
+        so existing devices stay backward-compatible.
+        """
+        from gateway.influxdb_writer import TelemetryWriter
+
+        # sample_decoded is a v1 packet (no current_ma / coulomb_mah keys)
+        writer = TelemetryWriter()
+        writer.write(sample_decoded)
+
+        point = mock_influx["write_api"].write.call_args.kwargs["record"]
+        line = point.to_line_protocol()
+
+        assert "current_ma=0" in line
+        assert "coulomb_mah=0" in line
+
     def test_write_includes_device_tag(self, mock_influx, sample_decoded):
         from gateway.influxdb_writer import TelemetryWriter
 
