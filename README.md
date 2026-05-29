@@ -11,7 +11,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 
 ---
 
-## Current Status: Phase 8a + 8b Complete (v0.8.5 / v0.9.0)
+## Current Status: Phase 8a + 8b Complete (v0.9.1)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -145,8 +145,10 @@ Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 
 ```ini
 ; platformio.ini
-lib_deps = aliaksandr-liapin/ibattery-sdk@^0.8.0
+lib_deps = aliaksandr-liapin/ibattery-sdk@^0.9.1
 ```
+
+The `^0.9.1` constraint pulls v0.9.1 or any newer 0.9.x release. v0.9.1 is the first PlatformIO-published version with both the Phase 8b voltage-smoothing features *and* the working Phase 8a coulomb counter — earlier 0.8.x or 0.9.0 versions have the inert coulomb counter that v0.8.4 fixed.
 
 ### Run unit tests (host, no hardware needed)
 
