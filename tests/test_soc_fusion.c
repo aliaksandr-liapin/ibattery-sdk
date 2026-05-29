@@ -16,18 +16,14 @@ void tearDown(void) {}
 
 /* --- blend() math ----------------------------------------------------- */
 
-void test_blend_alpha_0_returns_pure_coulomb(void)
+void test_blend_high_current_selects_load_alpha(void)
 {
     /* abs_current = 99999 -> well above threshold -> ALPHA_LOAD = 5.
-     * With alpha=5 (out of 1000) and soc_c=4000, soc_v=10000:
+     * With alpha=5 (out of 1000), soc_v=10000, soc_c=4000:
      * fused = (5 * 10000 + 995 * 4000) / 1000 = (50000 + 3980000) / 1000 = 4030
-     * The selector returns 5 (LOAD), so we test through select_alpha to be precise.
-     * For the "pure coulomb" case (alpha=0), test the internal blend math
-     * directly via select_alpha's actual return values. We assert relationships
-     * rather than exact numbers when alpha is fixed by the selector. */
+     * Math is deterministic — assert exact equality. */
     uint16_t fused = battery_soc_fusion_blend(10000, 4000, 99999);
-    /* With ALPHA_LOAD=5, fused should be very close to coulomb (4000) */
-    TEST_ASSERT_INT_WITHIN(50, 4030, fused);
+    TEST_ASSERT_EQUAL_UINT16(4030, fused);
 }
 
 void test_blend_at_rest_pulls_5pct_toward_voltage(void)
@@ -48,7 +44,7 @@ void test_blend_no_overflow_at_max_values(void)
     TEST_ASSERT_EQUAL_UINT16(10000, fused);
 }
 
-void test_blend_symmetric_inputs_symmetric_outputs(void)
+void test_blend_returns_input_when_both_signals_agree(void)
 {
     /* Both signals equal -> fused equals them, regardless of alpha. */
     TEST_ASSERT_EQUAL_UINT16(5000, battery_soc_fusion_blend(5000, 5000, 0));
@@ -107,10 +103,10 @@ void test_select_alpha_treats_negative_current_as_below_threshold(void)
 int main(void)
 {
     UNITY_BEGIN();
-    RUN_TEST(test_blend_alpha_0_returns_pure_coulomb);
+    RUN_TEST(test_blend_high_current_selects_load_alpha);
     RUN_TEST(test_blend_at_rest_pulls_5pct_toward_voltage);
     RUN_TEST(test_blend_no_overflow_at_max_values);
-    RUN_TEST(test_blend_symmetric_inputs_symmetric_outputs);
+    RUN_TEST(test_blend_returns_input_when_both_signals_agree);
     RUN_TEST(test_blend_at_rest_blends_correctly);
     RUN_TEST(test_blend_under_load_barely_moves);
     RUN_TEST(test_select_alpha_rest_when_below_threshold);
