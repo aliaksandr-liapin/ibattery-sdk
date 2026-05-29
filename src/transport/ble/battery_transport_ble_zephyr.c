@@ -92,6 +92,34 @@ static const struct bt_data sd[] = {
             sizeof(CONFIG_BT_DEVICE_NAME) - 1),
 };
 
+/* ── Advertising helpers ────────────────────────────────────────────── */
+
+static int start_advertising(void)
+{
+    struct bt_le_adv_param adv_param = BT_LE_ADV_PARAM_INIT(
+        BT_LE_ADV_OPT_CONN,
+        BT_GAP_ADV_SLOW_INT_MIN,
+        BT_GAP_ADV_SLOW_INT_MAX,
+        NULL);
+
+    return bt_le_adv_start(&adv_param, ad, ARRAY_SIZE(ad),
+                           sd, ARRAY_SIZE(sd));
+}
+
+/* Restarting advertising directly from the disconnected callback races the
+ * controller's connection teardown and silently fails, leaving the device
+ * un-discoverable until reboot. Defer it to the system workqueue so it runs
+ * after the disconnect is fully processed. */
+static void adv_restart_work_handler(struct k_work *work)
+{
+    int err = start_advertising();
+    if (err && err != -EALREADY) {
+        printk("BLE re-advertise failed: %d\n", err);
+    }
+}
+
+static K_WORK_DEFINE(adv_restart_work, adv_restart_work_handler);
+
 /* ── Connection callbacks ───────────────────────────────────────────── */
 
 static void on_connected(struct bt_conn *conn, uint8_t err)
@@ -110,15 +138,7 @@ static void on_disconnected(struct bt_conn *conn, uint8_t reason)
     }
     g_notify_enabled = false;
 
-    /* Resume advertising after disconnect */
-    struct bt_le_adv_param adv_param = BT_LE_ADV_PARAM_INIT(
-        BT_LE_ADV_OPT_CONN,
-        BT_GAP_ADV_SLOW_INT_MIN,
-        BT_GAP_ADV_SLOW_INT_MAX,
-        NULL);
-
-    bt_le_adv_start(&adv_param, ad, ARRAY_SIZE(ad),
-                     sd, ARRAY_SIZE(sd));
+    k_work_submit(&adv_restart_work);
 }
 
 BT_CONN_CB_DEFINE(conn_cbs) = {
@@ -150,14 +170,7 @@ static int ble_init(void)
     }
 
     /* Start connectable advertising */
-    struct bt_le_adv_param adv_param = BT_LE_ADV_PARAM_INIT(
-        BT_LE_ADV_OPT_CONN,
-        BT_GAP_ADV_SLOW_INT_MIN,
-        BT_GAP_ADV_SLOW_INT_MAX,
-        NULL);
-
-    err = bt_le_adv_start(&adv_param, ad, ARRAY_SIZE(ad),
-                          sd, ARRAY_SIZE(sd));
+    err = start_advertising();
     if (err && err != -EALREADY) {
         return BATTERY_STATUS_IO;
     }

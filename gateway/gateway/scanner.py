@@ -32,34 +32,63 @@ class DiscoveredDevice:
         return self.device.address
 
 
+def matches_ibattery(
+    device: BLEDevice,
+    adv_data,
+    name: str = config.DEVICE_NAME,
+    service_uuid: str = config.SERVICE_UUID,
+) -> bool:
+    """Return True if an advertisement is the iBattery device.
+
+    Matches on the advertised service UUID first, then falls back to a name
+    substring match. The service UUID lives in the primary advertisement and
+    is the most reliable discriminator on macOS, where CoreBluetooth populates
+    the GAP name asynchronously and leaves it empty on many packets.
+    """
+    uuids = [u.lower() for u in (adv_data.service_uuids or [])]
+    if service_uuid.lower() in uuids:
+        return True
+    adv_name = getattr(adv_data, "local_name", None) or device.name
+    return bool(adv_name and name.lower() in adv_name.lower())
+
+
 async def scan_for_device(
     name: str = config.DEVICE_NAME,
     timeout: float = config.SCAN_TIMEOUT,
+    service_uuid: str = config.SERVICE_UUID,
 ) -> Optional[BLEDevice]:
-    """Scan for a BLE device by name.
+    """Scan for the iBattery device by service UUID (name as fallback).
+
+    Uses find_device_by_filter, which evaluates every advertisement packet as
+    it arrives and returns on the first match. This is robust against the
+    BleakScanner.discover() snapshot on macOS, where a device's service_uuids
+    is intermittently empty in the final merged result depending on whether an
+    advertisement or scan-response packet landed last.
 
     Args:
-        name: Target device name (e.g., "iBattery").
+        name: Target device name substring (e.g., "iBattery").
         timeout: Scan duration in seconds.
+        service_uuid: Advertised primary service UUID to match on.
 
     Returns:
         BLEDevice if found, None otherwise.
     """
-    logger.info("Scanning for '%s' (timeout %.1fs)...", name, timeout)
-    discovered = await BleakScanner.discover(timeout=timeout, return_adv=True)
+    logger.info(
+        "Scanning for iBattery (service %s / name '%s', timeout %.1fs)...",
+        service_uuid,
+        name,
+        timeout,
+    )
+    device = await BleakScanner.find_device_by_filter(
+        lambda d, adv: matches_ibattery(d, adv, name, service_uuid),
+        timeout=timeout,
+    )
 
-    for address, (device, adv_data) in discovered.items():
-        if device.name and name.lower() in device.name.lower():
-            logger.info(
-                "Found '%s' at %s (RSSI: %s dBm)",
-                device.name,
-                device.address,
-                adv_data.rssi,
-            )
-            return device
-
-    logger.warning("Device '%s' not found", name)
-    return None
+    if device is None:
+        logger.warning("Device not found (service %s / name '%s')", service_uuid, name)
+    else:
+        logger.info("Found iBattery at %s (name=%r)", device.address, device.name)
+    return device
 
 
 async def list_nearby_devices(

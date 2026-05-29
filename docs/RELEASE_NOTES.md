@@ -1,5 +1,51 @@
 # Release Notes
 
+## v0.10.1 — BLE-on-NUCLEO end-to-end validation + three BLE fixes — 2026-05-29
+
+Closes the deferred v0.8.5 end-to-end validation: with an X-NUCLEO-IDB05A1
+BLE shield on the bench, v3 telemetry was driven all the way from firmware
+through BLE → Python gateway → InfluxDB → Grafana for the first time. Real
+`current_ma` / `coulomb_mah` from the INA219 now light up the Live Current
+and Remaining Charge dashboard panels over the air. Bringing this up exposed
+three bugs, all fixed and hardware-validated (see
+`docs/captures/2026-05-29-v0.10.1-ble-on-nucleo-e2e.log`).
+
+### Fixes
+
+- **BLE MTU too small for v3 (all platforms).** `CONFIG_BT_L2CAP_TX_MTU=27`
+  capped notification payloads at 24 bytes, but every packet is stamped v3
+  (32 bytes). v3 had only ever been validated over serial, so this went
+  unnoticed — v3 notifications were silently dropped/truncated. Bumped to
+  `35` (= 32 + 3 ATT header) with ACL buffers `31 → 39` across
+  `nucleo_l476rg_ble.conf`, `prj.conf` (nRF), and `esp32c3_devkitm.conf`.
+- **Gateway device matching unreliable on macOS.** CoreBluetooth populates
+  `device.name` asynchronously, so name-only matching missed a device that
+  was advertising correctly. `scan_for_device` now matches on the advertised
+  service UUID via `find_device_by_filter` (evaluates every advertisement
+  packet), with a name-substring fallback. +6 regression tests (73 total).
+- **Firmware did not re-advertise after disconnect.** `on_disconnected`
+  restarted advertising inline, racing the controller's connection teardown
+  and silently failing — the device became undiscoverable until reboot.
+  The restart is now deferred to the system workqueue, with failure logging.
+
+### New build variant
+
+- `app/boards/nucleo_l476rg_ble_current.conf` — BLE transport + INA219
+  current sense + coulomb counting in one image, so the v3 current/coulomb
+  fields carry real data over BLE.
+
+### Footprint
+
+`+56 B` flash for the BLE-only build; the BLE+current build is 99,536 B flash
+(9.49%) / 33,198 B RAM (33.77%) on the L476RG. No new heap.
+
+### Not done here
+
+- Visual Grafana panel rendering was confirmed via datasource health + the
+  underlying InfluxDB data; a screenshot was not archived.
+- nRF52840-DK and ESP32-C3 MTU fixes are config-only (those boards weren't on
+  the bench); validated on NUCLEO-L476RG only.
+
 ## v0.10.0 — Phase 8c: Voltage + Coulomb Signal Fusion — 2026-05-29
 
 Phase 8c lands. The SoC estimator gains a new continuous-correction stage
