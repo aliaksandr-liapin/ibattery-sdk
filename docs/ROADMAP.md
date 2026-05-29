@@ -1,6 +1,6 @@
 # Roadmap & Business Strategy
 
-## Current State (v0.9.0 + v0.8.3 — Phases 8a + 8b shipped, 8a hardware-validated on NUCLEO-L476RG)
+## Current State (v0.10.0 — Phases 8a + 8b + 8c shipped end-to-end, all hardware-validated on NUCLEO-L476RG)
 
 ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 
@@ -123,7 +123,7 @@ Lower scale but immediate revenue with zero infrastructure cost.
 | ~~10~~ | ~~Charging support — detect charging state, track charge cycles~~ | ✅ Done (v0.4.1 + v0.5.1 — TP4056 GPIO driver + NVS cycle counter) |
 | ~~8a~~ | ~~Advanced SoC — Coulomb Counting (v0.8.0 → v0.8.4 — hardware-validated, Q tracks discharge)~~ | ✅ Done (v0.8.4) — Current-sensor SoC with NVS persistence |
 | 8b | Advanced SoC — Voltage-LUT Correction (complete in v0.9.0) | Software-only SoC jitter reduction |
-| 8c | Advanced SoC — Kalman Filter Fusion (planned) | Optimal multi-signal SoC estimation |
+| ~~8c~~ | ~~Advanced SoC — Voltage+Coulomb Signal Fusion (v0.10.0 — hardware-validated, drift correction working)~~ | ✅ Done (v0.10.0) — complementary filter with current-adaptive α, opt-in via Kconfig |
 | ~~12~~ | ~~PlatformIO library publication~~ | ✅ Done — published to registry.platformio.org |
 | ~~13~~ | ~~Documentation site — GitHub Pages with guides and API reference~~ | ✅ Done — aliaksandr-liapin.github.io/ibattery-sdk/ |
 | 14 | Reference hardware design — open-source board (nRF52840 + fuel gauge IC + LiPo) | Hardware reference designs drive SDK adoption |
@@ -168,12 +168,36 @@ narrative.
 - No new hardware — software-only improvement
 - Delivered: median voltage filter (Kconfig-selectable) + SoC slew-rate limiter
 
-#### Phase 8c: Kalman Filter Fusion (planned)
+#### Phase 8c: Voltage + Coulomb Signal Fusion (v0.10.0)
 
-- Optimal blending of voltage + coulomb + temperature signals
-- Weighted by confidence (voltage noisy under load, coulomb drifts over time)
-- Industry-standard approach (phones, EVs, medical devices)
-- Same public API — drop-in replacement for 8a estimator
+**Software-complete and hardware-validated end-to-end on NUCLEO-L476RG.**
+
+- Complementary filter with current-adaptive blend coefficient (α)
+- α small under load (voltage unreliable due to IR drop), larger at rest (LUT accurate)
+- Targets mid-discharge drift in the coulomb integrator — the failure
+  mode that affects every long-running battery device that never reaches
+  voltage anchors
+- Integer-only math, ~45 lines, +56 bytes flash, **0 new RAM**
+- Composes cleanly with Phase 8a anchors (still fire as one-shot
+  calibration events) and Phase 8b slew limiter (still applies after
+  fusion to smooth the displayed SoC)
+- **Strictly opt-in** via `CONFIG_BATTERY_SOC_FUSION` (default n) —
+  byte-for-byte identical to v0.8.4 when disabled
+- Hardware-validated via 3 captures in `docs/captures/`:
+  drift-correction baseline (Δ Q matches theory), load-vs-rest
+  demonstration (10/10 toggles detected, adaptive α verified),
+  fusion-off regression (byte-identical to v0.8.4)
+- 19 host tests pass (was 17; +10 unit tests + 6 integration tests)
+- Kept the "Kalman filter" label internally during design but settled
+  on the complementary-filter approach: simpler, easier to reason
+  about, smaller, and the Kalman framing's advantage doesn't apply
+  cleanly to the bias-dominated noise model here
+
+What was deferred (not 8c scope):
+- Battery aging / capacity learning — Phase 8d candidate
+- Coulomb counter drift correction (INA219 ±1%) — Phase 8d candidate
+- Smooth α interpolation — YAGNI, step function matches physical knee
+- Runtime α tuning via API — compile-time is enough
 
 ### Long-term (6+ months)
 

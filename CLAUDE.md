@@ -4,13 +4,15 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 
 ## Current State
 
-- **Version**: v0.8.5 (latest patch in the Phase 8a hardware-validation line; v0.9.0 is the parallel software-feature branch with Phase 8b)
+- **Version**: v0.10.0 (Phases 8a + 8b + 8c all shipped end-to-end and hardware-validated)
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
 - **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32), ESP32-C3 DevKitM — all hardware-verified
 - **Phase 8a status**: ✅ Hardware-validated end-to-end on NUCLEO-L476RG. Coulomb counter ticks correctly under load (Q-as-remaining semantics, one-shot anchor); gateway persists `current_ma` and `coulomb_mah` to InfluxDB; Grafana dashboard has dedicated panels.
+- **Phase 8b status**: ✅ Shipped in v0.9.0 — median voltage filter + SoC slew-rate limiter.
+- **Phase 8c status**: ✅ Shipped in v0.10.0 — voltage+coulomb signal fusion with current-adaptive α, opt-in via `CONFIG_BATTERY_SOC_FUSION` (default n). +56 bytes flash, 0 new RAM. Hardware-validated with 3 captures including a load-vs-rest demonstration with 10 toggles cleanly detected.
 - **Known hardware limitation**: nRF52840-DK PCA10056 SN 1050258557 has a per-unit GPIO defect on P0.26/P0.27 — see `docs/HARDWARE_TROUBLESHOOTING.md` "swap-the-MCU" section.
-- **Next milestone**: Phase 8c (Kalman filter fusion) — coulomb signal now works (v0.8.4) and is observable (v0.8.5), ready to tune against real data.
+- **Next milestone**: open. Phase 8 series is complete. Future candidates: Phase 8d (capacity-aging learning, coulomb drift correction), new feature areas, or focused polish.
 - **Distribution**: PlatformIO registry + Zephyr module + GitHub Pages docs
 
 ## Build Commands
@@ -165,7 +167,7 @@ docs/             ARCHITECTURE, SDK_API, TESTING, WIRING, BATTERY_PROFILES, ROAD
 | `docs/TESTING.md` | Test procedures, suite descriptions, running instructions |
 | `docs/BATTERY_PROFILES.md` | CR2032 + LiPo discharge curves, LUT design rationale |
 | `docs/ROADMAP.md` | Business strategy, development priorities, monetization |
-| `docs/RELEASE_NOTES.md` | Version history (v0.1.0 through v0.8.5 + v0.9.0) |
+| `docs/RELEASE_NOTES.md` | Version history (v0.1.0 through v0.10.0) |
 | `docs/plans/` | Design docs and implementation plans |
 | `CONTRIBUTING.md` | Dev setup, code style, porting guide |
 | `gateway/README.md` | Gateway CLI usage, analytics, architecture |

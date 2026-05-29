@@ -180,6 +180,56 @@ config BATTERY_COULOMB_NVS_INTERVAL_S
       Lower values improve reboot accuracy at the cost of
       flash wear. Also saves on >1% SoC change regardless.
 
+config BATTERY_SOC_FUSION
+    bool "Phase 8c: voltage + coulomb signal fusion"
+    default n
+    depends on BATTERY_SOC_COULOMB
+    help
+      Continuously fuses voltage-LUT SoC with coulomb-counter SoC to
+      correct mid-discharge drift in the coulomb integrator. Trust
+      shifts toward voltage when the battery is at rest (current below
+      threshold) and toward coulomb under load (voltage sag is real).
+
+      Composes with the v0.8.4 anchor calibration (which still fires
+      at endpoints) and the Phase 8b slew limiter (which still applies
+      after fusion).
+
+      Defaults to off. Enable per build to opt in.
+
+if BATTERY_SOC_FUSION
+
+config BATTERY_SOC_FUSION_ALPHA_REST_X1000
+    int "Fusion alpha (x1000) when battery is at rest"
+    default 50 if !BATTERY_CHEMISTRY_LIPO
+    default 30 if BATTERY_CHEMISTRY_LIPO
+    range 0 1000
+    help
+      Per-sample pull toward voltage-LUT SoC when |I| < I_THRESH.
+      Larger = faster drift correction. Default 5.0% per sample (CR2032)
+      gives ~95% convergence in ~60 samples at 2s intervals.
+      LiPo default is 3.0% (LUT is flatter in the middle plateau, so
+      voltage is less informative even at rest).
+
+config BATTERY_SOC_FUSION_ALPHA_LOAD_X1000
+    int "Fusion alpha (x1000) under load"
+    default 5
+    range 0 1000
+    help
+      Per-sample pull toward voltage-LUT SoC when |I| >= I_THRESH.
+      Should be small -- voltage is unreliable under load (IR drop).
+      Default 0.5% per sample, both chemistries.
+
+config BATTERY_SOC_FUSION_I_THRESH_X100
+    int "Current threshold (x100 mA) classifying rest vs load"
+    default 200 if !BATTERY_CHEMISTRY_LIPO
+    default 5000 if BATTERY_CHEMISTRY_LIPO
+    range 0 1000000
+    help
+      Below this current magnitude, fusion uses ALPHA_REST.
+      Above (or equal), uses ALPHA_LOAD.
+
+endif # BATTERY_SOC_FUSION
+
 config BATTERY_CHARGER_TP4056
     bool "TP4056 charger IC GPIO status detection"
     default n

@@ -15,6 +15,10 @@
 #include <battery_sdk/battery_coulomb.h>
 #include <battery_sdk/battery_hal_current.h>
 
+#if defined(CONFIG_BATTERY_SOC_FUSION)
+#include <battery_sdk/battery_soc_fusion.h>
+#endif
+
 #ifndef CONFIG_BATTERY_CAPACITY_MAH
 #define CONFIG_BATTERY_CAPACITY_MAH 1000
 #endif
@@ -256,6 +260,17 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
         } else if (soc > 10000) {
             soc = 10000;
         }
+
+#if defined(CONFIG_BATTERY_SOC_FUSION)
+        /* Phase 8c fusion: blend coulomb SoC with LUT SoC, weighted by
+         * current magnitude (small current -> trust voltage more). The
+         * existing `lut_soc` and `abs_current` variables are in scope from
+         * earlier in this function. */
+        soc = (int32_t)battery_soc_fusion_blend(
+            (uint16_t)lut_soc,
+            (uint16_t)soc,
+            abs_current);
+#endif
 
         g_coulomb_soc_x100 = (uint16_t)soc;
 #if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)

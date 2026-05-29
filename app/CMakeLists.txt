@@ -46,6 +46,11 @@ if(CONFIG_BATTERY_SOC_COULOMB)
     target_sources(app PRIVATE ../src/intelligence/battery_coulomb.c)
 endif()
 
+# SoC fusion (voltage + coulomb blending)
+if(CONFIG_BATTERY_SOC_FUSION)
+    target_sources(app PRIVATE ../src/intelligence/battery_soc_fusion.c)
+endif()
+
 # Voltage filter: moving-average (default) or median
 if(CONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN)
     target_sources(app PRIVATE ../src/core_modules/battery_voltage_filter_median.c)
