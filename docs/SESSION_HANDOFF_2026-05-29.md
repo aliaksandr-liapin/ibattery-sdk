@@ -10,7 +10,7 @@
 > is struck through; everything else here is still accurate history.
 
 **Date:** 2026-05-29
-**Last release:** v0.10.1 (tagged, GitHub released, PlatformIO published) — followed v0.10.0 the same day
+**Last release:** v0.10.2 (docs/packaging fix — corrects the bundled README in the 0.10.1 tarball; no code change). Functional milestone is v0.10.1.
 **Status:** All work wrapped. Repo + remotes + registry + memory all synchronized. **Ready for any next direction.**
 
 This document is the cold-start brief for the next chat session. Open the next chat with the one-line summary at the bottom, and that session will know enough to pick up cleanly without re-deriving context.

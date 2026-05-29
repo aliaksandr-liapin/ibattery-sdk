@@ -1,5 +1,16 @@
 # Release Notes
 
+## v0.10.2 — Docs/packaging fix — 2026-05-29
+
+Documentation-and-packaging-only release. **No code changes** — firmware,
+gateway, and SDK behavior are identical to v0.10.1.
+
+The v0.10.1 PlatformIO tarball was packed before the current-state docs were
+synced, so the bundled `README.md` still showed the pre-v0.10.1 status header.
+PlatformIO package versions are immutable, so this republishes with the
+corrected README. Version pins (`lib_deps`, west `revision`) and status
+headers across README/index/ROADMAP now point at v0.10.2.
+
 ## v0.10.1 — BLE-on-NUCLEO end-to-end validation + three BLE fixes — 2026-05-29
 
 Closes the deferred v0.8.5 end-to-end validation: with an X-NUCLEO-IDB05A1
