@@ -1,5 +1,163 @@
 # Release Notes
 
+## v0.10.0 — Phase 8c: Voltage + Coulomb Signal Fusion — 2026-05-29
+
+Phase 8c lands. The SoC estimator gains a new continuous-correction stage
+that blends voltage-LUT SoC with coulomb-counter SoC using a complementary
+filter with **current-adaptive blend coefficient** — small α under load
+(voltage unreliable due to IR drop), larger α at rest (voltage-LUT is
+accurate). Targets the mid-discharge drift problem: a typical battery-
+powered IoT device running for months without ever hitting voltage anchors
+gets no correction signal under v0.8.x. With Phase 8c enabled, voltage
+continuously pulls on the SoC estimate at a rate proportional to how much
+we should trust voltage in the current operating conditions.
+
+**Opt-in via Kconfig.** With `CONFIG_BATTERY_SOC_FUSION=n` (default),
+behavior is byte-for-byte identical to v0.8.4. The new code is not
+compiled in.
+
+### Architecture
+
+```
+voltage_mv ─► LUT ─► soc_v_x100 ──┐
+                                   ├──► fusion ──► slew ──► soc_out
+current_ma ─► coulomb ─► soc_c ───┘  (8c, NEW)    (8b)
+                  ▲
+            anchor (8a, v0.8.4)
+```
+
+Fusion slots in between Phase 8a's anchor logic and Phase 8b's slew
+limiter. Existing anchors still fire as one-shot calibration events at
+the endpoints; fusion handles continuous correction in between.
+
+### Fusion math (integer-only, 0 RAM cost)
+
+```c
+alpha = (|I| < I_THRESH) ? ALPHA_REST : ALPHA_LOAD     // step function
+fused = (alpha * soc_v + (1000 - alpha) * soc_c + 500) / 1000
+                                                    ^^^^^
+                                                    round-to-nearest
+```
+
+- α represented in x1000 units (`0..1000`) for 0.1% blend resolution
+- `uint32_t` numerator gives 214× overflow headroom
+- The `+ 500` rounding constant eliminates the one-sided truncation bias
+  that would otherwise accumulate over thousands of estimator iterations
+- Stateless: no globals, no allocations, ~45 lines of C
+
+### New Kconfig surface
+
+Master enable + 3 tunables with per-chemistry defaults:
+
+| Symbol | CR2032 default | LiPo default | Range |
+|--------|---------------|--------------|-------|
+| `CONFIG_BATTERY_SOC_FUSION` | `n` | `n` | bool |
+| `CONFIG_BATTERY_SOC_FUSION_ALPHA_REST_X1000` | `50` (5.0%) | `30` (3.0%) | 0–1000 |
+| `CONFIG_BATTERY_SOC_FUSION_ALPHA_LOAD_X1000` | `5` (0.5%) | `5` (0.5%) | 0–1000 |
+| `CONFIG_BATTERY_SOC_FUSION_I_THRESH_X100` | `200` (2 mA) | `5000` (50 mA) | 0–1,000,000 |
+
+LiPo defaults are slightly more conservative because the OCV-vs-SoC
+curve is flatter in the middle plateau (3.6–3.8 V covers ~20–80% SoC),
+so voltage is less informative even at rest.
+
+### Hardware validation on NUCLEO-L476RG
+
+Same test rig as v0.8.4 (NUCLEO + Adafruit INA219 + ~2.80 mA load).
+Three captures, archived in `docs/captures/`:
+
+**1. `2026-05-29-v0.10.0-drift-correction.log`** — FUSION=y baseline.
+5-min autonomous capture under steady load. Q ticks from 219.92 to
+219.68 mAh (Δ = −0.24 mAh ≈ theoretical 0.233 mAh), `flags=0x00000000`
+throughout, SoC trajectory matches v0.8.4 within rounding. Confirms
+fusion runs cleanly without disturbing Q integration when both signals
+agree.
+
+**2. `2026-05-29-v0.10.0-load-vs-rest.log`** — FUSION=y with user-
+toggled load every 30 s, 10 transitions in 5 minutes. All 10 transitions
+auto-detected; current swings cleanly between 2.80 mA (load) and
+0.10 mA (rest). The adaptive α is doing exactly what it should:
+
+```
+Detected transitions (10/10):
+  t= 738860 ms  DISCONNECT  (~00:30 mark)
+  t= 768895 ms  RECONNECT   (Δ 30.0 s)
+  t= 798929 ms  DISCONNECT  (Δ 30.0 s)
+  t= 830966 ms  RECONNECT   (Δ 32.0 s)
+  t= 858998 ms  DISCONNECT  (Δ 28.0 s)
+  t= 889033 ms  RECONNECT   (Δ 30.0 s)
+  t= 919067 ms  DISCONNECT  (Δ 30.0 s)
+  t= 959113 ms  RECONNECT   (Δ 40.0 s)
+  t= 979136 ms  DISCONNECT  (Δ 20.0 s)
+  t=1009171 ms  RECONNECT   (Δ 30.0 s)
+```
+
+SoC stays flat during rest periods (no current → no integration),
+ticks down during load periods. No `CURRENT_ERR`, no estimator
+oscillation, no anchor re-fire through 10 abrupt current
+discontinuities.
+
+**3. `2026-05-29-v0.10.0-fusion-off-regression.log`** — FUSION=n.
+5-min autonomous capture under steady load. **Q = 219.98 → 219.75 mAh,
+SoC = 99.99% → 99.88%, flash = 73556 B** — matches v0.8.4's
+`q-ticks-down-fix` evidence to two decimal places, byte-identical flash
+size to v0.8.5 baseline. Phase 8c is strictly opt-in: when disabled,
+zero impact.
+
+### Flash & RAM cost
+
+| Build | FLASH | RAM |
+|-------|-------|-----|
+| v0.8.5 baseline | 73556 B | 15232 B |
+| v0.10.0, `FUSION=n` (default) | 73556 B | 15232 B |
+| v0.10.0, `FUSION=y` | 73612 B | 15232 B |
+
+**+56 bytes of flash when enabled, zero new RAM, zero CPU overhead in
+common case** (single multiply + compare per sample).
+
+### Tests
+
+- **19 C host tests pass** (was 17; +2 new executables: `test_soc_fusion`
+  with 10 unit tests, `test_soc_estimator_fusion` with 6 integration tests)
+- All 67 gateway tests still pass — no Python or InfluxDB schema changes
+- All 7 prior `test_soc_coulomb` tests still pass with FUSION=n —
+  byte-for-byte v0.8.4 behavior preserved
+
+### Public API and wire format
+
+- **No API breakage.** All public function signatures unchanged. New
+  public functions in `battery_soc_fusion.h` are additive.
+- **No wire format change.** v3 packets unchanged.
+
+### Known limitations / explicitly deferred
+
+- **Battery aging / capacity learning** — different problem class
+  (parameter estimation, not state estimation). Deferred to a potential
+  future Phase 8d.
+- **Coulomb counter drift (INA219 ±1% per spec)** — same. Deferred.
+- **Smooth α interpolation instead of step function** — YAGNI. The
+  step matches the physical knee in IR-drop sensitivity. Can revisit
+  if field data demands.
+- **Runtime α tuning via API** — compile-time only, by design.
+
+### Updated docs
+
+- `docs/RELEASE_NOTES.md` — this entry
+- `docs/ROADMAP.md` — Phase 8c marked complete
+- `docs/SDK_API.md` — documents the new fusion module
+- `docs/captures/` — 3 new hardware-evidence logs
+- `docs/plans/2026-05-29-phase-8c-fusion-design.md` — full design rationale
+- `docs/plans/2026-05-29-phase-8c-fusion-plan.md` — TDD implementation plan
+- `CLAUDE.md` / `README.md` / `docs/index.md` — version + status refresh
+- `library.json` — `0.9.1` → `0.10.0`
+
+### What's next
+
+Phase 8c is the final 8.x roadmap item. Future direction is Phase 9+
+work — potential candidates include capacity-aging learning (Phase 8d),
+sensor robustness improvements, or completely new feature areas.
+
+---
+
 ## v0.9.1 — PlatformIO Registry Consolidation — 2026-05-29
 
 Registry-side housekeeping release. `library.json` was at `0.9.0` (tagged

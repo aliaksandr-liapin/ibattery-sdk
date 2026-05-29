@@ -11,7 +11,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 
 ---
 
-## Current Status: Phase 8a + 8b Complete (v0.9.1)
+## Current Status: Phase 8a + 8b + 8c Complete (v0.10.0)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -26,6 +26,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 | Phase 7 | ESP32-C3 HAL port (DevKitM) | Done — hardware-validated, native BLE, full pipeline |
 | Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done (v0.8.5) — hardware-validated on NUCLEO-L476RG; Q ticks down under load with Q-as-remaining semantics; `current_ma` + `coulomb_mah` persisted to InfluxDB + Grafana panels |
 | Phase 8b | Median voltage filter + SoC slew-rate limiter | Done (v0.9.0) — software-only, no hardware needed |
+| Phase 8c | Voltage + coulomb signal fusion (current-adaptive α) | Done (v0.10.0) — opt-in via `CONFIG_BATTERY_SOC_FUSION` (default off); +56 B flash, 0 new RAM; hardware-validated with 3 captures including load-vs-rest demo |
 
 ---
 
@@ -135,7 +136,7 @@ manifest:
   projects:
     - name: ibattery-sdk
       remote: aliaksandr-liapin
-      revision: v0.8.5
+      revision: v0.10.0
       path: modules/lib/ibattery-sdk
 ```
 
@@ -145,10 +146,10 @@ Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 
 ```ini
 ; platformio.ini
-lib_deps = aliaksandr-liapin/ibattery-sdk@^0.9.1
+lib_deps = aliaksandr-liapin/ibattery-sdk@^0.10.0
 ```
 
-The `^0.9.1` constraint pulls v0.9.1 or any newer 0.9.x release. v0.9.1 is the first PlatformIO-published version with both the Phase 8b voltage-smoothing features *and* the working Phase 8a coulomb counter — earlier 0.8.x or 0.9.0 versions have the inert coulomb counter that v0.8.4 fixed.
+The `^0.10.0` constraint pulls v0.10.0 or any newer 0.10.x release. v0.10.0 adds Phase 8c (voltage+coulomb signal fusion) on top of the working Phase 8a coulomb counter (v0.8.4) and Phase 8b voltage smoothing (v0.9.0).
 
 ### Run unit tests (host, no hardware needed)
 

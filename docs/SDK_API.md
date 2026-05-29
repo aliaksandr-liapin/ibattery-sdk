@@ -528,6 +528,56 @@ Reset the coulomb counter accumulator to a known value. Used by the voltage-anch
 
 **Returns:** `BATTERY_STATUS_OK`, or `BATTERY_STATUS_NOT_INITIALIZED`.
 
+### Q semantics (since v0.8.4)
+
+The accumulator represents **remaining battery charge** in mAh. Positive INA219 current is discharge, so positive current decreases the accumulator; negative current (charge) increases it. This matches the SoC estimator which reads Q as remaining capacity to compute `soc = Q / capacity`.
+
+---
+
+## battery_soc_fusion.h — Signal Fusion (Phase 8c, v0.10.0)
+
+```c
+#include <battery_sdk/battery_soc_fusion.h>
+
+uint16_t battery_soc_fusion_blend(uint16_t soc_v_x100,
+                                   uint16_t soc_c_x100,
+                                   int32_t abs_current_x100);
+uint16_t battery_soc_fusion_select_alpha(int32_t abs_current_x100);
+```
+
+Continuous-correction stage for the SoC estimator. Blends voltage-LUT SoC with coulomb-counter SoC using a complementary filter with **current-adaptive blend coefficient** — small α under load (voltage unreliable due to IR drop), larger α at rest (LUT accurate). Stateless, integer-only, ~45 lines of C, **0 new RAM cost**.
+
+Most users do not call this directly — the SoC estimator wires it in automatically when `CONFIG_BATTERY_SOC_FUSION=y`. The header is public for advanced integrators and testing.
+
+### `battery_soc_fusion_blend`
+
+Blend voltage-LUT and coulomb-counter SoC estimates. α is selected internally based on the absolute current magnitude.
+
+| Parameter | Direction | Description |
+|-----------|-----------|-------------|
+| `soc_v_x100` | in | Voltage-LUT SoC in 0.01% units (0..10000) |
+| `soc_c_x100` | in | Coulomb SoC in 0.01% units (0..10000) |
+| `abs_current_x100` | in | Absolute current in 0.01 mA units. **Caller responsibility** to absolute the value — negative inputs are accepted as a courtesy (select `ALPHA_REST`) but the function does NOT do `abs()` internally. |
+
+**Returns:** Fused SoC in 0.01% units (0..10000). Inputs outside the documented ranges produce a blend in their corresponding ranges; the function does not clamp.
+
+### `battery_soc_fusion_select_alpha`
+
+Exposed for testability. Returns α in x1000 units based on current magnitude:
+- `abs_current_x100 < CONFIG_BATTERY_SOC_FUSION_I_THRESH_X100` → returns `CONFIG_BATTERY_SOC_FUSION_ALPHA_REST_X1000`
+- otherwise → returns `CONFIG_BATTERY_SOC_FUSION_ALPHA_LOAD_X1000`
+
+### Kconfig
+
+| Symbol | CR2032 default | LiPo default | Range |
+|--------|---------------|--------------|-------|
+| `CONFIG_BATTERY_SOC_FUSION` | n | n | bool |
+| `CONFIG_BATTERY_SOC_FUSION_ALPHA_REST_X1000` | 50 (5.0%) | 30 (3.0%) | 0–1000 |
+| `CONFIG_BATTERY_SOC_FUSION_ALPHA_LOAD_X1000` | 5 (0.5%) | 5 (0.5%) | 0–1000 |
+| `CONFIG_BATTERY_SOC_FUSION_I_THRESH_X100` | 200 (2 mA) | 5000 (50 mA) | 0–1,000,000 |
+
+See `docs/plans/2026-05-29-phase-8c-fusion-design.md` for full design rationale.
+
 ---
 
 ## Usage Example
