@@ -147,6 +147,12 @@ tracks discharge proportionally** (5-min capture: Q = 219.98 → 219.75 mAh,
 Δ = -0.23 mAh at 2.80 mA load, matches theory ≈ 0.233 mAh; SoC tracks 99.99% →
 99.88%).
 
+**Status (v0.8.5):** Cloud-side observability closed.
+`gateway/influxdb_writer.py` now persists `current_ma` and `coulomb_mah` to
+InfluxDB, and the Grafana dashboard has dedicated **Live Current (mA)** and
+**Remaining Charge (mAh)** timeseries panels. Phase 8a's signals are now
+visible end-to-end: chip → BLE → gateway → InfluxDB → dashboard.
+
 The nRF52840-DK unit used in v0.8.0–v0.8.2 development (PCA10056 SN 1050258557)
 has a per-unit GPIO defect on P0.26/P0.27 — two independent chips and fresh
 wires both fail to ACK firmware-side, but the same chips and wires work

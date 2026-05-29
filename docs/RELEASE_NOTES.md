@@ -1,5 +1,83 @@
 # Release Notes
 
+## v0.8.5 — Gateway + Grafana Persist current_ma and coulomb_mah — 2026-05-29
+
+Closes [#2](https://github.com/aliaksandr-liapin/ibattery-sdk/issues/2).
+Cloud side of the Phase 8a story: the v3 wire format has carried
+`current_ma_x100` and `coulomb_mah_x100` since v0.8.0, the gateway has
+decoded them since then, but the InfluxDB writer never wrote them to the
+database and the Grafana dashboard had no panels for them. Until v0.8.4
+fixed the coulomb counter (Q-as-remaining now actually tracks discharge),
+that gap was masked — there was no point persisting a broken signal.
+
+With v0.8.4 making `coulomb_mah` meaningful, this release plumbs both
+fields all the way through to the dashboard.
+
+### What changed
+
+**`gateway/gateway/influxdb_writer.py`**
+- Added two new fields to the `battery_telemetry` Point:
+  - `current_ma` — live current measurement in mA (positive = discharge,
+    matching INA219 convention)
+  - `coulomb_mah` — remaining charge in mAh (Q-as-remaining semantics
+    locked in by v0.8.4)
+- Both use `decoded.get(..., 0.0)` so v1 / v2 packets stay
+  backward-compatible (defaults to 0.0 when absent).
+
+**`cloud/grafana/provisioning/dashboards/battery.json`**
+- Two new timeseries panels in a fourth dashboard row (y=20):
+  - **Live Current (mA)** — 30-minute window, 5-second aggregation,
+    `mamp` unit
+  - **Remaining Charge (mAh)** — 30-minute window, 5-second aggregation,
+    two-decimal precision so the sub-mAh tracking is visible
+- Layout matches the top-row Voltage/Temperature panels in width (12) and
+  height (8) — Phase 8a's signals get equal visual weight to the existing
+  voltage-based panels.
+- Dashboard `version` bumped 1 → 2.
+
+### Tests
+
+- **67 gateway tests pass** (was 65; +2 in `test_writer.py`):
+  - `test_write_v3_current_and_coulomb_fields` — explicit guard that a v3
+    decoded packet writes both new fields with correct values
+  - `test_write_v1_packets_default_current_and_coulomb_to_zero` —
+    backward-compatibility guard for older firmware
+- All 17 C host tests still pass — no firmware changes in this release.
+
+### No firmware changes
+
+- No `.c` / `.h` files modified
+- No wire-format changes
+- v0.8.5 is a pure gateway + cloud release; existing v0.8.4 firmware is
+  what feeds it
+
+### End-to-end validation
+
+The unit tests cover the writer behavior precisely (line-protocol
+assertions on the encoded Point). Full BLE → InfluxDB → Grafana visual
+validation is deferred until the next BLE-capable test rig is set up
+(the v0.8.3 nRF52840-DK had the per-unit GPIO defect; the
+NUCLEO-L476RG used for v0.8.3/v0.8.4 hardware validation is BLE-less
+without the `x_nucleo_idb05a1` shield). The fix is small, additive, and
+covered by unit tests; deferring the full E2E visual check is low-risk.
+
+### Follow-ups
+
+- **Phase 8c (Kalman filter fusion)** — fully unblocked. A working coulomb
+  signal (v0.8.4) is now both flowing and observable (v0.8.5), so Phase 8c
+  can be tuned against real data with dashboard feedback.
+- **BLE-on-NUCLEO** — add the `x_nucleo_idb05a1` shield build to the bench
+  whenever convenient, to close the E2E visual loop on the new dashboard
+  panels.
+
+### Updated docs
+
+- `docs/RELEASE_NOTES.md` — this entry
+- `docs/ROADMAP.md` — Phase 8a entry notes v0.8.5 closes the cloud-side
+  gap
+
+---
+
 ## v0.8.4 — Phase 8a Coulomb Counter Bug Fix — 2026-05-29
 
 Closes [#1](https://github.com/aliaksandr-liapin/ibattery-sdk/issues/1). Two
