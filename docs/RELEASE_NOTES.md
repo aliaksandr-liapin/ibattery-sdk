@@ -1,5 +1,45 @@
 # Release Notes
 
+## v0.9.1 — PlatformIO Registry Consolidation — 2026-05-29
+
+Registry-side housekeeping release. `library.json` was at `0.9.0` (tagged
+2026-04-14, before today's Phase 8a hardware-validation arc), which meant
+PlatformIO users were pulling firmware *without* the v0.8.4 coulomb
+counter fix. This release bumps the PlatformIO-published version to
+`0.9.1` so registry users get the current state of `main` — which has
+all of:
+
+- **v0.9.0** — Phase 8b voltage smoothing (median filter + SoC slew limiter)
+- **v0.8.3** — Phase 8a hardware-validated on NUCLEO-L476RG
+- **v0.8.4** — Coulomb counter bug fix (one-shot anchor + Q-as-remaining semantics)
+- **v0.8.5** — Gateway persists `current_ma` and `coulomb_mah` to InfluxDB; Grafana panels
+
+### No code changes vs current `main`
+
+- `library.json` — `0.9.0` → `0.9.1`, description tightened to reflect that coulomb counting now works end-to-end
+- All firmware, gateway, and dashboard code unchanged from v0.8.5 / current `main`
+- 17 C host tests + 67 gateway tests still green (no regressions to test)
+
+### Why a patch bump and not v0.10.0
+
+This release is strictly additive vs. the existing v0.9.0:
+- Bug fix (v0.8.4 coulomb counter), no API or wire-format breakage
+- New optional gateway/Grafana fields (v0.8.5)
+- Hardware validation methodology (docs only)
+
+No new feature surface, no consumer-visible breakage. `v0.9.1` is the
+semver-appropriate label.
+
+### Why this release exists at all
+
+The v0.8.x line ran in parallel with v0.9.0 specifically to deliver
+the Phase 8a hardware-validation arc as focused patch releases (one
+theme per patch). That worked well for narrative and bisection but
+left the PlatformIO registry pointing at a stale snapshot. v0.9.1
+closes that gap.
+
+---
+
 ## v0.8.5 — Gateway + Grafana Persist current_ma and coulomb_mah — 2026-05-29
 
 Closes [#2](https://github.com/aliaksandr-liapin/ibattery-sdk/issues/2).
