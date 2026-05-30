@@ -346,7 +346,7 @@ Initialize the transport subsystem. Calls the active backend's init function. Fo
 
 ### `battery_transport_send`
 
-Serialize and send a telemetry packet. Packs the packet into a wire buffer (v1: 20 bytes, v2: 24 bytes, v3: 32 bytes) and forwards it to the active backend.
+Serialize and send a telemetry packet. Packs the packet into a wire buffer (v1: 20 bytes, v2: 24 bytes, v3: 32 bytes, v4: 34 bytes) and forwards it to the active backend.
 
 | Parameter | Direction | Description |
 |-----------|-----------|-------------|
@@ -377,7 +377,13 @@ Serialize and send a telemetry packet. Packs the packet into a wire buffer (v1: 
 | 24 | 4 | current_ma_x100 | int32 LE |
 | 28 | 4 | coulomb_mah_x100 | int32 LE |
 
-v3 is the current default when `CONFIG_BATTERY_CURRENT_SENSE=y` (`BATTERY_TELEMETRY_VERSION=3`). The decoder accepts v1, v2, and v3 for backward compatibility.
+**Wire format v4 (34 bytes, extends v3):**
+
+| Offset | Size | Field | Encoding |
+|--------|------|-------|----------|
+| 32 | 2 | soh_pct_x100 | uint16 LE |
+
+v3 is the default; v4 is emitted only when `CONFIG_BATTERY_SOC_SOH=y` (then `BATTERY_TELEMETRY_VERSION=4`, otherwise 3). The decoder accepts v1–v4 by length for backward compatibility.
 
 **BLE behavior:** When no client is subscribed (CCCD not enabled), the send silently succeeds (drop policy). The wire buffer is always updated for the Read characteristic regardless of subscription state.
 

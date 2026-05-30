@@ -19,10 +19,16 @@ zero impact when disabled.
 - **Tests:** `test_soc_soh` (11) + `test_soc_soh_estimator` (2) → 21 suites.
 - **Tunables (Kconfig):** `BATTERY_SOC_SOH_ALPHA_X1000` (500),
   `BATTERY_SOC_SOH_REJECT_LO_PCT` (30), `BATTERY_SOC_SOH_REJECT_HI_PCT` (120).
+- **Cloud (end-to-end):** SoH now travels firmware → gateway → InfluxDB →
+  Grafana. Conditional **wire v4** (34 bytes = v3 + `soh_pct_x100` uint16 at
+  offset 32; `BATTERY_TELEMETRY_VERSION` is 4 only when SoH is enabled). BLE
+  MTU bumped 35→37 / ACL 39→41 to carry it. Gateway auto-detects v4 by length
+  and writes a `soh_pct` InfluxDB field; a "State of Health (%)" Grafana panel
+  renders it. Back-compatible with v1–v3. Design + plan:
+  `docs/plans/2026-05-29-soh-cloud-design.md` / `-plan.md`.
 - **Limitations:** converges only over full discharge cycles (slow on CR2032);
-  discharge-direction only; RAM-only (relearns on reboot). Cloud telemetry
-  (wire v4 + Grafana SoH panel) and NVS persistence are deferred — the public
-  getter is designed so they drop in without rework. Design + plan:
+  discharge-direction only; RAM-only (relearns on reboot). NVS persistence is
+  still deferred. On-device design + plan:
   `docs/plans/2026-05-29-phase-8d-soh-design.md` / `-plan.md`.
 
 ## v0.10.2 — Docs/packaging fix — 2026-05-29

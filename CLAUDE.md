@@ -146,15 +146,16 @@ HAL (platform-specific)
 - **v1** (20 bytes): version, timestamp_ms, voltage_mv, temperature_c_x100, soc_pct_x100, power_state, status_flags
 - **v2** (24 bytes): v1 + cycle_count (uint32 LE at offset 20)
 - **v3** (32 bytes): v2 + current_ma_x100 (int32 LE at offset 24) + coulomb_mah_x100 (int32 LE at offset 28)
+- **v4** (34 bytes): v3 + soh_pct_x100 (uint16 LE at offset 32). Emitted only when `CONFIG_BATTERY_SOC_SOH=y` (`BATTERY_TELEMETRY_VERSION` is 4 then, else 3).
 
-All three formats accepted by gateway decoder (auto-detect by length).
+All four formats accepted by gateway decoder (auto-detect by length).
 
 ## Known Quirks
 
 - **SAADC channel re-setup**: nRF SAADC driver clobbers per-channel input-mux; both ADC HAL drivers call `adc_channel_setup()` before every `adc_read()`
 - **Die temp sensor noise**: ~0.2-0.3°C jitter per 2s sample = ~6-9°C/min apparent rate. Temperature rate threshold set to 15°C/min to filter this.
 - **CR2032 vs LiPo thresholds**: Anomaly detection uses chemistry-neutral thresholds (critical: 2.5V, low: 2.8V) to avoid false positives on CR2032 (~3.0V nominal)
-- **BLE MTU**: `CONFIG_BT_L2CAP_TX_MTU=35` (= 32-byte v3 payload + 3-byte ATT header), ACL buffers 39. Earlier configs used 27, which silently capped notifications at 24 bytes and blocked v3 over BLE entirely. Single connection only.
+- **BLE MTU**: `CONFIG_BT_L2CAP_TX_MTU=37` (= 34-byte v4 payload + 3-byte ATT header), ACL buffers 41. (Was 35/39 for v3's 32 bytes; 27 originally, which silently capped notifications at 24 bytes.) Size the MTU to the largest wire format the build emits. Single connection only.
 - **ESP32-C3 I2C + INA219**: Zephyr INA219 driver fails at boot (I2C not stable). Raw I2C fallback implemented but breadboard contacts cause NACKs. Needs soldered connections or different breadboard.
 - **nRF52840-DK I2C pull-ups**: Require Arduino power header GND connection to activate analog switch (SB32/SB33). Without this, I2C pull-ups are not enabled.
 
