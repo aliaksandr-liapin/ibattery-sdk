@@ -33,7 +33,8 @@ extern "C" {
 #define BATTERY_SERIALIZE_V1_SIZE 20
 #define BATTERY_SERIALIZE_V2_SIZE 24
 #define BATTERY_SERIALIZE_V3_SIZE 32
-#define BATTERY_SERIALIZE_BUF_SIZE BATTERY_SERIALIZE_V3_SIZE
+#define BATTERY_SERIALIZE_V4_SIZE 34
+#define BATTERY_SERIALIZE_BUF_SIZE BATTERY_SERIALIZE_V4_SIZE
 
 /**
  * Pack a telemetry packet into a wire buffer.
@@ -69,6 +70,7 @@ int battery_serialize_unpack(const uint8_t *buf, uint8_t buf_len,
  */
 static inline uint8_t battery_serialize_wire_size(uint8_t version)
 {
+    if (version >= 4) return BATTERY_SERIALIZE_V4_SIZE;
     if (version >= 3) return BATTERY_SERIALIZE_V3_SIZE;
     if (version >= 2) return BATTERY_SERIALIZE_V2_SIZE;
     return BATTERY_SERIALIZE_V1_SIZE;

@@ -7,7 +7,11 @@
 extern "C" {
 #endif
 
+#if defined(CONFIG_BATTERY_SOC_SOH)
+#define BATTERY_TELEMETRY_VERSION 4U
+#else
 #define BATTERY_TELEMETRY_VERSION 3U
+#endif
 
 enum battery_power_state {
     BATTERY_POWER_STATE_UNKNOWN = 0,
@@ -37,6 +41,9 @@ struct battery_telemetry_packet {
     /* v3 fields — zero when telemetry_version < 3 */
     int32_t current_ma_x100;
     int32_t coulomb_mah_x100;
+
+    /* v4 field — zero when telemetry_version < 4 */
+    uint16_t soh_pct_x100;
 };
 
 /* Telemetry status_flags bit definitions.
