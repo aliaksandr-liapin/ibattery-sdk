@@ -8,6 +8,7 @@
  * v1: 20 bytes  (version == 1)
  * v2: 24 bytes  (version >= 2, adds cycle_count)
  * v3: 32 bytes  (version >= 3, adds current_ma_x100, coulomb_mah_x100)
+ * v4: 34 bytes  (version >= 4, adds soh_pct_x100)
  */
 
 #include "battery_serialize.h"
@@ -79,6 +80,11 @@ int battery_serialize_pack(const struct battery_telemetry_packet *pkt,
         put_u32_le(&buf[28], (uint32_t)pkt->coulomb_mah_x100);
     }
 
+    /* v4 extension */
+    if (pkt->telemetry_version >= 4) {
+        put_u16_le(&buf[32], pkt->soh_pct_x100);
+    }
+
     return BATTERY_STATUS_OK;
 }
 
@@ -113,6 +119,13 @@ int battery_serialize_unpack(const uint8_t *buf, uint8_t buf_len,
     } else {
         pkt->current_ma_x100  = 0;
         pkt->coulomb_mah_x100 = 0;
+    }
+
+    /* v4 extension */
+    if (pkt->telemetry_version >= 4 && buf_len >= BATTERY_SERIALIZE_V4_SIZE) {
+        pkt->soh_pct_x100 = get_u16_le(&buf[32]);
+    } else {
+        pkt->soh_pct_x100 = 0;
     }
 
     return BATTERY_STATUS_OK;

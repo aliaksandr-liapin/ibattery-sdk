@@ -44,6 +44,14 @@ static struct battery_telemetry_packet make_v3_packet(void)
     return pkt;
 }
 
+static struct battery_telemetry_packet make_v4_packet(void)
+{
+    struct battery_telemetry_packet pkt = make_v3_packet();
+    pkt.telemetry_version = 4;
+    pkt.soh_pct_x100 = 8750;  /* 87.50% */
+    return pkt;
+}
+
 void setUp(void) {}
 void tearDown(void) {}
 
@@ -388,7 +396,7 @@ void test_wire_size_helper(void)
     TEST_ASSERT_EQUAL_UINT8(20, battery_serialize_wire_size(1));
     TEST_ASSERT_EQUAL_UINT8(24, battery_serialize_wire_size(2));
     TEST_ASSERT_EQUAL_UINT8(32, battery_serialize_wire_size(3));
-    TEST_ASSERT_EQUAL_UINT8(32, battery_serialize_wire_size(255));
+    TEST_ASSERT_EQUAL_UINT8(34, battery_serialize_wire_size(255));
 }
 
 /* ── v3 round-trip tests ─────────────────────────────────────────── */
@@ -471,7 +479,50 @@ void test_v3_wire_format_exact_bytes(void)
 void test_wire_size_v3(void)
 {
     TEST_ASSERT_EQUAL_UINT8(32, battery_serialize_wire_size(3));
-    TEST_ASSERT_EQUAL_UINT8(32, battery_serialize_wire_size(255));
+    TEST_ASSERT_EQUAL_UINT8(34, battery_serialize_wire_size(255));
+}
+
+/* ── v4 round-trip tests ─────────────────────────────────────────── */
+
+void test_wire_size_v4_is_34(void)
+{
+    TEST_ASSERT_EQUAL_UINT8(34, battery_serialize_wire_size(4));
+}
+
+void test_v4_roundtrip(void)
+{
+    struct battery_telemetry_packet src = make_v4_packet();
+    struct battery_telemetry_packet dst;
+    uint8_t buf[BATTERY_SERIALIZE_BUF_SIZE];
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK,
+                          battery_serialize_pack(&src, buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK,
+                          battery_serialize_unpack(buf, 34, &dst));
+    TEST_ASSERT_EQUAL_UINT8(4, dst.telemetry_version);
+    TEST_ASSERT_EQUAL_UINT16(8750, dst.soh_pct_x100);
+    /* v3 fields still intact */
+    TEST_ASSERT_EQUAL_INT32(src.current_ma_x100, dst.current_ma_x100);
+    TEST_ASSERT_EQUAL_INT32(src.coulomb_mah_x100, dst.coulomb_mah_x100);
+}
+
+void test_pack_v4_buffer_too_small(void)
+{
+    struct battery_telemetry_packet pkt = make_v4_packet();
+    uint8_t buf[33];  /* one short of 34 */
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_INVALID_ARG,
+                          battery_serialize_pack(&pkt, buf, sizeof(buf)));
+}
+
+void test_v3_unpack_leaves_soh_zero(void)
+{
+    /* A 32-byte v3 buffer must decode with soh_pct_x100 == 0. */
+    struct battery_telemetry_packet src = make_v3_packet();
+    struct battery_telemetry_packet dst;
+    uint8_t buf[BATTERY_SERIALIZE_BUF_SIZE];
+    battery_serialize_pack(&src, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK,
+                          battery_serialize_unpack(buf, 32, &dst));
+    TEST_ASSERT_EQUAL_UINT16(0, dst.soh_pct_x100);
 }
 
 /* ── Test runner ─────────────────────────────────────────────────── */
@@ -516,6 +567,12 @@ int main(void)
     RUN_TEST(test_v3_unpack_as_v2_gets_zero_current);
     RUN_TEST(test_v3_wire_format_exact_bytes);
     RUN_TEST(test_wire_size_v3);
+
+    /* v4 round-trip */
+    RUN_TEST(test_wire_size_v4_is_34);
+    RUN_TEST(test_v4_roundtrip);
+    RUN_TEST(test_pack_v4_buffer_too_small);
+    RUN_TEST(test_v3_unpack_leaves_soh_zero);
 
     return UNITY_END();
 }
