@@ -19,6 +19,10 @@
 #include <battery_sdk/battery_coulomb.h>
 #endif
 
+#if defined(CONFIG_BATTERY_SOC_SOH)
+#include <battery_sdk/battery_soh.h>
+#endif
+
 #if defined(CONFIG_BATTERY_CURRENT_SENSE)
 static uint32_t g_prev_timestamp_ms;
 static bool g_prev_timestamp_valid;
@@ -110,6 +114,11 @@ int battery_telemetry_collect(struct battery_telemetry_packet *packet)
             packet->status_flags |= BATTERY_TELEMETRY_FLAG_CURRENT_ERR;
         }
     }
+#endif
+
+    /* State of Health — best-effort (v4) */
+#if defined(CONFIG_BATTERY_SOC_SOH)
+    (void)battery_soh_get_pct_x100(&packet->soh_pct_x100);
 #endif
 
     /* Always succeeds — partial data is flagged, not fatal */
