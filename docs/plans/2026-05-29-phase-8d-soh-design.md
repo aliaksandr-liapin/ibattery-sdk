@@ -89,6 +89,14 @@ battery_soh_get_pct_x100() / get_learned_capacity_mah_x100()      (public API)
   `include/battery_sdk/battery_soh.h`.
 - The estimator calls `battery_soh_observe_excursion()` at the empty-anchor
   edge (it already has `Q` and the rated capacity in scope there).
+
+> **As-built note:** the implementation split the single
+> `observe_excursion(rated, q)` call above into a two-call arm/observe pair —
+> `battery_soh_note_full_anchor()` at the full edge and
+> `battery_soh_observe_empty_anchor(q_before_empty)` at the empty edge — with
+> `rated` stored once at `battery_soh_init()`. This reuses the estimator's
+> existing edge flags and keeps `rated` in one place. The data flow is
+> identical to the diagram.
 - A few `int32` file-scope statics (learned capacity + init flag). No heap,
   integer-only — consistent with SDK constraints.
 
