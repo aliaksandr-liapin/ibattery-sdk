@@ -118,6 +118,52 @@ class TestTelemetryWriter:
         assert "current_ma=2.8" in line
         assert "coulomb_mah=219.75" in line
 
+    def test_write_v4_soh_field(self, mock_influx):
+        """v4 telemetry packets persist soh_pct to InfluxDB.
+
+        Mirrors the current_ma/coulomb_mah guard for the Phase 8d cloud
+        path: the decoder extracts soh_pct from the 34-byte wire format and
+        the writer must persist it so the Grafana State of Health panel and
+        analytics can see it.
+        """
+        from gateway.influxdb_writer import TelemetryWriter
+
+        v4_decoded = {
+            "version": 4,
+            "timestamp_ms": 240000,
+            "voltage_mv": 3322,
+            "voltage_v": 3.322,
+            "temperature_c": 23.56,
+            "soc_pct": 99.88,
+            "power_state": "ACTIVE",
+            "power_state_raw": 1,
+            "status_flags": 0,
+            "cycle_count": 0,
+            "current_ma": 2.80,
+            "coulomb_mah": 219.75,
+            "soh_pct": 87.5,
+            "received_at": "2026-05-29T18:55:00+00:00",
+        }
+
+        writer = TelemetryWriter()
+        writer.write(v4_decoded)
+
+        point = mock_influx["write_api"].write.call_args.kwargs["record"]
+        line = point.to_line_protocol()
+
+        assert "soh_pct=87.5" in line
+
+    def test_write_v1_packets_default_soh_to_zero(self, mock_influx, sample_decoded):
+        """v1-v3 packets omit soh_pct — writer defaults to 0.0 for back-compat."""
+        from gateway.influxdb_writer import TelemetryWriter
+
+        writer = TelemetryWriter()
+        writer.write(sample_decoded)
+
+        point = mock_influx["write_api"].write.call_args.kwargs["record"]
+        line = point.to_line_protocol()
+        assert "soh_pct=0" in line
+
     def test_write_v1_packets_default_current_and_coulomb_to_zero(
         self, mock_influx, sample_decoded
     ):

@@ -50,6 +50,10 @@ class TelemetryWriter:
             # v0.8.5 (issue #2) once v0.8.4 made Q-as-remaining usable.
             .field("current_ma", decoded.get("current_ma", 0.0))
             .field("coulomb_mah", decoded.get("coulomb_mah", 0.0))
+            # v4 telemetry (Phase 8d on-device State of Health). Backward-
+            # compatible: v1-v3 packets omit this key, decoder returns a 0.0
+            # default, and v4 publishes the learned SoH percentage.
+            .field("soh_pct", decoded.get("soh_pct", 0.0))
             .time(datetime.now(timezone.utc), WritePrecision.MS)
         )
 
