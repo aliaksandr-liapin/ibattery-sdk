@@ -9,7 +9,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 
 ---
 
-## Current Status: Phase 8 Complete + BLE-on-NUCLEO E2E validated (v0.10.2)
+## Current Status: Phase 8 + State of Health, end-to-end (v0.11.0)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -120,7 +120,7 @@ manifest:
   projects:
     - name: ibattery-sdk
       remote: aliaksandr-liapin
-      revision: v0.10.2
+      revision: v0.11.0
       path: modules/lib/ibattery-sdk
 ```
 
@@ -130,7 +130,7 @@ Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 
 ```ini
 ; platformio.ini
-lib_deps = aliaksandr-liapin/ibattery-sdk@^0.10.2
+lib_deps = aliaksandr-liapin/ibattery-sdk@^0.11.0
 ```
 
 v0.10.0 adds Phase 8c (voltage+coulomb signal fusion, opt-in) on top of the working Phase 8a coulomb counter (v0.8.4) and Phase 8b voltage smoothing (v0.9.0).

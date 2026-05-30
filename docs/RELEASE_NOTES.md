@@ -1,8 +1,11 @@
 # Release Notes
 
-## Unreleased — Phase 8d: on-device State of Health (capacity-fade learning)
+## v0.11.0 — Phase 8d: State of Health, end-to-end — 2026-05-29
 
-First *parameter*-estimation feature (8a–8c were *state* estimation). Learns
+On-device State-of-Health learning **plus** its cloud path, shipped together:
+SoH is computed on the device and now travels firmware → BLE → gateway →
+InfluxDB → Grafana. First *parameter*-estimation feature (8a–8c were *state*
+estimation). Learns
 the battery's true usable capacity from full→empty discharge excursions: the
 coulomb integral between a full anchor and an empty anchor is the actual
 delivered charge, so an aged cell that hits empty-voltage while charge remains

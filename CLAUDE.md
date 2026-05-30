@@ -4,7 +4,7 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 
 ## Current State
 
-- **Version**: v0.10.2 (Phases 8a + 8b + 8c shipped; BLE-on-NUCLEO E2E validated with the X-NUCLEO-IDB05A2 shield in v0.10.1; v0.10.2 = docs/packaging fix)
+- **Version**: v0.11.0 (Phase 8d State of Health shipped end-to-end — on-device learning + wire v4 + Grafana panel; builds on v0.10.x BLE-on-NUCLEO E2E + Phase 8a/8b/8c)
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
 - **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32), ESP32-C3 DevKitM — all hardware-verified
@@ -14,8 +14,8 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 - **v0.10.1 status**: ✅ BLE-on-NUCLEO end-to-end validated — first time v3 (32-byte) telemetry traversed BLE on real hardware. Fixed three bugs: BLE MTU too small for v3 (27→35, all platforms), gateway name-matching unreliable on macOS (now service-UUID via `find_device_by_filter`), and firmware not re-advertising after disconnect (now deferred to workqueue). Real current/coulomb reach Grafana over BLE. Evidence: `docs/captures/2026-05-29-v0.10.1-ble-on-nucleo-e2e.log`.
 - **Known hardware limitation**: nRF52840-DK PCA10056 SN 1050258557 has a per-unit GPIO defect on P0.26/P0.27 — see `docs/HARDWARE_TROUBLESHOOTING.md` "swap-the-MCU" section.
 - **BLE testing on macOS**: bleak (scan/stream/run) must run from a Bluetooth-permitted app like **iTerm**, NOT Claude Code — Claude.app lacks the Bluetooth TCC grant and the bare pyenv python has no `NSBluetoothAlwaysUsageDescription`, so CoreBluetooth calls SIGABRT. Non-BLE checks (serial, InfluxDB, Grafana) work from anywhere.
-- **Phase 8d status**: ✅ On-device State of Health (capacity-fade learning) + its cloud layer both merged to `main` (UNRELEASED — no tag/PlatformIO publish yet). `battery_soh` learns usable capacity from full→empty excursions (opt-in `CONFIG_BATTERY_SOC_SOH`; integer-only, ~200 B flash, 0 new RAM). SoH travels end-to-end via **wire v4** (34 bytes, `soh_pct_x100` at offset 32; version 4 only when SoH enabled) → gateway → InfluxDB → Grafana "State of Health (%)" panel. Hardware-validated E2E (`docs/captures/2026-05-29-v4-soh-cloud-e2e.log`). 21 host + 77 gateway suites pass. NVS persistence still deferred. Design/plans: `docs/plans/2026-05-29-phase-8d-soh-{design,plan}.md` + `2026-05-29-soh-cloud-{design,plan}.md`.
-- **Next milestone**: release decision — tag a version bundling Phase 8d + SoH cloud (would need library.json bump + GitHub release + PlatformIO publish). Other candidates: nRF I2C remap experiment, promo blog post.
+- **Phase 8d status**: ✅ Shipped in **v0.11.0** — on-device State of Health (capacity-fade learning) + cloud layer, end-to-end. `battery_soh` learns usable capacity from full→empty excursions (opt-in `CONFIG_BATTERY_SOC_SOH`; integer-only, ~200 B flash, 0 new RAM). SoH travels via **wire v4** (34 bytes, `soh_pct_x100` at offset 32; version 4 only when SoH enabled) → gateway → InfluxDB → Grafana "State of Health (%)" panel. Hardware-validated E2E (`docs/captures/2026-05-29-v4-soh-cloud-e2e.log`). 21 host + 77 gateway suites pass. NVS persistence still deferred.
+- **Next milestone**: open. Candidates: NVS persistence for SoH, partial-excursion learning (faster SoH convergence), nRF I2C remap experiment, promo blog post on the SoH/parameter-estimation story.
 - **Distribution**: PlatformIO registry + Zephyr module + GitHub Pages docs
 
 ## Build Commands
