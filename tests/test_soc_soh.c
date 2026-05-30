@@ -103,6 +103,22 @@ void test_reset_restores_100pct(void)
     TEST_ASSERT_EQUAL_UINT16(10000, soh);
 }
 
+void test_large_capacity_no_int32_overflow(void)
+{
+    /* Regression: get_pct's (learned * 10000) must use an int64 intermediate.
+     * 2000 mAh pack -> rated_x100 = 200000. Push learned above rated so the
+     * product exceeds INT32_MAX (2.147e9): 220000 * 10000 = 2.2e9. With int32
+     * this overflows to a negative value (clamped to 0); with int64 it is
+     * 11000, clamped to 10000. */
+    battery_soh_init(200000);
+    battery_soh_note_full_anchor();
+    /* measured = 200000 - (-40000) = 240000 = hi guard (120%), passes.
+     * learned = 200000 + (240000-200000)*500/1000 = 220000. */
+    battery_soh_observe_empty_anchor(-40000);
+    uint16_t soh; battery_soh_get_pct_x100(&soh);
+    TEST_ASSERT_EQUAL_UINT16(10000, soh);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -116,5 +132,6 @@ int main(void)
     RUN_TEST(test_implausible_low_rejected);
     RUN_TEST(test_implausible_high_rejected);
     RUN_TEST(test_reset_restores_100pct);
+    RUN_TEST(test_large_capacity_no_int32_overflow);
     return UNITY_END();
 }

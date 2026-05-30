@@ -10,6 +10,7 @@
 static int32_t g_rated_x100;
 static int32_t g_learned_x100;
 static bool    g_armed;
+static bool    g_initialized;
 
 int battery_soh_init(int32_t rated_mah_x100)
 {
@@ -19,6 +20,7 @@ int battery_soh_init(int32_t rated_mah_x100)
     g_rated_x100 = rated_mah_x100;
     g_learned_x100 = rated_mah_x100;
     g_armed = false;
+    g_initialized = true;
     return BATTERY_STATUS_OK;
 }
 
@@ -27,7 +29,13 @@ int battery_soh_get_pct_x100(uint16_t *soh_x100_out)
     if (soh_x100_out == NULL) {
         return BATTERY_STATUS_INVALID_ARG;
     }
-    int32_t soh = (g_learned_x100 * 10000) / g_rated_x100;
+    if (!g_initialized) {
+        return BATTERY_STATUS_NOT_INITIALIZED;
+    }
+    /* int64 intermediate: learned can reach 120% of rated (guard ceiling);
+     * for large packs (learned * 10000) would overflow int32. Matches the
+     * int64 discipline in battery_coulomb.c. */
+    int32_t soh = (int32_t)(((int64_t)g_learned_x100 * 10000) / g_rated_x100);
     if (soh < 0) soh = 0;
     if (soh > 10000) soh = 10000;
     *soh_x100_out = (uint16_t)soh;
@@ -39,21 +47,36 @@ int battery_soh_get_learned_capacity_mah_x100(int32_t *cap_x100_out)
     if (cap_x100_out == NULL) {
         return BATTERY_STATUS_INVALID_ARG;
     }
+    if (!g_initialized) {
+        return BATTERY_STATUS_NOT_INITIALIZED;
+    }
     *cap_x100_out = g_learned_x100;
     return BATTERY_STATUS_OK;
 }
 
 int battery_soh_reset(void)
 {
+    if (!g_initialized) {
+        return BATTERY_STATUS_NOT_INITIALIZED;
+    }
     g_learned_x100 = g_rated_x100;
     g_armed = false;
     return BATTERY_STATUS_OK;
 }
 
-void battery_soh_note_full_anchor(void) { g_armed = true; }
+void battery_soh_note_full_anchor(void)
+{
+    if (!g_initialized) {
+        return;
+    }
+    g_armed = true;
+}
 
 int battery_soh_observe_empty_anchor(int32_t q_before_empty_x100)
 {
+    if (!g_initialized) {
+        return BATTERY_STATUS_NOT_INITIALIZED;
+    }
     if (!g_armed) {
         return BATTERY_STATUS_OK;  /* not a full->empty excursion */
     }
