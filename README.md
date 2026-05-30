@@ -37,7 +37,7 @@ Live telemetry over BLE on the Grafana dashboard — at-a-glance status tiles
 (voltage, temperature, current, status, power state), State-of-Charge and
 State-of-Health gauges, and trend charts (voltage, remaining charge, SoH fade).
 
-![iBattery Grafana dashboard](docs/images/grafana-dashboard.png)
+![iBattery Grafana dashboard](https://raw.githubusercontent.com/aliaksandr-liapin/ibattery-sdk/main/docs/images/grafana-dashboard.png)
 
 > Bring it up with `cd cloud && docker compose up -d` (Grafana on
 > http://localhost:3000), then run `ibattery-gateway run` to stream live data.
