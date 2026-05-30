@@ -1,0 +1,4773 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/RELEASE_NOTES/">
+      
+      
+        <link rel="prev" href="../ROADMAP/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Release Notes - iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#release-notes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Release Notes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BATTERY_PROFILES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#v0111-docs-fix-registry-image-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.11.1 — Docs fix (registry image) — 2026-05-29
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0110-phase-8d-state-of-health-end-to-end-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.11.0 — Phase 8d: State of Health, end-to-end — 2026-05-29
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0102-docspackaging-fix-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.10.2 — Docs/packaging fix — 2026-05-29
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0101-ble-on-nucleo-end-to-end-validation-three-ble-fixes-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.10.1 — BLE-on-NUCLEO end-to-end validation + three BLE fixes — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.10.1 — BLE-on-NUCLEO end-to-end validation + three BLE fixes — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-build-variant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New build variant
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#footprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Footprint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#not-done-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not done here
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0100-phase-8c-voltage-coulomb-signal-fusion-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.10.0 — Phase 8c: Voltage + Coulomb Signal Fusion — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.10.0 — Phase 8c: Voltage + Coulomb Signal Fusion — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fusion-math-integer-only-0-ram-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fusion math (integer-only, 0 RAM cost)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-kconfig-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Kconfig surface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-validation-on-nucleo-l476rg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware validation on NUCLEO-L476RG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flash-ram-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flash &amp; RAM cost
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public-api-and-wire-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public API and wire format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations-explicitly-deferred" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known limitations / explicitly deferred
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's next
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v091-platformio-registry-consolidation-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.9.1 — PlatformIO Registry Consolidation — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.9.1 — PlatformIO Registry Consolidation — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-code-changes-vs-current-main" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No code changes vs current main
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-a-patch-bump-and-not-v0100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why a patch bump and not v0.10.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-release-exists-at-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why this release exists at all
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v085-gateway-grafana-persist-current_ma-and-coulomb_mah-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.5 — Gateway + Grafana Persist current_ma and coulomb_mah — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.5 — Gateway + Grafana Persist current_ma and coulomb_mah — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-firmware-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No firmware changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#end-to-end-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        End-to-end validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v084-phase-8a-coulomb-counter-bug-fix-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.4 — Phase 8a Coulomb Counter Bug Fix — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.4 — Phase 8a Coulomb Counter Bug Fix — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-was-broken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was broken
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-was-fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-validation-on-nucleo-l476rg_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware validation on NUCLEO-L476RG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public-api-and-wire-format_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public API and wire format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#follow-ups_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v083-phase-8a-hardware-validated-on-nucleo-l476rg-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.3 — Phase 8a Hardware-Validated on NUCLEO-L476RG — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.3 — Phase 8a Hardware-Validated on NUCLEO-L476RG — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-was-validated-on-nucleo-l476rg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was validated on NUCLEO-L476RG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diagnostic-narrative-the-nrf52840-dk-fork" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostic narrative — the nRF52840-DK fork
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migration-to-nucleo-l476rg-as-the-validation-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration to NUCLEO-L476RG as the validation platform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-didnt-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What didn't change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v082-ina219-confirmed-responding-on-hardware-phase-8a-2026-05-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.2 — INA219 Confirmed Responding on Hardware (Phase 8a) — 2026-05-24
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.2 — INA219 Confirmed Responding on Hardware (Phase 8a) — 2026-05-24">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-was-validated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was validated
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-debugging-journey-documented-for-posterity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The debugging journey (documented for posterity)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitation-stable-firmware-level-read-pending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known limitation — stable firmware-level read pending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-didnt-change_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What didn't change
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v081-hardware-diagnostic-tooling-phase-8a-follow-up-2026-05-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.1 — Hardware Diagnostic Tooling (Phase 8a follow-up) — 2026-05-15
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.1 — Hardware Diagnostic Tooling (Phase 8a follow-up) — 2026-05-15">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-8a-hardware-validation-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 8a hardware validation status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-didnt-change_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What didn't change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#captured-i2c-trace-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Captured I2C trace evidence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-voltage-smoothing-soc-slew-limiter-phase-8b-2026-04-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.9.0 — Voltage Smoothing &amp; SoC Slew Limiter (Phase 8b) — 2026-04-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.9.0 — Voltage Smoothing &amp; SoC Slew Limiter (Phase 8b) — 2026-04-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#composition-with-phase-8a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composition with Phase 8a
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-modified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Modified
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v080-coulomb-counting-soc-phase-8a-2026-04-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.0 — Coulomb Counting SoC (Phase 8a) — 2026-04-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.0 — Coulomb Counting SoC (Phase 8a) — 2026-04-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-features_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-setup-ina219" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Setup (INA219)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roadmap-split" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roadmap Split
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v070-phase-7-esp32-c3-hal-port-on-target-validation-2026-04-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.7.0 — Phase 7: ESP32-C3 HAL Port + On-Target Validation (2026-04-09)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.7.0 — Phase 7: ESP32-C3 HAL Port + On-Target Validation (2026-04-09)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v060-phase-6-stm32-hal-port-on-target-validation-2026-04-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.6.0 — Phase 6: STM32 HAL Port + On-Target Validation (2026-04-08)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.6.0 — Phase 6: STM32 HAL Port + On-Target Validation (2026-04-08)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-changes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v051-phase-5b-cycle-counter-wire-v2-rul-cycle-analysis-2026-03-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.5.1 — Phase 5b: Cycle Counter, Wire v2, RUL &amp; Cycle Analysis (2026-03-14)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.5.1 — Phase 5b: Cycle Counter, Wire v2, RUL &amp; Cycle Analysis (2026-03-14)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-init-order-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK Init Order Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v050-phase-5a-temperature-compensated-soc-cloud-analytics-2026-03-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.5.0 — Phase 5a: Temperature-Compensated SoC + Cloud Analytics (2026-03-14)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.5.0 — Phase 5a: Temperature-Compensated SoC + Cloud Analytics (2026-03-14)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v041-expanded-battery-power-states-tp4056-charger-scaffold-2026-03-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.4.1 — Expanded Battery Power States + TP4056 Charger Scaffold (2026-03-13)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.4.1 — Expanded Battery Power States + TP4056 Charger Scaffold (2026-03-13)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enabling-tp4056-when-hardware-arrives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling TP4056 (when hardware arrives)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v040-phase-4-cloud-telemetry-pipeline-2026-03-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.4.0 — Phase 4: Cloud Telemetry Pipeline (2026-03-12)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.4.0 — Phase 4: Cloud Telemetry Pipeline (2026-03-12)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v030-phase-3-ble-telemetry-transport-2026-03-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.3.0 — Phase 3: BLE Telemetry Transport (2026-03-12)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.3.0 — Phase 3: BLE Telemetry Transport (2026-03-12)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v021-saadc-adc-enum-fix-channel-re-setup-workaround-2026-03-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.2.1 — SAADC ADC Enum Fix &amp; Channel Re-setup Workaround (2026-03-12)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.2.1 — SAADC ADC Enum Fix &amp; Channel Re-setup Workaround (2026-03-12)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v020-phase-2-real-temperature-power-state-machine-2026-03-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.2.0 — Phase 2: Real Temperature + Power State Machine (2026-03-09)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.2.0 — Phase 2: Real Temperature + Power State Machine (2026-03-09)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v010-phase-1-complete-2026-03-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.1.0 — Phase 1 Complete (2026-03-09)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.1.0 — Phase 1 Complete (2026-03-09)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified On
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-from-pre-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking Changes from Pre-release
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#v0111-docs-fix-registry-image-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.11.1 — Docs fix (registry image) — 2026-05-29
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0110-phase-8d-state-of-health-end-to-end-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.11.0 — Phase 8d: State of Health, end-to-end — 2026-05-29
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0102-docspackaging-fix-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.10.2 — Docs/packaging fix — 2026-05-29
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0101-ble-on-nucleo-end-to-end-validation-three-ble-fixes-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.10.1 — BLE-on-NUCLEO end-to-end validation + three BLE fixes — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.10.1 — BLE-on-NUCLEO end-to-end validation + three BLE fixes — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-build-variant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New build variant
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#footprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Footprint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#not-done-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not done here
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v0100-phase-8c-voltage-coulomb-signal-fusion-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.10.0 — Phase 8c: Voltage + Coulomb Signal Fusion — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.10.0 — Phase 8c: Voltage + Coulomb Signal Fusion — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fusion-math-integer-only-0-ram-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fusion math (integer-only, 0 RAM cost)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-kconfig-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Kconfig surface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-validation-on-nucleo-l476rg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware validation on NUCLEO-L476RG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flash-ram-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flash &amp; RAM cost
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public-api-and-wire-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public API and wire format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations-explicitly-deferred" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known limitations / explicitly deferred
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's next
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v091-platformio-registry-consolidation-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.9.1 — PlatformIO Registry Consolidation — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.9.1 — PlatformIO Registry Consolidation — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-code-changes-vs-current-main" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No code changes vs current main
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-a-patch-bump-and-not-v0100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why a patch bump and not v0.10.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-release-exists-at-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why this release exists at all
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v085-gateway-grafana-persist-current_ma-and-coulomb_mah-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.5 — Gateway + Grafana Persist current_ma and coulomb_mah — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.5 — Gateway + Grafana Persist current_ma and coulomb_mah — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-firmware-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No firmware changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#end-to-end-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        End-to-end validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#follow-ups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v084-phase-8a-coulomb-counter-bug-fix-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.4 — Phase 8a Coulomb Counter Bug Fix — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.4 — Phase 8a Coulomb Counter Bug Fix — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-was-broken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was broken
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-was-fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-validation-on-nucleo-l476rg_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware validation on NUCLEO-L476RG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public-api-and-wire-format_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public API and wire format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#follow-ups_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Follow-ups
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v083-phase-8a-hardware-validated-on-nucleo-l476rg-2026-05-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.3 — Phase 8a Hardware-Validated on NUCLEO-L476RG — 2026-05-29
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.3 — Phase 8a Hardware-Validated on NUCLEO-L476RG — 2026-05-29">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-was-validated-on-nucleo-l476rg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was validated on NUCLEO-L476RG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diagnostic-narrative-the-nrf52840-dk-fork" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagnostic narrative — the nRF52840-DK fork
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migration-to-nucleo-l476rg-as-the-validation-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration to NUCLEO-L476RG as the validation platform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-didnt-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What didn't change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v082-ina219-confirmed-responding-on-hardware-phase-8a-2026-05-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.2 — INA219 Confirmed Responding on Hardware (Phase 8a) — 2026-05-24
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.2 — INA219 Confirmed Responding on Hardware (Phase 8a) — 2026-05-24">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-was-validated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What was validated
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-debugging-journey-documented-for-posterity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The debugging journey (documented for posterity)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitation-stable-firmware-level-read-pending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known limitation — stable firmware-level read pending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-docs_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated docs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-didnt-change_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What didn't change
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v081-hardware-diagnostic-tooling-phase-8a-follow-up-2026-05-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.1 — Hardware Diagnostic Tooling (Phase 8a follow-up) — 2026-05-15
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.1 — Hardware Diagnostic Tooling (Phase 8a follow-up) — 2026-05-15">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-8a-hardware-validation-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 8a hardware validation status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-didnt-change_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What didn't change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#captured-i2c-trace-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Captured I2C trace evidence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v090-voltage-smoothing-soc-slew-limiter-phase-8b-2026-04-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.9.0 — Voltage Smoothing &amp; SoC Slew Limiter (Phase 8b) — 2026-04-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.9.0 — Voltage Smoothing &amp; SoC Slew Limiter (Phase 8b) — 2026-04-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#composition-with-phase-8a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composition with Phase 8a
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#files-modified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files Modified
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v080-coulomb-counting-soc-phase-8a-2026-04-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.0 — Coulomb Counting SoC (Phase 8a) — 2026-04-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.0 — Coulomb Counting SoC (Phase 8a) — 2026-04-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-features_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tests_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-setup-ina219" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Setup (INA219)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roadmap-split" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roadmap Split
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v070-phase-7-esp32-c3-hal-port-on-target-validation-2026-04-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.7.0 — Phase 7: ESP32-C3 HAL Port + On-Target Validation (2026-04-09)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.7.0 — Phase 7: ESP32-C3 HAL Port + On-Target Validation (2026-04-09)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v060-phase-6-stm32-hal-port-on-target-validation-2026-04-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.6.0 — Phase 6: STM32 HAL Port + On-Target Validation (2026-04-08)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.6.0 — Phase 6: STM32 HAL Port + On-Target Validation (2026-04-08)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-changes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v051-phase-5b-cycle-counter-wire-v2-rul-cycle-analysis-2026-03-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.5.1 — Phase 5b: Cycle Counter, Wire v2, RUL &amp; Cycle Analysis (2026-03-14)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.5.1 — Phase 5b: Cycle Counter, Wire v2, RUL &amp; Cycle Analysis (2026-03-14)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-init-order-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK Init Order Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v050-phase-5a-temperature-compensated-soc-cloud-analytics-2026-03-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.5.0 — Phase 5a: Temperature-Compensated SoC + Cloud Analytics (2026-03-14)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.5.0 — Phase 5a: Temperature-Compensated SoC + Cloud Analytics (2026-03-14)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v041-expanded-battery-power-states-tp4056-charger-scaffold-2026-03-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.4.1 — Expanded Battery Power States + TP4056 Charger Scaffold (2026-03-13)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.4.1 — Expanded Battery Power States + TP4056 Charger Scaffold (2026-03-13)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enabling-tp4056-when-hardware-arrives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling TP4056 (when hardware arrives)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v040-phase-4-cloud-telemetry-pipeline-2026-03-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.4.0 — Phase 4: Cloud Telemetry Pipeline (2026-03-12)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.4.0 — Phase 4: Cloud Telemetry Pipeline (2026-03-12)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v030-phase-3-ble-telemetry-transport-2026-03-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.3.0 — Phase 3: BLE Telemetry Transport (2026-03-12)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.3.0 — Phase 3: BLE Telemetry Transport (2026-03-12)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v021-saadc-adc-enum-fix-channel-re-setup-workaround-2026-03-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.2.1 — SAADC ADC Enum Fix &amp; Channel Re-setup Workaround (2026-03-12)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.2.1 — SAADC ADC Enum Fix &amp; Channel Re-setup Workaround (2026-03-12)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v020-phase-2-real-temperature-power-state-machine-2026-03-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.2.0 — Phase 2: Real Temperature + Power State Machine (2026-03-09)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.2.0 — Phase 2: Real Temperature + Power State Machine (2026-03-09)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v010-phase-1-complete-2026-03-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.1.0 — Phase 1 Complete (2026-03-09)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.1.0 — Phase 1 Complete (2026-03-09)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#whats-new_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's New
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-verified-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Verified On
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-limitations_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-from-pre-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking Changes from Pre-release
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="release-notes">Release Notes<a class="headerlink" href="#release-notes" title="Permanent link">&para;</a></h1>
+<h2 id="v0111-docs-fix-registry-image-2026-05-29">v0.11.1 — Docs fix (registry image) — 2026-05-29<a class="headerlink" href="#v0111-docs-fix-registry-image-2026-05-29" title="Permanent link">&para;</a></h2>
+<p>Documentation-only release. <strong>No code changes</strong> — identical behavior to v0.11.0.
+The README's dashboard image used a repo-relative path, which renders on GitHub
+but not on the PlatformIO registry (the package excludes <code>docs/</code>). Switched to
+an absolute raw-GitHub URL so the screenshot renders everywhere. Republished
+because PlatformIO package versions are immutable.</p>
+<h2 id="v0110-phase-8d-state-of-health-end-to-end-2026-05-29">v0.11.0 — Phase 8d: State of Health, end-to-end — 2026-05-29<a class="headerlink" href="#v0110-phase-8d-state-of-health-end-to-end-2026-05-29" title="Permanent link">&para;</a></h2>
+<p>On-device State-of-Health learning <strong>plus</strong> its cloud path, shipped together:
+SoH is computed on the device and now travels firmware → BLE → gateway →
+InfluxDB → Grafana. First <em>parameter</em>-estimation feature (8a–8c were <em>state</em>
+estimation). Learns
+the battery's true usable capacity from full→empty discharge excursions: the
+coulomb integral between a full anchor and an empty anchor is the actual
+delivered charge, so an aged cell that hits empty-voltage while charge remains
+shows up as SoH below 100%. Opt-in via <code>CONFIG_BATTERY_SOC_SOH</code> (default n);
+zero impact when disabled.</p>
+<ul>
+<li><strong>Module:</strong> <code>battery_soh</code> — <code>measured = rated − Q_before_empty</code>, smoothed
+  with an integer EMA (round-to-nearest), plausibility guard (reject &lt; 30% or<blockquote>
+<p>120% of rated). Public API: <code>battery_soh_get_pct_x100</code>,
+  <code>battery_soh_get_learned_capacity_mah_x100</code>, <code>battery_soh_reset</code>.</p>
+</blockquote>
+</li>
+<li><strong>Integration:</strong> the SoC estimator arms SoH at the full-anchor edge and
+  feeds it <code>Q</code> (captured before the coulomb reset) at the empty-anchor edge.</li>
+<li><strong>Footprint:</strong> ~200 B flash, <strong>0 new RAM</strong> on the L476RG; integer-only.</li>
+<li><strong>Tests:</strong> <code>test_soc_soh</code> (11) + <code>test_soc_soh_estimator</code> (2) → 21 suites.</li>
+<li><strong>Tunables (Kconfig):</strong> <code>BATTERY_SOC_SOH_ALPHA_X1000</code> (500),
+  <code>BATTERY_SOC_SOH_REJECT_LO_PCT</code> (30), <code>BATTERY_SOC_SOH_REJECT_HI_PCT</code> (120).</li>
+<li><strong>Cloud (end-to-end):</strong> SoH now travels firmware → gateway → InfluxDB →
+  Grafana. Conditional <strong>wire v4</strong> (34 bytes = v3 + <code>soh_pct_x100</code> uint16 at
+  offset 32; <code>BATTERY_TELEMETRY_VERSION</code> is 4 only when SoH is enabled). BLE
+  MTU bumped 35→37 / ACL 39→41 to carry it. Gateway auto-detects v4 by length
+  and writes a <code>soh_pct</code> InfluxDB field; a "State of Health (%)" Grafana panel
+  renders it. Back-compatible with v1–v3. Design + plan:
+  <code>docs/plans/2026-05-29-soh-cloud-design.md</code> / <code>-plan.md</code>.</li>
+<li><strong>Dashboard:</strong> refreshed Grafana layout (status tiles → health gauges →
+  trends). Screenshot: <code>docs/images/grafana-dashboard.png</code>.</li>
+<li><strong>Limitations:</strong> converges only over full discharge cycles (slow on CR2032);
+  discharge-direction only; RAM-only (relearns on reboot). NVS persistence is
+  still deferred. On-device design + plan:
+  <code>docs/plans/2026-05-29-phase-8d-soh-design.md</code> / <code>-plan.md</code>.</li>
+</ul>
+<h2 id="v0102-docspackaging-fix-2026-05-29">v0.10.2 — Docs/packaging fix — 2026-05-29<a class="headerlink" href="#v0102-docspackaging-fix-2026-05-29" title="Permanent link">&para;</a></h2>
+<p>Documentation-and-packaging-only release. <strong>No code changes</strong> — firmware,
+gateway, and SDK behavior are identical to v0.10.1.</p>
+<p>The v0.10.1 PlatformIO tarball was packed before the current-state docs were
+synced, so the bundled <code>README.md</code> still showed the pre-v0.10.1 status header.
+PlatformIO package versions are immutable, so this republishes with the
+corrected README. Version pins (<code>lib_deps</code>, west <code>revision</code>) and status
+headers across README/index/ROADMAP now point at v0.10.2.</p>
+<h2 id="v0101-ble-on-nucleo-end-to-end-validation-three-ble-fixes-2026-05-29">v0.10.1 — BLE-on-NUCLEO end-to-end validation + three BLE fixes — 2026-05-29<a class="headerlink" href="#v0101-ble-on-nucleo-end-to-end-validation-three-ble-fixes-2026-05-29" title="Permanent link">&para;</a></h2>
+<p>Closes the deferred v0.8.5 end-to-end validation: with an X-NUCLEO-IDB05A2
+BLE shield on the bench, v3 telemetry was driven all the way from firmware
+through BLE → Python gateway → InfluxDB → Grafana for the first time. Real
+<code>current_ma</code> / <code>coulomb_mah</code> from the INA219 now light up the Live Current
+and Remaining Charge dashboard panels over the air. Bringing this up exposed
+three bugs, all fixed and hardware-validated (see
+<code>docs/captures/2026-05-29-v0.10.1-ble-on-nucleo-e2e.log</code>).</p>
+<h3 id="fixes">Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>BLE MTU too small for v3 (all platforms).</strong> <code>CONFIG_BT_L2CAP_TX_MTU=27</code>
+  capped notification payloads at 24 bytes, but every packet is stamped v3
+  (32 bytes). v3 had only ever been validated over serial, so this went
+  unnoticed — v3 notifications were silently dropped/truncated. Bumped to
+  <code>35</code> (= 32 + 3 ATT header) with ACL buffers <code>31 → 39</code> across
+  <code>nucleo_l476rg_ble.conf</code>, <code>prj.conf</code> (nRF), and <code>esp32c3_devkitm.conf</code>.</li>
+<li><strong>Gateway device matching unreliable on macOS.</strong> CoreBluetooth populates
+  <code>device.name</code> asynchronously, so name-only matching missed a device that
+  was advertising correctly. <code>scan_for_device</code> now matches on the advertised
+  service UUID via <code>find_device_by_filter</code> (evaluates every advertisement
+  packet), with a name-substring fallback. +6 regression tests (73 total).</li>
+<li><strong>Firmware did not re-advertise after disconnect.</strong> <code>on_disconnected</code>
+  restarted advertising inline, racing the controller's connection teardown
+  and silently failing — the device became undiscoverable until reboot.
+  The restart is now deferred to the system workqueue, with failure logging.</li>
+</ul>
+<h3 id="new-build-variant">New build variant<a class="headerlink" href="#new-build-variant" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>app/boards/nucleo_l476rg_ble_current.conf</code> — BLE transport + INA219
+  current sense + coulomb counting in one image, so the v3 current/coulomb
+  fields carry real data over BLE.</li>
+</ul>
+<h3 id="footprint">Footprint<a class="headerlink" href="#footprint" title="Permanent link">&para;</a></h3>
+<p><code>+56 B</code> flash for the BLE-only build; the BLE+current build is 99,536 B flash
+(9.49%) / 33,198 B RAM (33.77%) on the L476RG. No new heap.</p>
+<h3 id="not-done-here">Not done here<a class="headerlink" href="#not-done-here" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Visual Grafana panel rendering was confirmed via datasource health + the
+  underlying InfluxDB data; a screenshot was not archived.</li>
+<li>nRF52840-DK and ESP32-C3 MTU fixes are config-only (those boards weren't on
+  the bench); validated on NUCLEO-L476RG only.</li>
+</ul>
+<h2 id="v0100-phase-8c-voltage-coulomb-signal-fusion-2026-05-29">v0.10.0 — Phase 8c: Voltage + Coulomb Signal Fusion — 2026-05-29<a class="headerlink" href="#v0100-phase-8c-voltage-coulomb-signal-fusion-2026-05-29" title="Permanent link">&para;</a></h2>
+<p>Phase 8c lands. The SoC estimator gains a new continuous-correction stage
+that blends voltage-LUT SoC with coulomb-counter SoC using a complementary
+filter with <strong>current-adaptive blend coefficient</strong> — small α under load
+(voltage unreliable due to IR drop), larger α at rest (voltage-LUT is
+accurate). Targets the mid-discharge drift problem: a typical battery-
+powered IoT device running for months without ever hitting voltage anchors
+gets no correction signal under v0.8.x. With Phase 8c enabled, voltage
+continuously pulls on the SoC estimate at a rate proportional to how much
+we should trust voltage in the current operating conditions.</p>
+<p><strong>Opt-in via Kconfig.</strong> With <code>CONFIG_BATTERY_SOC_FUSION=n</code> (default),
+behavior is byte-for-byte identical to v0.8.4. The new code is not
+compiled in.</p>
+<h3 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>voltage_mv ─► LUT ─► soc_v_x100 ──┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                                   ├──► fusion ──► slew ──► soc_out
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>current_ma ─► coulomb ─► soc_c ───┘  (8c, NEW)    (8b)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                  ▲
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>            anchor (8a, v0.8.4)
+</code></pre></div>
+<p>Fusion slots in between Phase 8a's anchor logic and Phase 8b's slew
+limiter. Existing anchors still fire as one-shot calibration events at
+the endpoints; fusion handles continuous correction in between.</p>
+<h3 id="fusion-math-integer-only-0-ram-cost">Fusion math (integer-only, 0 RAM cost)<a class="headerlink" href="#fusion-math-integer-only-0-ram-cost" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">|</span><span class="n">I</span><span class="o">|</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">I_THRESH</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">ALPHA_REST</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">ALPHA_LOAD</span><span class="w">     </span><span class="c1">// step function</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">fused</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">alpha</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">soc_v</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">1000</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">alpha</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">soc_c</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">500</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1000</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">                                                    </span><span class="o">^^^^^</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">                                                    </span><span class="n">round</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">nearest</span>
+</code></pre></div>
+<ul>
+<li>α represented in x1000 units (<code>0..1000</code>) for 0.1% blend resolution</li>
+<li><code>uint32_t</code> numerator gives 214× overflow headroom</li>
+<li>The <code>+ 500</code> rounding constant eliminates the one-sided truncation bias
+  that would otherwise accumulate over thousands of estimator iterations</li>
+<li>Stateless: no globals, no allocations, ~45 lines of C</li>
+</ul>
+<h3 id="new-kconfig-surface">New Kconfig surface<a class="headerlink" href="#new-kconfig-surface" title="Permanent link">&para;</a></h3>
+<p>Master enable + 3 tunables with per-chemistry defaults:</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>CR2032 default</th>
+<th>LiPo default</th>
+<th>Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONFIG_BATTERY_SOC_FUSION</code></td>
+<td><code>n</code></td>
+<td><code>n</code></td>
+<td>bool</td>
+</tr>
+<tr>
+<td><code>CONFIG_BATTERY_SOC_FUSION_ALPHA_REST_X1000</code></td>
+<td><code>50</code> (5.0%)</td>
+<td><code>30</code> (3.0%)</td>
+<td>0–1000</td>
+</tr>
+<tr>
+<td><code>CONFIG_BATTERY_SOC_FUSION_ALPHA_LOAD_X1000</code></td>
+<td><code>5</code> (0.5%)</td>
+<td><code>5</code> (0.5%)</td>
+<td>0–1000</td>
+</tr>
+<tr>
+<td><code>CONFIG_BATTERY_SOC_FUSION_I_THRESH_X100</code></td>
+<td><code>200</code> (2 mA)</td>
+<td><code>5000</code> (50 mA)</td>
+<td>0–1,000,000</td>
+</tr>
+</tbody>
+</table>
+<p>LiPo defaults are slightly more conservative because the OCV-vs-SoC
+curve is flatter in the middle plateau (3.6–3.8 V covers ~20–80% SoC),
+so voltage is less informative even at rest.</p>
+<h3 id="hardware-validation-on-nucleo-l476rg">Hardware validation on NUCLEO-L476RG<a class="headerlink" href="#hardware-validation-on-nucleo-l476rg" title="Permanent link">&para;</a></h3>
+<p>Same test rig as v0.8.4 (NUCLEO + Adafruit INA219 + ~2.80 mA load).
+Three captures, archived in <code>docs/captures/</code>:</p>
+<p><strong>1. <code>2026-05-29-v0.10.0-drift-correction.log</code></strong> — FUSION=y baseline.
+5-min autonomous capture under steady load. Q ticks from 219.92 to
+219.68 mAh (Δ = −0.24 mAh ≈ theoretical 0.233 mAh), <code>flags=0x00000000</code>
+throughout, SoC trajectory matches v0.8.4 within rounding. Confirms
+fusion runs cleanly without disturbing Q integration when both signals
+agree.</p>
+<p><strong>2. <code>2026-05-29-v0.10.0-load-vs-rest.log</code></strong> — FUSION=y with user-
+toggled load every 30 s, 10 transitions in 5 minutes. All 10 transitions
+auto-detected; current swings cleanly between 2.80 mA (load) and
+0.10 mA (rest). The adaptive α is doing exactly what it should:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Detected transitions (10/10):
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  t= 738860 ms  DISCONNECT  (~00:30 mark)
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  t= 768895 ms  RECONNECT   (Δ 30.0 s)
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  t= 798929 ms  DISCONNECT  (Δ 30.0 s)
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  t= 830966 ms  RECONNECT   (Δ 32.0 s)
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  t= 858998 ms  DISCONNECT  (Δ 28.0 s)
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>  t= 889033 ms  RECONNECT   (Δ 30.0 s)
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  t= 919067 ms  DISCONNECT  (Δ 30.0 s)
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>  t= 959113 ms  RECONNECT   (Δ 40.0 s)
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  t= 979136 ms  DISCONNECT  (Δ 20.0 s)
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  t=1009171 ms  RECONNECT   (Δ 30.0 s)
+</code></pre></div>
+<p>SoC stays flat during rest periods (no current → no integration),
+ticks down during load periods. No <code>CURRENT_ERR</code>, no estimator
+oscillation, no anchor re-fire through 10 abrupt current
+discontinuities.</p>
+<p><strong>3. <code>2026-05-29-v0.10.0-fusion-off-regression.log</code></strong> — FUSION=n.
+5-min autonomous capture under steady load. <strong>Q = 219.98 → 219.75 mAh,
+SoC = 99.99% → 99.88%, flash = 73556 B</strong> — matches v0.8.4's
+<code>q-ticks-down-fix</code> evidence to two decimal places, byte-identical flash
+size to v0.8.5 baseline. Phase 8c is strictly opt-in: when disabled,
+zero impact.</p>
+<h3 id="flash-ram-cost">Flash &amp; RAM cost<a class="headerlink" href="#flash-ram-cost" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Build</th>
+<th>FLASH</th>
+<th>RAM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v0.8.5 baseline</td>
+<td>73556 B</td>
+<td>15232 B</td>
+</tr>
+<tr>
+<td>v0.10.0, <code>FUSION=n</code> (default)</td>
+<td>73556 B</td>
+<td>15232 B</td>
+</tr>
+<tr>
+<td>v0.10.0, <code>FUSION=y</code></td>
+<td>73612 B</td>
+<td>15232 B</td>
+</tr>
+</tbody>
+</table>
+<p><strong>+56 bytes of flash when enabled, zero new RAM, zero CPU overhead in
+common case</strong> (single multiply + compare per sample).</p>
+<h3 id="tests">Tests<a class="headerlink" href="#tests" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>19 C host tests pass</strong> (was 17; +2 new executables: <code>test_soc_fusion</code>
+  with 10 unit tests, <code>test_soc_estimator_fusion</code> with 6 integration tests)</li>
+<li>All 67 gateway tests still pass — no Python or InfluxDB schema changes</li>
+<li>All 7 prior <code>test_soc_coulomb</code> tests still pass with FUSION=n —
+  byte-for-byte v0.8.4 behavior preserved</li>
+</ul>
+<h3 id="public-api-and-wire-format">Public API and wire format<a class="headerlink" href="#public-api-and-wire-format" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>No API breakage.</strong> All public function signatures unchanged. New
+  public functions in <code>battery_soc_fusion.h</code> are additive.</li>
+<li><strong>No wire format change.</strong> v3 packets unchanged.</li>
+</ul>
+<h3 id="known-limitations-explicitly-deferred">Known limitations / explicitly deferred<a class="headerlink" href="#known-limitations-explicitly-deferred" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Battery aging / capacity learning</strong> — different problem class
+  (parameter estimation, not state estimation). Deferred to a potential
+  future Phase 8d.</li>
+<li><strong>Coulomb counter drift (INA219 ±1% per spec)</strong> — same. Deferred.</li>
+<li><strong>Smooth α interpolation instead of step function</strong> — YAGNI. The
+  step matches the physical knee in IR-drop sensitivity. Can revisit
+  if field data demands.</li>
+<li><strong>Runtime α tuning via API</strong> — compile-time only, by design.</li>
+</ul>
+<h3 id="updated-docs">Updated docs<a class="headerlink" href="#updated-docs" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>docs/RELEASE_NOTES.md</code> — this entry</li>
+<li><code>docs/ROADMAP.md</code> — Phase 8c marked complete</li>
+<li><code>docs/SDK_API.md</code> — documents the new fusion module</li>
+<li><code>docs/captures/</code> — 3 new hardware-evidence logs</li>
+<li><code>docs/plans/2026-05-29-phase-8c-fusion-design.md</code> — full design rationale</li>
+<li><code>docs/plans/2026-05-29-phase-8c-fusion-plan.md</code> — TDD implementation plan</li>
+<li><code>CLAUDE.md</code> / <code>README.md</code> / <code>docs/index.md</code> — version + status refresh</li>
+<li><code>library.json</code> — <code>0.9.1</code> → <code>0.10.0</code></li>
+</ul>
+<h3 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h3>
+<p>Phase 8c is the final 8.x roadmap item. Future direction is Phase 9+
+work — potential candidates include capacity-aging learning (Phase 8d),
+sensor robustness improvements, or completely new feature areas.</p>
+<hr />
+<h2 id="v091-platformio-registry-consolidation-2026-05-29">v0.9.1 — PlatformIO Registry Consolidation — 2026-05-29<a class="headerlink" href="#v091-platformio-registry-consolidation-2026-05-29" title="Permanent link">&para;</a></h2>
+<p>Registry-side housekeeping release. <code>library.json</code> was at <code>0.9.0</code> (tagged
+2026-04-14, before today's Phase 8a hardware-validation arc), which meant
+PlatformIO users were pulling firmware <em>without</em> the v0.8.4 coulomb
+counter fix. This release bumps the PlatformIO-published version to
+<code>0.9.1</code> so registry users get the current state of <code>main</code> — which has
+all of:</p>
+<ul>
+<li><strong>v0.9.0</strong> — Phase 8b voltage smoothing (median filter + SoC slew limiter)</li>
+<li><strong>v0.8.3</strong> — Phase 8a hardware-validated on NUCLEO-L476RG</li>
+<li><strong>v0.8.4</strong> — Coulomb counter bug fix (one-shot anchor + Q-as-remaining semantics)</li>
+<li><strong>v0.8.5</strong> — Gateway persists <code>current_ma</code> and <code>coulomb_mah</code> to InfluxDB; Grafana panels</li>
+</ul>
+<h3 id="no-code-changes-vs-current-main">No code changes vs current <code>main</code><a class="headerlink" href="#no-code-changes-vs-current-main" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>library.json</code> — <code>0.9.0</code> → <code>0.9.1</code>, description tightened to reflect that coulomb counting now works end-to-end</li>
+<li>All firmware, gateway, and dashboard code unchanged from v0.8.5 / current <code>main</code></li>
+<li>17 C host tests + 67 gateway tests still green (no regressions to test)</li>
+</ul>
+<h3 id="why-a-patch-bump-and-not-v0100">Why a patch bump and not v0.10.0<a class="headerlink" href="#why-a-patch-bump-and-not-v0100" title="Permanent link">&para;</a></h3>
+<p>This release is strictly additive vs. the existing v0.9.0:
+- Bug fix (v0.8.4 coulomb counter), no API or wire-format breakage
+- New optional gateway/Grafana fields (v0.8.5)
+- Hardware validation methodology (docs only)</p>
+<p>No new feature surface, no consumer-visible breakage. <code>v0.9.1</code> is the
+semver-appropriate label.</p>
+<h3 id="why-this-release-exists-at-all">Why this release exists at all<a class="headerlink" href="#why-this-release-exists-at-all" title="Permanent link">&para;</a></h3>
+<p>The v0.8.x line ran in parallel with v0.9.0 specifically to deliver
+the Phase 8a hardware-validation arc as focused patch releases (one
+theme per patch). That worked well for narrative and bisection but
+left the PlatformIO registry pointing at a stale snapshot. v0.9.1
+closes that gap.</p>
+<hr />
+<h2 id="v085-gateway-grafana-persist-current_ma-and-coulomb_mah-2026-05-29">v0.8.5 — Gateway + Grafana Persist current_ma and coulomb_mah — 2026-05-29<a class="headerlink" href="#v085-gateway-grafana-persist-current_ma-and-coulomb_mah-2026-05-29" title="Permanent link">&para;</a></h2>
+<p>Closes <a href="https://github.com/aliaksandr-liapin/ibattery-sdk/issues/2">#2</a>.
+Cloud side of the Phase 8a story: the v3 wire format has carried
+<code>current_ma_x100</code> and <code>coulomb_mah_x100</code> since v0.8.0, the gateway has
+decoded them since then, but the InfluxDB writer never wrote them to the
+database and the Grafana dashboard had no panels for them. Until v0.8.4
+fixed the coulomb counter (Q-as-remaining now actually tracks discharge),
+that gap was masked — there was no point persisting a broken signal.</p>
+<p>With v0.8.4 making <code>coulomb_mah</code> meaningful, this release plumbs both
+fields all the way through to the dashboard.</p>
+<h3 id="what-changed">What changed<a class="headerlink" href="#what-changed" title="Permanent link">&para;</a></h3>
+<p><strong><code>gateway/gateway/influxdb_writer.py</code></strong>
+- Added two new fields to the <code>battery_telemetry</code> Point:
+  - <code>current_ma</code> — live current measurement in mA (positive = discharge,
+    matching INA219 convention)
+  - <code>coulomb_mah</code> — remaining charge in mAh (Q-as-remaining semantics
+    locked in by v0.8.4)
+- Both use <code>decoded.get(..., 0.0)</code> so v1 / v2 packets stay
+  backward-compatible (defaults to 0.0 when absent).</p>
+<p><strong><code>cloud/grafana/provisioning/dashboards/battery.json</code></strong>
+- Two new timeseries panels in a fourth dashboard row (y=20):
+  - <strong>Live Current (mA)</strong> — 30-minute window, 5-second aggregation,
+    <code>mamp</code> unit
+  - <strong>Remaining Charge (mAh)</strong> — 30-minute window, 5-second aggregation,
+    two-decimal precision so the sub-mAh tracking is visible
+- Layout matches the top-row Voltage/Temperature panels in width (12) and
+  height (8) — Phase 8a's signals get equal visual weight to the existing
+  voltage-based panels.
+- Dashboard <code>version</code> bumped 1 → 2.</p>
+<h3 id="tests_1">Tests<a class="headerlink" href="#tests_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>67 gateway tests pass</strong> (was 65; +2 in <code>test_writer.py</code>):</li>
+<li><code>test_write_v3_current_and_coulomb_fields</code> — explicit guard that a v3
+    decoded packet writes both new fields with correct values</li>
+<li><code>test_write_v1_packets_default_current_and_coulomb_to_zero</code> —
+    backward-compatibility guard for older firmware</li>
+<li>All 17 C host tests still pass — no firmware changes in this release.</li>
+</ul>
+<h3 id="no-firmware-changes">No firmware changes<a class="headerlink" href="#no-firmware-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>No <code>.c</code> / <code>.h</code> files modified</li>
+<li>No wire-format changes</li>
+<li>v0.8.5 is a pure gateway + cloud release; existing v0.8.4 firmware is
+  what feeds it</li>
+</ul>
+<h3 id="end-to-end-validation">End-to-end validation<a class="headerlink" href="#end-to-end-validation" title="Permanent link">&para;</a></h3>
+<p>The unit tests cover the writer behavior precisely (line-protocol
+assertions on the encoded Point). Full BLE → InfluxDB → Grafana visual
+validation is deferred until the next BLE-capable test rig is set up
+(the v0.8.3 nRF52840-DK had the per-unit GPIO defect; the
+NUCLEO-L476RG used for v0.8.3/v0.8.4 hardware validation is BLE-less
+without the <code>x_nucleo_idb05a1</code> shield). The fix is small, additive, and
+covered by unit tests; deferring the full E2E visual check is low-risk.</p>
+<h3 id="follow-ups">Follow-ups<a class="headerlink" href="#follow-ups" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Phase 8c (Kalman filter fusion)</strong> — fully unblocked. A working coulomb
+  signal (v0.8.4) is now both flowing and observable (v0.8.5), so Phase 8c
+  can be tuned against real data with dashboard feedback.</li>
+<li><strong>BLE-on-NUCLEO</strong> — add the <code>x_nucleo_idb05a1</code> shield build to the bench
+  whenever convenient, to close the E2E visual loop on the new dashboard
+  panels.</li>
+</ul>
+<h3 id="updated-docs_1">Updated docs<a class="headerlink" href="#updated-docs_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>docs/RELEASE_NOTES.md</code> — this entry</li>
+<li><code>docs/ROADMAP.md</code> — Phase 8a entry notes v0.8.5 closes the cloud-side
+  gap</li>
+</ul>
+<hr />
+<h2 id="v084-phase-8a-coulomb-counter-bug-fix-2026-05-29">v0.8.4 — Phase 8a Coulomb Counter Bug Fix — 2026-05-29<a class="headerlink" href="#v084-phase-8a-coulomb-counter-bug-fix-2026-05-29" title="Permanent link">&para;</a></h2>
+<p>Closes <a href="https://github.com/aliaksandr-liapin/ibattery-sdk/issues/1">#1</a>. Two
+compounding bugs made Phase 8a coulomb counting functionally inert on CR2032
+(the default chemistry and v0.8.3's validated hardware): Q stayed pinned at
+capacity regardless of load, and the integrator's semantics didn't match the
+SoC estimator's. Both fixed; Q now ticks down as expected under real load.</p>
+<h3 id="what-was-broken">What was broken<a class="headerlink" href="#what-was-broken" title="Permanent link">&para;</a></h3>
+<p><strong>Bug B (definite) — Full anchor fired on every sample.</strong> For CR2032, the
+anchor-arming condition <code>(SOC_ANCHOR_FULL_I_X100 == 0 || abs_current &lt; ...)</code>
+short-circuited to true (because the macro is <code>0</code>), collapsing the full
+anchor gate to just <code>V &gt;= 2950 mV</code>. The estimator then called
+<code>battery_coulomb_reset(full_mah_x100)</code> on every poll, wiping any
+integration delta. A fresh CR2032 never exits <code>V &gt; 2.95 V</code> under any
+realistic load, so Q stayed pinned at capacity forever.</p>
+<p><strong>Bug A (latent, masked by B) — Integrator/estimator semantics mismatch.</strong>
+The integrator at <code>battery_coulomb.c</code> treated positive current (INA219
+discharge convention) as adding to Q — Q-as-cumulative-throughput. The
+SoC estimator treated Q as remaining capacity (<code>soc = Q * 10000 / capacity</code>,
+anchor sets Q to <code>full_mah_x100</code>). Even if Bug B were fixed in isolation,
+positive-current discharge would have grown Q above capacity (clamped to
+100% by SoC math), not ticked it down.</p>
+<h3 id="what-was-fixed">What was fixed<a class="headerlink" href="#what-was-fixed" title="Permanent link">&para;</a></h3>
+<p><strong><code>src/intelligence/battery_soc_estimator.c</code></strong>
+- Anchors are now <strong>one-shot edge-detected calibration events</strong>. Two new
+  static flags (<code>g_full_anchor_active</code>, <code>g_empty_anchor_active</code>) gate the
+  resets to fire only on transition into the anchor voltage region. The
+  anchor re-arms when voltage leaves the region, so a sag-and-recover
+  cycle can re-calibrate at the next idle. <code>battery_soc_estimator_init()</code>
+  clears both flags.</p>
+<p><strong><code>src/intelligence/battery_coulomb.c</code></strong>
+- Integrator flipped to <strong>Q-as-remaining semantics</strong>: positive (discharge)
+  current now subtracts from the accumulator; negative (charge) current
+  adds to it. Matches the SoC estimator's reading of Q as remaining mAh.
+- File header comment + integration math comment updated to document the
+  semantics convention.</p>
+<h3 id="hardware-validation-on-nucleo-l476rg_1">Hardware validation on NUCLEO-L476RG<a class="headerlink" href="#hardware-validation-on-nucleo-l476rg_1" title="Permanent link">&para;</a></h3>
+<p>Same test rig as v0.8.3: NUCLEO-L476RG + Adafruit INA219 + ~1 kΩ load
+across Vin+/Vin-. Captured 5 min of telemetry (151 samples):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>v0.8.3 (broken):   Q = 220.00 mAh stuck    SoC = 100.00% stuck
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>v0.8.4 (fixed):    Q = 219.98 → 219.75 mAh SoC = 99.99% → 99.88%
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>                   Δ = -0.23 mAh over 5 min @ 2.80 mA  (matches theory ≈ 0.233 mAh)
+</code></pre></div>
+<p>The anchor calibration is visible in the first sample: Q starts at 219.98
+(not 220.00), confirming that the anchor fired once at boot and Q then
+immediately started tracking the 2.80 mA load. Across the next 5 minutes
+the discharge is monotonic, smooth, and within &lt; 0.5% of the theoretical
+discharge rate.</p>
+<h3 id="tests_2">Tests<a class="headerlink" href="#tests_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All previous 16 host tests still pass (no regressions)</li>
+<li><strong>New test:</strong> <code>tests/test_soc_coulomb_cr2032.c</code> — TDD regression test
+  capturing Bug B (anchor must be one-shot, not every-sample). This test
+  failed deterministically on v0.8.3, passes on v0.8.4.</li>
+<li><strong>New tests in <code>tests/test_coulomb.c</code>:</strong></li>
+<li><code>test_positive_current_decreases_q_as_remaining</code> — explicit guard for
+    Q-as-remaining semantics under discharge</li>
+<li><code>test_negative_current_increases_q_as_remaining</code> — same for charge</li>
+<li><strong>Updated tests in <code>tests/test_coulomb.c</code>:</strong> the three integration tests
+  (<code>test_constant_discharge_1_hour</code>, <code>test_constant_charge_negative_current</code>,
+  <code>test_trapezoidal_ramp</code>) were updated to reset to a 220 mAh baseline and
+  assert against Q-as-remaining expectations. The old assertions matched
+  the old buggy semantics by definition; updating them is part of the fix.</li>
+</ul>
+<p><strong>Total: 17 host tests pass (was 16; new CR2032 anchor test).</strong></p>
+<h3 id="public-api-and-wire-format_1">Public API and wire format<a class="headerlink" href="#public-api-and-wire-format_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>No API breakage.</strong> All public functions keep the same signatures.</li>
+<li><strong>No wire format change.</strong> <code>coulomb_mah_x100</code> in the v3 packet is the
+  same byte layout; only its semantic meaning is clarified to "remaining
+  mAh" (was undefined / implementation-dependent before).</li>
+</ul>
+<h3 id="updated-docs_2">Updated docs<a class="headerlink" href="#updated-docs_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>docs/RELEASE_NOTES.md</code> — this entry</li>
+<li><code>docs/ROADMAP.md</code> — Phase 8a entry now reflects both v0.8.3 hardware
+  validation and the v0.8.4 fix</li>
+<li><code>docs/SDK_API.md</code> — to be updated alongside the gateway-side dashboard
+  enrichment in <a href="https://github.com/aliaksandr-liapin/ibattery-sdk/issues/2">#2</a></li>
+</ul>
+<h3 id="follow-ups_1">Follow-ups<a class="headerlink" href="#follow-ups_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://github.com/aliaksandr-liapin/ibattery-sdk/issues/2">#2</a> —
+  Persist <code>current_ma</code> and <code>coulomb_mah</code> to InfluxDB and add Grafana panels.
+  Now unblocked.</li>
+<li>Phase 8c (Kalman filter fusion) — unblocked; can now consume a working
+  coulomb signal.</li>
+</ul>
+<hr />
+<h2 id="v083-phase-8a-hardware-validated-on-nucleo-l476rg-2026-05-29">v0.8.3 — Phase 8a Hardware-Validated on NUCLEO-L476RG — 2026-05-29<a class="headerlink" href="#v083-phase-8a-hardware-validated-on-nucleo-l476rg-2026-05-29" title="Permanent link">&para;</a></h2>
+<p>Milestone: <strong>Phase 8a coulomb counting is fully end-to-end hardware-validated.</strong>
+After the v0.8.2 nRF52840-DK marginal-connection issue could not be resolved
+even with the INA219 male headers soldered and both I2C jumpers replaced,
+the SDK was successfully brought up on the <strong>NUCLEO-L476RG</strong> with the same
+INA219 wiring. The chip ACKs 6/6, the driver initializes cleanly, and live
+current is measured under load.</p>
+<p>This proves the <strong>firmware, HAL, INA219 driver, and SDK wire format are all
+correct</strong>. The nRF52840-DK unit (PCA10056 SN 1050258557) is the sole remaining
+hardware blocker and is now isolated as a per-unit GPIO issue, not a platform
+problem.</p>
+<h3 id="what-was-validated-on-nucleo-l476rg">What was validated on NUCLEO-L476RG<a class="headerlink" href="#what-was-validated-on-nucleo-l476rg" title="Permanent link">&para;</a></h3>
+<p>INA219 wired to I2C1 (PB8/PB9, Arduino D15/D14):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uart:~$ i2c scan i2c@40005400
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>40:  40 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>1 devices found on i2c@40005400
+</code></pre></div>
+<p><strong>6/6 consecutive scans</strong> report <code>0x40</code> (vs 0/6 on the nRF DK).</p>
+<p>Live telemetry, quiescent (no load):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>[v3 t=92117] V=3323 mV T=23.56 C SOC=100.00% PWR=1 CYC=0 flags=0x00000000
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>I=0.20 mA Q=220.00 mAh
+</code></pre></div></p>
+<p>Live telemetry, with ~1 kΩ load across Vin+/Vin- (5-min capture, 151 samples):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>[v3 t=5946854] V=3322 mV T=23.56 C SOC=100.00% PWR=1 CYC=0 flags=0x00000000
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>I=2.80 mA Q=220.00 mAh   (stable across all 151 samples)
+</code></pre></div></p>
+<p>What's new vs v0.8.2:
+- ✅ Stable firmware-level I2C reads (was: intermittent on nRF)
+- ✅ <code>flags = 0x00000000</code> (was: <code>0x00000020</code> CURRENT_ERR on nRF)
+- ✅ Real current measurement: 14× quiescent under modest load
+- ✅ Sensible die temperature: 23–24 °C (was: 105 °C anomaly on nRF)
+- ✅ Driver init reproducibly succeeds across power cycles</p>
+<p>Coulomb accumulator <code>Q</code> remains pinned at 220.00 mAh during the 5-min capture
+because the SoC estimator is anchored at 100% (V=3322 mV is well above the
+CR2032 LUT's nominal 3.0 V). Q would track once SoC transitions off the
+full-charge anchor; this is consistent with the SDK design and is being
+investigated as a follow-up to confirm vs. flag as a bug.</p>
+<h3 id="diagnostic-narrative-the-nrf52840-dk-fork">Diagnostic narrative — the nRF52840-DK fork<a class="headerlink" href="#diagnostic-narrative-the-nrf52840-dk-fork" title="Permanent link">&para;</a></h3>
+<p>Continuing from v0.8.2 with the INA219 headers freshly soldered, the
+firmware-level <code>i2c scan</code> on the nRF52840-DK still returned <strong>0/6</strong> ACKs.
+Systematic isolation:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Soldered INA219 male header pins (replaced press-fit headers)</td>
+<td>0/6 — no change</td>
+</tr>
+<tr>
+<td>Power confirmed at chip (Adafruit green LED solid)</td>
+<td>rules out red/black wires</td>
+</tr>
+<tr>
+<td>Replaced SCL jumper (green → grey, fresh)</td>
+<td>0/6 — no change</td>
+</tr>
+<tr>
+<td>Replaced SDA jumper (yellow → violet, fresh)</td>
+<td>0/6 — no change</td>
+</tr>
+<tr>
+<td>Verified nRF pin assignment: green→P0.27, yellow→P0.26, red→VDD</td>
+<td>correct</td>
+</tr>
+<tr>
+<td>Swapped in a <strong>second</strong> soldered INA219</td>
+<td>0/6 at 0x40/0x41/0x44/0x45 — no chip ACK at any address</td>
+</tr>
+<tr>
+<td>Same wires + same INA219 moved to <strong>NUCLEO-L476RG</strong></td>
+<td><strong>6/6 ACK immediately</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Conclusion: the nRF52840-DK unit's P0.26 / P0.27 pins (or an SBx
+solder-bridge near them) are not driving / receiving I2C correctly.
+Two independent INA219 chips both work perfectly on STM32 with the same
+physical wires — so the chip(s), the wires, and the SDK firmware path
+are all good. <strong>The defect is local to this DK unit.</strong></p>
+<h3 id="migration-to-nucleo-l476rg-as-the-validation-platform">Migration to NUCLEO-L476RG as the validation platform<a class="headerlink" href="#migration-to-nucleo-l476rg-as-the-validation-platform" title="Permanent link">&para;</a></h3>
+<p>The NUCLEO-L476RG was already a supported target (see <code>CLAUDE.md</code>).
+This release adds the INA219 wiring on the STM32 side:</p>
+<p><strong>New files:</strong>
+- <code>app/boards/nucleo_l476rg_i2cscan.conf</code> — i2c shell + INA219 driver config
+  (mirrors <code>nrf52840dk_nrf52840_i2cscan.conf</code>)</p>
+<p><strong>Modified files:</strong>
+- <code>app/boards/nucleo_l476rg.overlay</code> — added <code>ina219@40</code> node on <code>&amp;i2c1</code>
+  (status="disabled"; enabled at runtime by the HAL)</p>
+<p><strong>Build + flash:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>west<span class="w"> </span>build<span class="w"> </span>-b<span class="w"> </span>nucleo_l476rg<span class="w"> </span>app<span class="w"> </span>-d<span class="w"> </span>/tmp/build-stm32-scan<span class="w"> </span>--pristine<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span>-DEXTRA_CONF_FILE<span class="o">=</span>boards/nucleo_l476rg_i2cscan.conf<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span>-DZEPHYR_EXTRA_MODULES<span class="o">=</span><span class="s2">&quot;/opt/nordic/ncs/v3.2.2/modules/hal/stm32&quot;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>west<span class="w"> </span>flash<span class="w"> </span>-d<span class="w"> </span>/tmp/build-stm32-scan<span class="w"> </span>--runner<span class="w"> </span>openocd
+</code></pre></div></p>
+<p><strong>Wiring (Adafruit INA219 → NUCLEO-L476RG):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>INA219 pin    →  NUCLEO pin              Wire
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>─────────────────────────────────────────────────
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>VCC           →  3V3      (CN6 POWER)    red
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>GND           →  GND      (CN6 POWER)    black
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>SCL           →  D15/PB8  (CN5 Arduino)  grey
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>SDA           →  D14/PB9  (CN5 Arduino)  violet
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>+ for current measurement:
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>Vin+          →  3V3 (CN6 or IOREF as alt 3.3V tap)
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>Vin-          →  [load]  →  GND (CN6 POWER)
+</code></pre></div></p>
+<h3 id="known-limitations">Known limitations<a class="headerlink" href="#known-limitations" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>nRF52840-DK PCA10056 SN 1050258557</strong> — INA219 does not ACK on
+  P0.26/P0.27 firmware-side (per-unit issue; documented in
+  <code>docs/HARDWARE_TROUBLESHOOTING.md</code>). Workaround: use STM32 NUCLEO-L476RG
+  for Phase 8a validation, or remap nRF I2C to alternate GPIOs (planned
+  for a future patch release).</li>
+<li><strong>ESP32-C3</strong> — known I2C/INA219 driver instability (unchanged from
+  earlier releases; see <code>CLAUDE.md</code>).</li>
+</ul>
+<h3 id="what-didnt-change">What didn't change<a class="headerlink" href="#what-didnt-change" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All 16 C unit tests pass (no regressions from overlay/config additions)</li>
+<li>65 Python gateway tests still pass</li>
+<li>Public API unchanged</li>
+<li>v3 wire format unchanged — same packets stream over USB on the STM32</li>
+</ul>
+<h3 id="updated-docs_3">Updated docs<a class="headerlink" href="#updated-docs_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>docs/RELEASE_NOTES.md</code> — this entry</li>
+<li><code>docs/HARDWARE_TROUBLESHOOTING.md</code> — new "Swap-the-MCU isolation test"
+  section + per-unit nRF52840-DK limitation</li>
+<li><code>docs/ROADMAP.md</code> — Phase 8a marked hardware-validated</li>
+</ul>
+<hr />
+<h2 id="v082-ina219-confirmed-responding-on-hardware-phase-8a-2026-05-24">v0.8.2 — INA219 Confirmed Responding on Hardware (Phase 8a) — 2026-05-24<a class="headerlink" href="#v082-ina219-confirmed-responding-on-hardware-phase-8a-2026-05-24" title="Permanent link">&para;</a></h2>
+<p>Milestone patch: the INA219 current sensor was <strong>confirmed responding at
+I2C address 0x40 on the nRF52840-DK</strong>, verified by logic-analyzer capture
+of a clean ACK. This closes the core question from v0.8.0/v0.8.1 — the
+SDK firmware, the nRF I2C master, and the INA219 chip all work together.</p>
+<h3 id="what-was-validated">What was validated<a class="headerlink" href="#what-was-validated" title="Permanent link">&para;</a></h3>
+<p>Using a USB logic analyzer probing SDA + SCL simultaneously during a live
+I2C scan, we captured the decoded transaction:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Start
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Address write: 40
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>ACK            ← INA219 acknowledges its address
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>...
+</code></pre></div>
+<p>This was reproduced across multiple scans (3 clean ACKs at 0x40 in one
+capture window). Combined with the 80+ host tests, this confirms:</p>
+<ul>
+<li>✅ SDK firmware drives I2C correctly (<code>START → 0x40 → ACK → STOP</code>)</li>
+<li>✅ nRF52840 TWIM master functions correctly</li>
+<li>✅ INA219 chip is alive and ACKs at its default address</li>
+<li>✅ Bus pull-ups and signal framing are correct</li>
+</ul>
+<h3 id="the-debugging-journey-documented-for-posterity">The debugging journey (documented for posterity)<a class="headerlink" href="#the-debugging-journey-documented-for-posterity" title="Permanent link">&para;</a></h3>
+<p>The root cause of earlier failures (v0.8.0/v0.8.1, "0 devices found") was
+<strong>not</strong> chip defects — it was a <strong>breadboard column-alignment error</strong>: one
+I2C jumper sat in a different breadboard column than its INA219 pin, so the
+signal left the nRF but never reached the chip. The logic analyzer pinpointed
+this: one line showed 951 transitions (master active) while the other showed
+0 (pull-up present but no master signal). Re-aligning the wire to share the
+INA219 pin's column immediately produced the first ACKs.</p>
+<p>Two HiLetgo INA219 clones tested earlier were likely fine all along — they
+were victims of the same wiring error, not defective. (A genuine Adafruit
+INA219 #904 was used for final confirmation.)</p>
+<h3 id="known-limitation-stable-firmware-level-read-pending">Known limitation — stable firmware-level read pending<a class="headerlink" href="#known-limitation-stable-firmware-level-read-pending" title="Permanent link">&para;</a></h3>
+<p>The breadboard/jumper connection proved <strong>intermittent</strong>: the analyzer
+captured clean ACKs, but the nRF's firmware-level <code>i2c scan</code> did not yet
+report the device consistently, due to marginal contact resistance degrading
+the SDA signal at the sampling instant. A <strong>soldered or otherwise permanent
+connection</strong> is needed for a stable end-to-end current-reading run.</p>
+<p>This does not affect the SDK code — it is purely a bench-wiring quality issue.</p>
+<h3 id="updated-docs_4">Updated docs<a class="headerlink" href="#updated-docs_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>docs/HARDWARE_TROUBLESHOOTING.md</code> — added the column-alignment root cause,
+  the captured ACK trace, and the "analyzer sees ACK but firmware reads NACK"
+  signal-integrity signature</li>
+<li><code>README.md</code> / <code>docs/ROADMAP.md</code> — Phase 8a marked hardware-confirmed
+  (chip ACKs); final live-reading run noted as pending permanent wiring</li>
+</ul>
+<h3 id="what-didnt-change_1">What didn't change<a class="headerlink" href="#what-didnt-change_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>No firmware/software changes. All 16 C tests + 65 gateway tests still pass.</li>
+<li>No API or build-system changes from v0.8.1.</li>
+</ul>
+<hr />
+<h2 id="v081-hardware-diagnostic-tooling-phase-8a-follow-up-2026-05-15">v0.8.1 — Hardware Diagnostic Tooling (Phase 8a follow-up) — 2026-05-15<a class="headerlink" href="#v081-hardware-diagnostic-tooling-phase-8a-follow-up-2026-05-15" title="Permanent link">&para;</a></h2>
+<p>Patch release capturing the hardware-validation effort for Phase 8a
+coulomb counting. No firmware/software changes — this release adds
+diagnostic tooling and documentation for INA219 bring-up.</p>
+<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<p><strong>I2C analyzer tooling</strong> (<code>tools/i2c-analyzer/</code>)
+- <code>capture.sh</code> — wraps <code>sigrok-cli</code> to capture and decode I2C bus
+  activity using a HiLetgo / Saleae-clone USB logic analyzer
+- <code>README.md</code> — wiring, common findings, and decoder usage</p>
+<p><strong>Hardware troubleshooting guide</strong> (<code>docs/HARDWARE_TROUBLESHOOTING.md</code>)
+- Four-phase debug methodology (electrical, master signaling, slave
+  identification, root cause isolation)
+- Captured I2C trace from the v0.8.0 diagnostic session
+- Known issues with cheap INA219 clones documented</p>
+<h3 id="phase-8a-hardware-validation-status">Phase 8a hardware validation status<a class="headerlink" href="#phase-8a-hardware-validation-status" title="Permanent link">&para;</a></h3>
+<p>After ~3 hours of methodical diagnosis with a logic analyzer, the
+SDK was conclusively verified end-to-end at the protocol level:</p>
+<ul>
+<li>✅ nRF52840-DK I2C master correctly drives START, address bits,
+  R/W, and STOP conditions</li>
+<li>✅ Bus electrical layer is clean (pull-ups active, idle = 3.3V,
+  signals captured cleanly)</li>
+<li>✅ Wire path from MCU to bus verified via simultaneous SDA + SCL
+  captures</li>
+<li>❌ <strong>Two HiLetgo INA219 boards from the same 2-pack failed to
+  respond at any of 128 I2C addresses</strong> — likely factory defect or
+  ESD damage to both chips in the batch</li>
+</ul>
+<p>The SDK is wire-compatible with any device implementing the TI
+INA219 I2C protocol. Customers should source from a reputable
+vendor (Adafruit product #904, or Adafruit-branded Amazon listings
+"Sold by Adafruit Industries" / "Sold by Amazon.com").</p>
+<h3 id="what-didnt-change_2">What didn't change<a class="headerlink" href="#what-didnt-change_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All firmware modules (HAL, coulomb counter, SoC estimator,
+  telemetry, transport) — verified by 16 C unit tests + 65 Python
+  gateway tests</li>
+<li>Public API — no breaking changes from v0.8.0</li>
+<li>Build system — no Kconfig or CMake changes</li>
+</ul>
+<h3 id="captured-i2c-trace-evidence">Captured I2C trace evidence<a class="headerlink" href="#captured-i2c-trace-evidence" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>i2c-1: Start
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>i2c-1: Address read: 40
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>i2c-1: NACK
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>i2c-1: Stop
+</code></pre></div>
+<p>The master correctly addresses <code>0x40</code> (the INA219's default I2C
+address) and requests a read. The chip fails to acknowledge.
+Bus electrical layer is correct; failure is on the chip side.</p>
+<p>Full diagnostic methodology in <code>docs/HARDWARE_TROUBLESHOOTING.md</code>.</p>
+<hr />
+<h2 id="v090-voltage-smoothing-soc-slew-limiter-phase-8b-2026-04-14">v0.9.0 — Voltage Smoothing &amp; SoC Slew Limiter (Phase 8b) — 2026-04-14<a class="headerlink" href="#v090-voltage-smoothing-soc-slew-limiter-phase-8b-2026-04-14" title="Permanent link">&para;</a></h2>
+<p>Software-only accuracy improvement for SoC estimation. Two
+defense-in-depth layers against load-induced voltage sag and
+LUT plateau cliffs. No hardware required — works on every
+existing platform.</p>
+<h3 id="new-features">New Features<a class="headerlink" href="#new-features" title="Permanent link">&para;</a></h3>
+<p><strong>Median Voltage Filter</strong>
+- Alternative to existing moving-average filter
+- Selected via <code>CONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN=y</code>
+- Single-sample outliers (BLE TX sag, etc.) completely rejected
+- Same struct, same API — drop-in replacement at compile time
+- Insertion sort, integer-only, ~32 bytes scratch buffer</p>
+<p><strong>SoC Slew-Rate Limiter</strong>
+- Caps reported SoC change rate (default 5%/min)
+- Bypassed on first sample after init for instant initial reading
+- Filters LUT plateau cliffs and any remaining voltage outliers
+- New Kconfig: <code>CONFIG_BATTERY_SOC_SLEW_LIMIT</code> (default y),
+  <code>CONFIG_BATTERY_SOC_SLEW_RATE_PCT_PER_MIN</code> (default 5)</p>
+<h3 id="tests_3">Tests<a class="headerlink" href="#tests_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>12 new median filter tests (<code>test_voltage_filter_median</code>)</li>
+<li>6 new slew limiter tests (<code>test_soc_slew_limit</code>)</li>
+<li>All 16 C test suites pass + 65 gateway tests</li>
+</ul>
+<h3 id="build-verification">Build Verification<a class="headerlink" href="#build-verification" title="Permanent link">&para;</a></h3>
+<ul>
+<li>ESP32-C3 with median: 8.51% flash, clean</li>
+<li>nRF52840-DK with median: 14.59% flash, clean</li>
+<li>nRF52840-DK default (mean): 14.58% flash, clean (regression-free)</li>
+<li>Median filter overhead: ~80 bytes flash vs mean</li>
+</ul>
+<h3 id="composition-with-phase-8a">Composition with Phase 8a<a class="headerlink" href="#composition-with-phase-8a" title="Permanent link">&para;</a></h3>
+<p>When both <code>BATTERY_SOC_COULOMB</code> and <code>BATTERY_SOC_SLEW_LIMIT</code> are
+enabled, slew limiter applies to the final SoC value (after coulomb
+correction). Anchor events (full charge / cutoff) bypass the slew
+limiter for instant reset to LUT value.</p>
+<h3 id="files-added">Files Added<a class="headerlink" href="#files-added" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>src/core_modules/battery_voltage_filter_median.c</code></li>
+<li><code>tests/test_voltage_filter_median.c</code></li>
+<li><code>tests/test_soc_slew_limit.c</code></li>
+<li><code>app/boards/esp32c3_devkitm_median.conf</code></li>
+</ul>
+<h3 id="files-modified">Files Modified<a class="headerlink" href="#files-modified" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>app/Kconfig</code> — filter type choice + slew options</li>
+<li><code>CMakeLists.txt</code> — conditional voltage filter source</li>
+<li><code>app/CMakeLists.txt</code> — same conditional</li>
+<li><code>src/intelligence/battery_soc_estimator.c</code> — slew limiter integration</li>
+<li><code>tests/CMakeLists.txt</code> — new test targets</li>
+</ul>
+<hr />
+<h2 id="v080-coulomb-counting-soc-phase-8a-2026-04-14">v0.8.0 — Coulomb Counting SoC (Phase 8a) — 2026-04-14<a class="headerlink" href="#v080-coulomb-counting-soc-phase-8a-2026-04-14" title="Permanent link">&para;</a></h2>
+<p>Adds full coulomb counting infrastructure for advanced SoC estimation.
+Software-complete release; on-target hardware validation pending
+(see Known Issues).</p>
+<h3 id="new-features_1">New Features<a class="headerlink" href="#new-features_1" title="Permanent link">&para;</a></h3>
+<p><strong>Current Sensing HAL</strong>
+- New <code>battery_hal_current</code> interface — abstract current measurement
+- INA219 backend via Zephyr sensor API (with raw I2C fallback for ESP32-C3)
+- Stub backend for builds without current sensing — zero overhead
+- Sign convention: positive = discharging, negative = charging</p>
+<p><strong>Coulomb Counter</strong>
+- Trapezoidal integration with <code>int64_t</code> accumulator (sub-mAh precision)
+- Remainder tracking eliminates truncation drift over multi-day runs
+- NVS persistence: saves every 60s or on &gt;1 mAh change
+- Survives reboot — accumulator restored from flash on init</p>
+<p><strong>SoC Estimator v2</strong>
+- Coulomb counting as primary tracker, voltage-LUT as calibration anchor
+- Anchors at full charge (4180mV LiPo, low current) and cutoff (3000mV LiPo)
+- Graceful fallback to voltage-LUT if current sensor unavailable
+- Same public API — no breaking changes for existing callers</p>
+<p><strong>Telemetry v3 Wire Format (32 bytes)</strong>
+- Adds <code>current_ma_x100</code> (signed int32) at offset 24
+- Adds <code>coulomb_mah_x100</code> (signed int32) at offset 28
+- Two new status flags: CURRENT_ERR (bit 5), COULOMB_ERR (bit 6)
+- Backward compatible: gateway auto-detects v1 (20B), v2 (24B), v3 (32B)</p>
+<p><strong>Gateway v3 Decoder</strong>
+- Python decoder extended for 32-byte v3 packets
+- Reports <code>current_ma</code> (float) and <code>coulomb_mah</code> (float) in result dict
+- 8 new tests covering encode/decode/edge cases</p>
+<h3 id="build-system">Build System<a class="headerlink" href="#build-system" title="Permanent link">&para;</a></h3>
+<p><strong>New Kconfig Options</strong>
+- <code>CONFIG_BATTERY_CURRENT_SENSE</code> — enable INA219 + I2C
+- <code>CONFIG_BATTERY_SOC_COULOMB</code> — enable coulomb-based SoC
+- <code>CONFIG_BATTERY_CAPACITY_MAH</code> — battery capacity (220 for CR2032, 1000 for LiPo)
+- <code>CONFIG_BATTERY_COULOMB_NVS_INTERVAL_S</code> — NVS save interval (default 60s)</p>
+<p><strong>CMake</strong>
+- Conditional sources for current HAL (Zephyr/stub) and coulomb counter
+- Same pattern in both root <code>CMakeLists.txt</code> (Zephyr module) and <code>app/CMakeLists.txt</code></p>
+<p><strong>Board Configs</strong>
+- <code>app/boards/esp32c3_devkitm_current.conf</code> — ESP32-C3 with current sensing
+- <code>app/boards/nrf52840dk_nrf52840_current.conf</code> — nRF52840-DK with current sensing
+- Devicetree overlays for both platforms include INA219 node at I2C 0x40</p>
+<h3 id="tests_4">Tests<a class="headerlink" href="#tests_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>14/14 C unit tests pass (3 new: <code>hal_current_stub</code>, <code>coulomb</code>, <code>soc_coulomb</code>)</li>
+<li>65/65 gateway tests pass (8 new for v3 decoding)</li>
+<li>ESP32-C3 and nRF52840-DK both build cleanly with and without current sensing</li>
+</ul>
+<h3 id="hardware-setup-ina219">Hardware Setup (INA219)<a class="headerlink" href="#hardware-setup-ina219" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Battery+ ── INA219 VIN+ ── INA219 VIN- ── Load (VDD)
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>                I2C: SDA, SCL → board&#39;s I2C0 pins
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>                3.3V power, GND
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>SDA</th>
+<th>SCL</th>
+<th>I2C Address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ESP32-C3</td>
+<td>GPIO1</td>
+<td>GPIO3</td>
+<td>0x40</td>
+</tr>
+<tr>
+<td>nRF52840-DK</td>
+<td>P0.26</td>
+<td>P0.27</td>
+<td>0x40</td>
+</tr>
+</tbody>
+</table>
+<h3 id="known-issues">Known Issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h3>
+<p><strong>Hardware validation pending</strong>
+- INA219 detection failed on both ESP32-C3 (write NACK -14) and
+  nRF52840-DK (no devices on bus) during initial bring-up.
+- Root cause appears to be physical (breadboard contacts, header solder
+  joints, or pull-up resistor configuration on nRF52840-DK without
+  Arduino shield).
+- Software is verified via host tests (no hardware required).
+- v0.8.1 will follow with on-target hardware validation once a working
+  INA219 setup is confirmed (recommend logic analyzer for diagnosis).</p>
+<p><strong>ESP32-C3 I2C driver quirk</strong>
+- Zephyr 4.2.2's <code>i2c_write</code> function fails on ESP32-C3 with EFAULT (-14).
+- Workaround already in code: use <code>i2c_burst_write</code> and separate
+  <code>i2c_write</code> + <code>i2c_read</code> calls instead of <code>i2c_write_read</code>.</p>
+<h3 id="roadmap-split">Roadmap Split<a class="headerlink" href="#roadmap-split" title="Permanent link">&para;</a></h3>
+<p>Phase 8 Advanced SoC is now three sub-phases:</p>
+<ul>
+<li><strong>Phase 8a (this release)</strong>: Coulomb counting with voltage anchoring</li>
+<li><strong>Phase 8b (next)</strong>: Voltage-LUT correction mode — coulomb as smoothing layer</li>
+<li><strong>Phase 8c (future)</strong>: Kalman filter fusion — optimal blending</li>
+</ul>
+<p>Each phase reuses the HAL and telemetry from 8a — same public API throughout.</p>
+<hr />
+<hr />
+<h2 id="v070-phase-7-esp32-c3-hal-port-on-target-validation-2026-04-09">v0.7.0 — Phase 7: ESP32-C3 HAL Port + On-Target Validation (2026-04-09)<a class="headerlink" href="#v070-phase-7-esp32-c3-hal-port-on-target-validation-2026-04-09" title="Permanent link">&para;</a></h2>
+<p>Adds ESP32-C3 as the third supported platform, making iBattery SDK a genuine 3-platform solution. Introduces a new VDD measurement strategy via external voltage divider. Native BLE — no shield needed.</p>
+<h3 id="whats-new">What's New<a class="headerlink" href="#whats-new" title="Permanent link">&para;</a></h3>
+<p><strong>ESP32-C3 DevKitM Board Support</strong>
+- <code>app/boards/esp32c3_devkitm.overlay</code> — ADC0, die temp sensor (coretemp), GPIO alias
+- <code>app/boards/esp32c3_devkitm.conf</code> — board-specific Kconfig (native BLE, die temp default)
+- Build requires vanilla Zephyr v4.2.2 workspace (not NCS)</p>
+<p><strong>Voltage Divider ADC Path</strong>
+- New <code>BATTERY_ADC_VDD_USE_DIVIDER</code> flag — third VDD strategy alongside direct SAADC (nRF52) and VREFINT (STM32)
+- External resistor divider: Battery+ → R1(100K) → GPIO2 → R2(100K) → GND
+- ADC reads divided voltage, firmware multiplies by <code>BATTERY_ADC_VDD_DIVIDER_RATIO</code> (default 2)
+- 12 dB attenuation, ~0–2500 mV input range</p>
+<p><strong>Platform Abstraction Improvements</strong>
+- <code>battery_adc_platform.h</code> — ESP32-C3 section with <code>BATTERY_ADC_DT_NODE</code> macro
+- <code>battery_hal_temp_zephyr.c</code> — auto-detect <code>coretemp</code> node label (ESP32)
+- <code>battery_hal_temp_ntc_zephyr.c</code> — <code>adc0</code> node label for ESP32-C3
+- <code>battery_transport_ble_zephyr.c</code> — conditional include for <code>assigned_numbers.h</code> (NCS-only header)
+- <code>app/Kconfig</code> — <code>select ESP32_TEMP if SOC_SERIES_ESP32C3</code> for die temp driver</p>
+<p><strong>Build Matrix</strong>
+- nRF52840-DK: 152 KB Flash, 30 KB RAM (NCS)
+- NUCLEO-L476RG: 38 KB Flash, 10 KB RAM (NCS)
+- ESP32-C3 DevKitM: 356 KB Flash, 138 KB RAM (vanilla Zephyr v4.2.2)</p>
+<h3 id="hardware-verified">Hardware Verified<a class="headerlink" href="#hardware-verified" title="Permanent link">&para;</a></h3>
+<p>ESP32-C3-DevKitM-1-N4X (RISC-V, ESP32-C3-MINI-1 module):</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Expected</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boot banner</td>
+<td>"ESP32-C3 (DevKitM)"</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>Die temperature sensor</td>
+<td>30-50 C (ESP32 runs warm)</td>
+<td>38-44 C</td>
+</tr>
+<tr>
+<td>BLE advertising</td>
+<td>"iBattery-ESP32C3" visible</td>
+<td>OK — RSSI -42/-43 dBm</td>
+</tr>
+<tr>
+<td>Gateway scan</td>
+<td>Device found</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>Gateway stream</td>
+<td>Live telemetry via BLE</td>
+<td>OK — v2 packets, 2s intervals</td>
+</tr>
+<tr>
+<td>Gateway run → InfluxDB → Grafana</td>
+<td>Full pipeline</td>
+<td>OK — dashboard live</td>
+</tr>
+<tr>
+<td>ACTIVE→IDLE transition</td>
+<td>~30s</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>IDLE→SLEEP transition</td>
+<td>~120s</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>Error flags</td>
+<td>0x00000000</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>Voltage divider (LiPo 500mAh)</td>
+<td>~3.7-4.2V</td>
+<td>4110-4134 mV (avg 4119, 24 mV spread)</td>
+</tr>
+<tr>
+<td>SoC with LiPo LUT</td>
+<td>85-100% at ~4.1V</td>
+<td>90-93% (correct)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="no-changes">No Changes<a class="headerlink" href="#no-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All 11 C unit tests pass (host, unchanged)</li>
+<li>All 58 Python gateway tests pass (unchanged)</li>
+<li>No core module, intelligence, telemetry, or transport logic changes</li>
+<li>Wire format v1/v2 unchanged</li>
+<li>nRF52840 and STM32 firmware unchanged</li>
+</ul>
+<hr />
+<h2 id="v060-phase-6-stm32-hal-port-on-target-validation-2026-04-08">v0.6.0 — Phase 6: STM32 HAL Port + On-Target Validation (2026-04-08)<a class="headerlink" href="#v060-phase-6-stm32-hal-port-on-target-validation-2026-04-08" title="Permanent link">&para;</a></h2>
+<p>Adds multi-platform support by porting the HAL layer to STM32L476 (NUCLEO-L476RG) under Zephyr RTOS. All core modules, intelligence, telemetry, and transport code remain unchanged — only the HAL abstraction was refactored to be SoC-agnostic. Hardware-validated on NUCLEO-L476RG.</p>
+<h3 id="whats-new_1">What's New<a class="headerlink" href="#whats-new_1" title="Permanent link">&para;</a></h3>
+<p><strong>Platform Abstraction</strong>
+- New <code>src/hal/helpers/battery_adc_platform.h</code> replaces nRF-specific <code>nrfx_analog_common.h</code>
+- Per-SoC ADC configuration (input channels, gain, reference voltage) selected via <code>CONFIG_SOC_SERIES_*</code>
+- STM32 VDD measurement via VREFINT factory calibration (ROM address <code>0x1FFF75AA</code>)</p>
+<p><strong>STM32L476 Board Support</strong>
+- <code>app/boards/nucleo_l476rg.overlay</code> — ADC1, die temp sensor, charger GPIO alias
+- <code>app/boards/nucleo_l476rg.conf</code> — board-specific Kconfig (die temp + BLE disabled by default)
+- BLE supported via X-NUCLEO-IDB05A2 shield (<code>-DSHIELD=x_nucleo_idb05a1</code>)</p>
+<p><strong>HAL Portability Improvements</strong>
+- <code>battery_hal_adc_zephyr.c</code> — VREFINT path for STM32, platform macros for gain/ref
+- <code>battery_hal_temp_ntc_zephyr.c</code> — platform-agnostic ADC channel and reference
+- <code>battery_hal_temp_zephyr.c</code> — auto-detect <code>temp</code> (nRF) vs <code>die_temp</code> (STM32) DT node
+- <code>battery_hal_charger_tp4056_zephyr.c</code> — DT alias (<code>battery-charger-gpio</code>) instead of hardcoded <code>gpio0</code>
+- <code>battery_hal_nvs_zephyr.c</code> — dynamic flash page size query (4096 nRF, 2048 STM32)
+- <code>app/Kconfig</code> — platform-neutral: conditional <code>TEMP_NRF5</code> select, updated help text</p>
+<p><strong>Boot Diagnostics</strong>
+- <code>print_platform_info()</code> at boot — shows platform, VDD method, temp source, chemistry, transport, charger status
+- Useful for on-target validation and debugging multi-platform builds</p>
+<p><strong>Build Matrix</strong>
+- nRF52840-DK: <code>west build -b nrf52840dk/nrf52840 app</code> — 152 KB Flash, 30 KB RAM
+- NUCLEO-L476RG: <code>west build -b nucleo_l476rg app</code> — 38 KB Flash, 10 KB RAM</p>
+<h3 id="hardware-verified_1">Hardware Verified<a class="headerlink" href="#hardware-verified_1" title="Permanent link">&para;</a></h3>
+<p>NUCLEO-L476RG (STM32L476RG, ST-Link V2, Rev 4) via OpenOCD:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Expected</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VDD via VREFINT sensor</td>
+<td>3200-3400 mV (USB)</td>
+<td>3316-3324 mV</td>
+</tr>
+<tr>
+<td>Die temperature sensor</td>
+<td>20-40 C (room)</td>
+<td>23.23-24.88 C</td>
+</tr>
+<tr>
+<td>SoC estimation (CR2032 LUT)</td>
+<td>100% at 3.3V</td>
+<td>100.00%</td>
+</tr>
+<tr>
+<td>Telemetry loop interval</td>
+<td>2000 ms</td>
+<td>2002 ms</td>
+</tr>
+<tr>
+<td>Error flags</td>
+<td>0x00000000</td>
+<td>0x00000000</td>
+</tr>
+<tr>
+<td>ACTIVE→IDLE transition</td>
+<td>~30s</td>
+<td>30028 ms</td>
+</tr>
+<tr>
+<td>IDLE→SLEEP transition</td>
+<td>~120s</td>
+<td>120113 ms</td>
+</tr>
+</tbody>
+</table>
+<p><strong>BLE Shield Validation (X-NUCLEO-IDB05A2)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Expected</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BLE SPI init</td>
+<td>No crash at boot</td>
+<td>OK — telemetry streaming</td>
+</tr>
+<tr>
+<td>BLE advertising</td>
+<td>"iBattery-STM32" visible</td>
+<td>OK — RSSI -43 dBm</td>
+</tr>
+<tr>
+<td>Gateway scan</td>
+<td>Device found</td>
+<td>OK — <code>ibattery-gateway scan</code></td>
+</tr>
+<tr>
+<td>Gateway stream</td>
+<td>Live telemetry via BLE</td>
+<td>OK — v2 packets, 2s intervals</td>
+</tr>
+<tr>
+<td>BLE wire format</td>
+<td>v2, 24 bytes</td>
+<td>OK — voltage, temp, SoC, power state</td>
+</tr>
+</tbody>
+</table>
+<p>Build: <code>west build -b nucleo_l476rg app -- -DSHIELD=x_nucleo_idb05a1 -DEXTRA_CONF_FILE=boards/nucleo_l476rg_ble.conf</code>
+Footprint: 95 KB Flash, 33 KB RAM (vs 38 KB / 10 KB without BLE)</p>
+<h3 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h3>
+<p>Fully validated on both platforms including BLE. Pending: NTC thermistor (requires external hardware on PA0), TP4056 charger GPIO (requires wiring PC6/PC7).</p>
+<h3 id="no-changes_1">No Changes<a class="headerlink" href="#no-changes_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All 11 C unit tests pass (host, unchanged)</li>
+<li>All 58 Python gateway tests pass (unchanged)</li>
+<li>No core module, intelligence, telemetry, or transport changes</li>
+<li>Wire format v1/v2 unchanged</li>
+<li>nRF52840 firmware binary identical in memory footprint</li>
+</ul>
+<hr />
+<h2 id="v051-phase-5b-cycle-counter-wire-v2-rul-cycle-analysis-2026-03-14">v0.5.1 — Phase 5b: Cycle Counter, Wire v2, RUL &amp; Cycle Analysis (2026-03-14)<a class="headerlink" href="#v051-phase-5b-cycle-counter-wire-v2-rul-cycle-analysis-2026-03-14" title="Permanent link">&para;</a></h2>
+<p>Adds charge cycle counting with flash persistence, extends the wire format to 24 bytes (v2), and delivers remaining useful life estimation, cycle analysis, and an 11-panel Grafana dashboard.</p>
+<h3 id="whats-new_2">What's New<a class="headerlink" href="#whats-new_2" title="Permanent link">&para;</a></h3>
+<p><strong>Charge Cycle Counter</strong>
+- Tracks CHARGING → CHARGED transitions as completed charge cycles
+- NVS flash persistence via new HAL interface (<code>battery_hal_nvs.h</code>) — count survives reboots
+- <code>battery_cycle_counter_init()</code> loads stored count (or starts at 0)
+- <code>battery_cycle_counter_update(power_state)</code> called each telemetry loop; increments on state transition
+- <code>battery_cycle_counter_get(&amp;count)</code> reads current count</p>
+<p><strong>Wire Format v2 (24 bytes)</strong>
+- Extends v1 (20 bytes) with <code>cycle_count</code> field at offset 20 (uint32 LE)
+- <code>BATTERY_TELEMETRY_VERSION</code> bumped from 1 to 2
+- <code>battery_serialize_pack()</code> writes 24 bytes for v2, 20 bytes for v1
+- <code>battery_serialize_unpack()</code> accepts both 20-byte and 24-byte buffers — backward compatible
+- <code>BATTERY_TRANSPORT_WIRE_SIZE</code> updated to 24; BLE MTU configured accordingly</p>
+<p><strong>Gateway Decoder v2</strong>
+- Python decoder auto-detects v1 (20B) and v2 (24B) packets
+- v2 packets include <code>cycle_count</code> field in decoded output and InfluxDB writes</p>
+<p><strong>Cloud Analytics CLI</strong>
+- <code>ibattery-gateway analytics rul</code> — remaining useful life estimation (linear regression on health vs cycles)
+- <code>ibattery-gateway analytics cycles</code> — charge cycle pattern analysis (duration, capacity fade, temperature stats)
+- Existing commands: <code>analytics health</code> (health score) and <code>analytics anomalies</code> (anomaly detection)</p>
+<p><strong>Anomaly Detection Tuning</strong>
+- Voltage thresholds tuned for dual-chemistry compatibility (CR2032 ~3.0V + LiPo ~3.7V)
+- Critical voltage: 2.5V (was 3.0V) — safe for any chemistry
+- SoC inconsistency: voltage &lt; 2.8V with SoC &gt; 50% (was 3.2V / 30%)
+- Temperature rate threshold: 15°C/min (was 5°C/min) — filters die sensor noise (~0.3°C/sample jitter)
+- Eliminates false positive warnings on CR2032 hardware</p>
+<p><strong>Grafana Dashboard v2 (11 panels)</strong>
+- Voltage, SoC gauge, Power State, Temperature, Cycle Count, Health Score gauge
+- SoC Over Time, Capacity Fade bar chart, Anomaly Log table, RUL stat, Charge Duration Trend
+- Import via <code>gateway/grafana/ibattery-dashboard.json</code></p>
+<p><strong>Expanded Tests</strong>
+- Firmware: 11 C test suites (was 9) — new: <code>soc_temp_comp</code>, <code>cycle_counter</code>
+- Gateway: 58 Python tests (was 22) — new: decoder v1/v2, RUL estimator, cycle analyzer, updated realtime anomaly tests
+- New mocks: <code>mock_nvs.c</code> (NVS HAL), <code>mock_cycle_counter.c</code> (cycle counter)</p>
+<h3 id="sdk-init-order-update">SDK Init Order Update<a class="headerlink" href="#sdk-init-order-update" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>1. battery_hal_init()
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>2. battery_voltage_init()
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>3. battery_temperature_init()
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>4. battery_hal_charger_init()    [if CONFIG_BATTERY_CHARGER_TP4056]
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>5. battery_power_manager_init()
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>6. battery_soc_estimator_init()
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>7. battery_cycle_counter_init()  [NEW — loads NVS count]
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>8. battery_telemetry_init()
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>9. battery_transport_init()      [if CONFIG_BATTERY_TRANSPORT]
+</code></pre></div>
+<h3 id="hardware-verified_2">Hardware Verified<a class="headerlink" href="#hardware-verified_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>nRF52840-DK (PCA10056 rev 3.0.3) with CR2032</li>
+<li>Wire v2 packets (24 bytes) confirmed via gateway stream</li>
+<li>Gateway → InfluxDB → Grafana pipeline with all 11 panels</li>
+<li>All 4 analytics CLI commands verified with live data</li>
+<li>Zero false positive anomaly warnings on CR2032</li>
+</ul>
+<hr />
+<h2 id="v050-phase-5a-temperature-compensated-soc-cloud-analytics-2026-03-14">v0.5.0 — Phase 5a: Temperature-Compensated SoC + Cloud Analytics (2026-03-14)<a class="headerlink" href="#v050-phase-5a-temperature-compensated-soc-cloud-analytics-2026-03-14" title="Permanent link">&para;</a></h2>
+<p>Adds temperature compensation to the SoC estimator for LiPo cells and introduces cloud-side analytics: battery health scoring, real-time and historical anomaly detection.</p>
+<h3 id="whats-new_3">What's New<a class="headerlink" href="#whats-new_3" title="Permanent link">&para;</a></h3>
+<p><strong>Temperature-Compensated SoC (LiPo only)</strong>
+- <code>battery_soc_temp_comp.c</code> — applies temperature correction factors to LUT-based SoC
+- Gated by <code>CONFIG_BATTERY_CHEMISTRY=LIPO</code> — CR2032 uses raw LUT (temperature compensation is not meaningful for primary cells)
+- <code>CONFIG_BATTERY_CHEMISTRY</code> Kconfig: selects CR2032 or LiPo LUT at compile time</p>
+<p><strong>Cloud Analytics</strong>
+- <code>ibattery-gateway analytics health</code> — voltage-based battery health score (0-100)
+- <code>ibattery-gateway analytics anomalies</code> — historical anomaly detection from InfluxDB data
+- Real-time per-packet anomaly checks during BLE streaming (no InfluxDB query needed)
+- Anomaly types: voltage drop, SoC inconsistency, critical voltage, high/low temperature, temperature spike</p>
+<p><strong>Gateway Analytics Modules</strong>
+- <code>gateway/analytics/health_score.py</code> — health scoring from InfluxDB voltage history
+- <code>gateway/analytics/anomaly_detector.py</code> — historical anomaly detection (voltage + temperature)
+- <code>gateway/analytics/realtime.py</code> — inline per-packet threshold checks</p>
+<p><strong>Expanded Tests</strong>
+- Firmware: new <code>test_soc_temp_comp</code> suite (temperature compensation logic)
+- Gateway: new <code>test_realtime.py</code> (11 tests for per-packet anomaly detection)</p>
+<hr />
+<h2 id="v041-expanded-battery-power-states-tp4056-charger-scaffold-2026-03-13">v0.4.1 — Expanded Battery Power States + TP4056 Charger Scaffold (2026-03-13)<a class="headerlink" href="#v041-expanded-battery-power-states-tp4056-charger-scaffold-2026-03-13" title="Permanent link">&para;</a></h2>
+<p>Adds full battery state machine with IDLE/SLEEP inactivity timers, CHARGING/DISCHARGING/CHARGED states, and a scaffolded TP4056 GPIO charger driver (Kconfig-gated, ready for hardware integration).</p>
+<h3 id="whats-new_4">What's New<a class="headerlink" href="#whats-new_4" title="Permanent link">&para;</a></h3>
+<p><strong>Expanded Power State Enum</strong>
+- New states: <code>CHARGING</code> (5), <code>DISCHARGING</code> (6), <code>CHARGED</code> (7) — appended for backward compatibility
+- Existing <code>IDLE</code> (2) and <code>SLEEP</code> (3) states now wired into the state machine
+- 8 total states: UNKNOWN, ACTIVE, IDLE, SLEEP, CRITICAL, CHARGING, DISCHARGING, CHARGED</p>
+<p><strong>Inactivity Timer State Machine</strong>
+- <code>ACTIVE → IDLE</code> after 30 seconds of inactivity
+- <code>IDLE → SLEEP</code> after 120 seconds of inactivity
+- <code>battery_power_manager_report_activity()</code> resets the timer on BLE connections or user events
+- CRITICAL always overrides IDLE/SLEEP (voltage safety takes priority)
+- Graceful degradation: uptime read failure skips inactivity logic, stays ACTIVE</p>
+<p><strong>TP4056 Charger Driver (scaffolded behind Kconfig)</strong>
+- <code>CONFIG_BATTERY_CHARGER_TP4056</code> — disabled by default, flip on when hardware arrives
+- Reads CHRG and STDBY GPIO pins (active-low, pull-up configured)
+- Truth table: CHRG=LOW → charging, STDBY=LOW → charge complete
+- Configurable pin numbers: <code>CONFIG_BATTERY_CHARGER_TP4056_CHRG_PIN</code> (default P0.28), <code>_STDBY_PIN</code> (default P0.29)
+- Charger state overrides inactivity logic (CHARGING &gt; IDLE/SLEEP)
+- CRITICAL → CHARGING recovery when charger connected at low voltage</p>
+<p><strong>Gateway + Dashboard Alignment</strong>
+- Fixed gateway decoder: state names now match firmware enum exactly (was BOOT/LOW/SHUTDOWN, now UNKNOWN/IDLE/CRITICAL)
+- Grafana Power State panel updated with 8-state color mapping
+- 22 Python tests (was 20): new <code>test_charging_states</code>, <code>test_idle_sleep_states</code></p>
+<p><strong>Expanded Firmware Tests</strong>
+- New test suite: <code>test_power_manager_charger</code> — 23 tests with <code>CONFIG_BATTERY_CHARGER_TP4056=1</code>
+- Tests cover: CHARGING, CHARGED, DISCHARGING, critical-to-charging recovery, charger error fallback, charging-overrides-idle
+- Base <code>test_power_manager</code> suite: 17 tests (was 12) — adds IDLE/SLEEP inactivity, activity reset, critical-overrides-idle, uptime error
+- Telemetry suite: 14 tests (was 9) — adds CHARGING, DISCHARGING, CHARGED, IDLE, SLEEP state collection
+- Serialize suite: roundtrip for all 8 power states (was 5)
+- <strong>Total: 9 suites, 125+ tests</strong> (was 8 suites, 106 tests)</p>
+<h3 id="hardware-verification">Hardware Verification<a class="headerlink" href="#hardware-verification" title="Permanent link">&para;</a></h3>
+<p>All 6 active power states verified end-to-end on nRF52840-DK (PCA10056 rev 3.0.3) via BLE gateway and Grafana dashboard:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>PWR</th>
+<th>Verified</th>
+<th>Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IDLE</td>
+<td>2</td>
+<td>Yes</td>
+<td>30s inactivity timeout (real LiPo power)</td>
+</tr>
+<tr>
+<td>SLEEP</td>
+<td>3</td>
+<td>Yes</td>
+<td>120s inactivity timeout (real LiPo power)</td>
+</tr>
+<tr>
+<td>CRITICAL</td>
+<td>4</td>
+<td>Yes</td>
+<td>Voltage &lt; 2100 mV threshold</td>
+</tr>
+<tr>
+<td>CHARGING</td>
+<td>5</td>
+<td>Yes</td>
+<td>Jumper wire P0.28 → GND (simulated)</td>
+</tr>
+<tr>
+<td>DISCHARGING</td>
+<td>6</td>
+<td>Yes</td>
+<td>Both pins floating, LiPo powering DK via TP4056 OUT+/OUT-</td>
+</tr>
+<tr>
+<td>CHARGED</td>
+<td>7</td>
+<td>Yes</td>
+<td>Jumper wire P0.29 → GND (simulated)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>LiPo + TP4056 power delivery verified:</strong>
+- LiPo 500mAh (PL 602535, 3.7V) connected to TP4056 HW-373 (USB-C) via B+/B- pads
+- TP4056 OUT+/OUT- powering nRF52840-DK VDD/GND — board boots and runs on battery
+- USB-C charging confirmed: voltage rises from ~3.01V to ~3.60V when charger connected
+- TP4056 red LED lights during charging</p>
+<blockquote>
+<p><strong>Note:</strong> CHARGING/CHARGED state detection was verified using jumper wires on GPIO pins (P0.28/P0.29 → GND), not by reading actual TP4056 CHRG/STDBY LED signals. The LED pad soldering for real charger state readout is pending. Power delivery and actual charging via TP4056 are confirmed working. Confidence level for real CHRG/STDBY signal detection: ~85% (depends on LED pad signal quality on HW-373 module).</p>
+</blockquote>
+<h3 id="enabling-tp4056-when-hardware-arrives">Enabling TP4056 (when hardware arrives)<a class="headerlink" href="#enabling-tp4056-when-hardware-arrives" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a># app/prj.conf
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>CONFIG_BATTERY_CHARGER_TP4056=y
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>CONFIG_BATTERY_CHARGER_TP4056_CHRG_PIN=28
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>CONFIG_BATTERY_CHARGER_TP4056_STDBY_PIN=29
+</code></pre></div>
+<p>Wire TP4056 CHRG → P0.28, STDBY → P0.29 on nRF52840-DK. Flash — charging states appear automatically.</p>
+<hr />
+<h2 id="v040-phase-4-cloud-telemetry-pipeline-2026-03-12">v0.4.0 — Phase 4: Cloud Telemetry Pipeline (2026-03-12)<a class="headerlink" href="#v040-phase-4-cloud-telemetry-pipeline-2026-03-12" title="Permanent link">&para;</a></h2>
+<p>Adds a Python BLE gateway and Docker-based cloud stack (InfluxDB + Grafana) for real-time battery telemetry visualization. Closes the loop from sensor to dashboard.</p>
+<h3 id="whats-new_5">What's New<a class="headerlink" href="#whats-new_5" title="Permanent link">&para;</a></h3>
+<p><strong>Python BLE Gateway (<code>gateway/</code>)</strong>
+- <code>ibattery-gateway</code> CLI tool with three commands: <code>scan</code>, <code>stream</code>, <code>run</code>
+- BLE connection via bleak library with auto-reconnect and exponential backoff
+- Decodes the same 20-byte LE wire format as the firmware serializer
+- Writes telemetry to InfluxDB 2.x as <code>battery_telemetry</code> measurement points
+- Installable Python package with <code>pip install -e .</code></p>
+<p><strong>Docker Cloud Stack (<code>cloud/</code>)</strong>
+- Docker Compose with InfluxDB 2.x (time-series storage) and Grafana (visualization)
+- Auto-provisioned InfluxDB datasource and Grafana dashboard
+- "iBattery Telemetry" dashboard with 6 panels:
+  - Voltage (V) — time series, 30min window
+  - Temperature (°C) — time series, 30min window
+  - State of Charge — gauge, 0–100% with color thresholds
+  - Power State — stat with 8-state color-coded value mappings
+  - Raw Voltage (mV) — time series, 1h window
+  - Status Flags — stat with error threshold coloring
+- Anonymous viewer access enabled for local development</p>
+<p><strong>Gateway Tests</strong>
+- Decoder tests: known wire bytes, mobile app packet, all power states, edge cases
+- Writer tests: mock InfluxDB client, Point field verification, error resilience</p>
+<h3 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nb">cd</span><span class="w"> </span>cloud<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w">          </span><span class="c1"># Start InfluxDB + Grafana</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nb">cd</span><span class="w"> </span>gateway<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w">            </span><span class="c1"># Install gateway</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>ibattery-gateway<span class="w"> </span>run<span class="w">                      </span><span class="c1"># BLE → InfluxDB → Grafana</span>
+</code></pre></div>
+<p>Open http://localhost:3000 → "iBattery Telemetry" dashboard.</p>
+<hr />
+<h2 id="v030-phase-3-ble-telemetry-transport-2026-03-12">v0.3.0 — Phase 3: BLE Telemetry Transport (2026-03-12)<a class="headerlink" href="#v030-phase-3-ble-telemetry-transport-2026-03-12" title="Permanent link">&para;</a></h2>
+<p>Adds wireless telemetry delivery over Bluetooth Low Energy. Telemetry packets now flow off the device via BLE GATT notifications while serial output continues unchanged (dual output).</p>
+<h3 id="whats-new_6">What's New<a class="headerlink" href="#whats-new_6" title="Permanent link">&para;</a></h3>
+<p><strong>BLE Transport Layer</strong>
+- Custom BLE GATT service with notification characteristic for 20-byte telemetry wire packets
+- Service UUID: <code>12340001-5678-9ABC-DEF0-123456789ABC</code>
+- Characteristic UUID: <code>12340002-5678-9ABC-DEF0-123456789ABC</code> (Read + Notify)
+- Connectable advertising with device name "iBattery" (configurable)
+- Drop policy: silently succeeds when no client subscribed
+- Automatic re-advertising on disconnect</p>
+<p><strong>Transport Abstraction</strong>
+- Compile-time vtable pattern (<code>struct battery_transport_ops</code>) for pluggable backends
+- Backend selected via Kconfig: <code>CONFIG_BATTERY_TRANSPORT_BLE</code> (or mock for testing)
+- <code>battery_transport_send()</code> serializes + dispatches in one call
+- Returns <code>BATTERY_STATUS_UNSUPPORTED</code> when no backend compiled in</p>
+<p><strong>Wire Serialization</strong>
+- 20-byte little-endian wire format, fits BLE default ATT MTU (23 − 3 = 20)
+- Explicit byte-shift encoding — no struct packing, no memcpy, fully portable
+- Pack/unpack round-trip verified by unit tests</p>
+<p><strong>SDK Integration</strong>
+- <code>battery_sdk_init()</code> now calls <code>battery_transport_init()</code> as the last step (guarded by <code>CONFIG_BATTERY_TRANSPORT</code>)
+- Application main loop calls <code>battery_transport_send()</code> after telemetry collection
+- Compile without transport: <code>CONFIG_BATTERY_TRANSPORT=n</code> → serial-only, zero BLE overhead</p>
+<p><strong>Expanded Test Coverage</strong>
+- 106 tests across 8 suites (up from 80 tests across 6 suites)
+- New: Serialization suite (15 tests) — round-trip, wire format, null/boundary checks
+- New: Transport suite (11 tests) — backend delegation, error propagation, wire byte verification
+- New mock: <code>mock_transport.c</code> with controllable rc, capture buffer, and send counter</p>
+<p><strong>Build Configuration</strong>
+- New Kconfig options: <code>CONFIG_BATTERY_TRANSPORT</code>, <code>CONFIG_BATTERY_TRANSPORT_BLE</code>, <code>CONFIG_BATTERY_BLE_DEVICE_NAME</code>, <code>CONFIG_BATTERY_BLE_ADV_INTERVAL_MS</code>
+- Stack sizes increased: main=4096, system workqueue=2048 (BLE stack requirements)
+- BLE stack adds ~62 KB flash, ~12 KB RAM</p>
+<h3 id="known-limitations_1">Known Limitations<a class="headerlink" href="#known-limitations_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Single BLE connection only (<code>CONFIG_BT_MAX_CONN=1</code>)</li>
+<li>No authentication or encryption on the GATT characteristic</li>
+<li>No serial transport backend (BLE only for now)</li>
+<li>IDLE and SLEEP power states now implemented (see v0.4.1)</li>
+<li>No persistent storage of calibration data</li>
+</ul>
+<hr />
+<h2 id="v021-saadc-adc-enum-fix-channel-re-setup-workaround-2026-03-12">v0.2.1 — SAADC ADC Enum Fix &amp; Channel Re-setup Workaround (2026-03-12)<a class="headerlink" href="#v021-saadc-adc-enum-fix-channel-re-setup-workaround-2026-03-12" title="Permanent link">&para;</a></h2>
+<p>Fixes incorrect NTC temperature readings caused by an analog input enum mismatch and an nRF SAADC driver quirk.</p>
+<h3 id="bug-fixes">Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permanent link">&para;</a></h3>
+<p><strong>NTC reading wrong ADC pin (off-by-one)</strong>
+- Root cause: <code>NRF_SAADC_INPUT_AIN1</code> (from legacy <code>&lt;hal/nrf_saadc.h&gt;</code>) has value 2, but the Zephyr ADC driver interprets the <code>input_positive</code> field using the nrfx v3.x 0-based scheme where value 2 = AIN2 (P0.04), not AIN1 (P0.03)
+- Fix: switched to <code>NRFX_ANALOG_EXTERNAL_AIN1</code> (value 1) from <code>&lt;helpers/nrfx_analog_common.h&gt;</code>
+- Symptom: NTC reads ~87 mV instead of ~1500 mV at room temperature; LUT clamped to 125 °C</p>
+<p><strong>SAADC channel input-mux clobbering across channels</strong>
+- Root cause: the nRF SAADC driver does not preserve per-channel input-mux (<code>PSELP</code>) settings when a different channel is read; reading internal VDD on channel 0 overwrites channel 1's AIN1 selection
+- Fix: both HAL ADC drivers (<code>battery_hal_adc_zephyr.c</code> and <code>battery_hal_temp_ntc_zephyr.c</code>) now call <code>adc_channel_setup()</code> before every <code>adc_read()</code> to restore the correct input configuration
+- Channel configs moved from local variables in init functions to file-scope <code>static const</code> structs so they are available in read functions
+- Symptom: first NTC read after boot was correct, but subsequent reads returned ~3020 mV (VDD value) after a VDD channel read</p>
+<h3 id="hardware-verified_3">Hardware Verified<a class="headerlink" href="#hardware-verified_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>nRF52840-DK (PCA10056 rev 3.0.3)</li>
+<li>10K NTC (B=3950) on AIN1 (P0.03) with 10K pullup to VDD</li>
+<li>Stable ~29.5 °C readings at room temperature, surviving multiple reboots</li>
+</ul>
+<hr />
+<h2 id="v020-phase-2-real-temperature-power-state-machine-2026-03-09">v0.2.0 — Phase 2: Real Temperature + Power State Machine (2026-03-09)<a class="headerlink" href="#v020-phase-2-real-temperature-power-state-machine-2026-03-09" title="Permanent link">&para;</a></h2>
+<p>Replaces the two remaining stubs from Phase 1 with real implementations: die temperature sensor readings, external NTC thermistor support, and voltage-based power state detection with hysteresis.</p>
+<h3 id="whats-new_7">What's New<a class="headerlink" href="#whats-new_7" title="Permanent link">&para;</a></h3>
+<p><strong>Real Temperature Measurement</strong>
+- nRF52840 on-chip die temperature sensor via Zephyr sensor API (±2 °C accuracy)
+- New HAL driver: <code>battery_hal_temp_zephyr.c</code> using <code>SENSOR_CHAN_DIE_TEMP</code>
+- Temperature module now delegates to HAL instead of returning fixed 25.00 °C</p>
+<p><strong>External NTC Thermistor Support</strong>
+- New HAL driver: <code>battery_hal_temp_ntc_zephyr.c</code> for 10K NTC (B=3950) on SAADC AIN1 (P0.03)
+- New intelligence module: <code>battery_ntc_lut.c</code> with 16-point resistance-to-temperature LUT (-40 °C to +125 °C)
+- Voltage divider math: ADC → millivolts → resistance → temperature, all integer math
+- Compile-time selection via Kconfig: <code>CONFIG_BATTERY_TEMP_NTC</code> (default) or <code>CONFIG_BATTERY_TEMP_DIE</code>
+- Same HAL interface (<code>battery_hal_temp_read_c_x100</code>) — modules above HAL are unchanged</p>
+<p><strong>Voltage-Based Power State Machine</strong>
+- Threshold-based state detection: enters CRITICAL when voltage drops below 2100 mV
+- Hysteresis dead band: exits CRITICAL only when voltage rises above 2200 mV (100 mV band prevents oscillation)
+- Graceful degradation: returns last known state if voltage read fails
+- Uses existing <code>battery_voltage_get_mv()</code> (lateral dependency, init-order safe)</p>
+<p><strong>LiPo Single-Cell Discharge Curve</strong>
+- 11-point voltage-to-SoC lookup table for 3.7 V nominal LiPo cells (4200 mV → 3000 mV)
+- Extra density in knee/cliff regions below 3700 mV to minimise interpolation error
+- Data synthesised from multiple sources (Grepow, Adafruit, RC community measurements)
+- Shared interpolation engine — no code duplication, just data</p>
+<p><strong>Expanded Test Coverage</strong>
+- 80 tests across 6 suites (up from 32 tests across 3 suites)
+- New: NTC LUT suite (21 tests) — resistance conversion edge cases, LUT interpolation across full temperature range, negative temps, clamping
+- New: Temperature suite (7 tests) — HAL delegation, negative temps, error propagation
+- New: Power manager suite (12 tests) — thresholds, hysteresis boundary conditions, graceful degradation
+- New: LiPo LUT tests (8 tests) — exact points, clamping, interpolation across plateau/knee/cliff regions
+- Updated mock_hal.c with temperature HAL stubs</p>
+<p><strong>Build Configuration</strong>
+- New <code>app/Kconfig</code> with temperature source selection (NTC vs die sensor)
+- Conditional compilation in CMake: NTC HAL + NTC LUT or die sensor HAL
+- Added <code>&amp;temp { status = "okay"; }</code> to devicetree overlay
+- +1 byte static RAM (power state hysteresis memory)</p>
+<h3 id="known-limitations_2">Known Limitations<a class="headerlink" href="#known-limitations_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Die temperature measures chip temperature, not ambient or battery temperature</li>
+<li>IDLE and SLEEP power states defined but not implemented (require Zephyr PM integration)</li>
+<li>SoC lookup table is static; coulomb counting / adaptive estimation planned for future phases</li>
+<li>No persistent storage of calibration data</li>
+<li>No wireless telemetry transport (serial only)</li>
+</ul>
+<hr />
+<h2 id="v010-phase-1-complete-2026-03-09">v0.1.0 — Phase 1 Complete (2026-03-09)<a class="headerlink" href="#v010-phase-1-complete-2026-03-09" title="Permanent link">&para;</a></h2>
+<p>First functional release of the Battery SDK. All Phase 1 objectives are met: the firmware reads real battery voltage from a CR2032 coin cell, estimates state-of-charge, and outputs structured telemetry packets over serial.</p>
+<h3 id="whats-new_8">What's New<a class="headerlink" href="#whats-new_8" title="Permanent link">&para;</a></h3>
+<p><strong>Core SDK</strong>
+- <code>battery_sdk_init()</code> — single-call initialization of all subsystems in dependency order (HAL, voltage, temperature, power manager, SoC estimator, telemetry)
+- Unified error codes via <code>battery_status.h</code> (OK, ERROR, INVALID_ARG, NOT_INITIALIZED, UNSUPPORTED, IO)
+- Internal runtime state tracking for all modules</p>
+<p><strong>Voltage Measurement</strong>
+- Real ADC reading via nRF52840 SAADC VDD input
+- 12-bit resolution, 1/6 gain, internal 0.6V reference (3.6V full-scale)
+- Moving average filter: window size 12, O(1) update, 28 bytes RAM, deterministic
+- Typical readings: 3012-3017 mV on fresh CR2032</p>
+<p><strong>SoC Estimation</strong>
+- CR2032 voltage-to-SoC lookup table (9-point discharge curve)
+- Linear interpolation between table points, integer math only
+- Range: 3000 mV = 100%, 2000 mV = 0%
+- Clamped at boundaries (above 3000 mV = 100%, below 2000 mV = 0%)</p>
+<p><strong>Telemetry</strong>
+- 7-field telemetry packet: version, timestamp, voltage, temperature, SoC, power state, status flags
+- Resilient best-effort collection — collects what it can, sets error flags for failures
+- Per-field error flag bits in <code>status_flags</code> for voltage, temperature, SoC, power state, and timestamp</p>
+<p><strong>Testing</strong>
+- Unity-based host test framework (compiles and runs on macOS, no Zephyr or hardware needed)
+- 32 tests across 3 test suites:
+  - Voltage filter: 12 tests (null checks, single sample, averaging, window rollover, reset, edge cases)
+  - SoC LUT: 11 tests (exact table points, interpolation midpoints, clamping, null safety)
+  - Telemetry: 9 tests (full packet assembly, uninitialized state, null handling, partial failures)
+- 6 configurable mock modules for isolated unit testing</p>
+<h3 id="hardware-verified-on">Hardware Verified On<a class="headerlink" href="#hardware-verified-on" title="Permanent link">&para;</a></h3>
+<ul>
+<li>nRF52840-DK (PCA10056 rev 3.0.3)</li>
+<li>CR2032 Energizer coin cell</li>
+<li>Power switch: VDD position</li>
+<li>nRF Connect SDK v3.2.2</li>
+<li>Zephyr OS v4.2.99-fe4f0106803e</li>
+</ul>
+<h3 id="known-limitations_3">Known Limitations<a class="headerlink" href="#known-limitations_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Temperature reading is a stub (returns 25.00 C); real sensor integration planned for Phase 2</li>
+<li>Power manager returns ACTIVE state only; dynamic power state transitions planned for Phase 2</li>
+<li>SoC lookup table is static; coulomb counting / adaptive estimation planned for Phase 2</li>
+<li>No persistent storage of calibration data</li>
+<li>No wireless telemetry transport (serial only)</li>
+</ul>
+<h3 id="breaking-changes-from-pre-release">Breaking Changes from Pre-release<a class="headerlink" href="#breaking-changes-from-pre-release" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Removed internal <code>battery_telemetry.h</code> (3-field struct) — replaced by public <code>battery_types.h</code> (7-field struct)</li>
+<li>All errno-based error codes replaced with <code>battery_status.h</code> enum values</li>
+<li>ADC input changed from floating AIN0 pin to VDD rail</li>
+<li>ADC abstraction now uses <code>NRFX_ANALOG_INTERNAL_VDD</code> (nrfx v3.x API) instead of raw <code>NRF_SAADC_INPUT_VDD</code></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

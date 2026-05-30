@@ -1,0 +1,935 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/SESSION_HANDOFF_2026-05-29/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Session Handoff — State of Health shipped end-to-end (v0.11.1) - iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#session-handoff-state-of-health-shipped-end-to-end-v0111" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Session Handoff — State of Health shipped end-to-end (v0.11.1)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BATTERY_PROFILES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RELEASE_NOTES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#big-picture-one-paragraph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Big picture (one paragraph)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-core-strategy-read-this-governs-all-future-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open-core strategy (READ THIS — governs all future work)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-shipped-this-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What shipped this session
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-verification-run-first-in-the-next-session-30-s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State verification (run first in the next session, ~30 s)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-test-most-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build / test (most-used)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-available-to-work-on-menu-tagged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's available to work on (menu, tagged)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gotchas-lessons-learned-the-hard-way-this-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gotchas / lessons (learned the hard way this session)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-you-pick-this-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When you pick this up
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="session-handoff-state-of-health-shipped-end-to-end-v0111">Session Handoff — State of Health shipped end-to-end (v0.11.1)<a class="headerlink" href="#session-handoff-state-of-health-shipped-end-to-end-v0111" title="Permanent link">&para;</a></h1>
+<p><strong>Date:</strong> 2026-05-29
+<strong>Last release:</strong> <strong>v0.11.1</strong> (tagged, GitHub released, PlatformIO published)
+<strong>Status:</strong> All work wrapped. Repo + remotes + registry + memory in sync. Working tree clean. <strong>Ready for any next direction.</strong></p>
+<p>This is the cold-start brief for the next chat. Paste the one-liner at the bottom into the new window.</p>
+<hr />
+<h2 id="big-picture-one-paragraph">Big picture (one paragraph)<a class="headerlink" href="#big-picture-one-paragraph" title="Permanent link">&para;</a></h2>
+<p>ibattery-sdk is an open-core embedded battery-intelligence SDK (Zephyr C) with a full pipeline: firmware → BLE → Python gateway → InfluxDB → Grafana. Phases 8a–8c (coulomb counting, voltage smoothing, voltage+coulomb fusion) shipped earlier. <strong>This session</strong> validated BLE-on-NUCLEO end-to-end (v0.10.1/0.10.2), then built <strong>Phase 8d State of Health</strong> — on-device capacity-fade learning <em>and</em> its cloud path — and shipped it as <strong>v0.11.0</strong>, plus a Grafana dashboard redesign and a v0.11.1 docs fix. SoH now travels firmware→BLE→gateway→InfluxDB→Grafana via a new <strong>wire v4</strong>. Everything was built the disciplined way (brainstorm → design → plan → subagent-driven TDD with spec/quality/final reviews → hardware E2E). 21 host + 77 gateway tests pass.</p>
+<hr />
+<h2 id="open-core-strategy-read-this-governs-all-future-work">Open-core strategy (READ THIS — governs all future work)<a class="headerlink" href="#open-core-strategy-read-this-governs-all-future-work" title="Permanent link">&para;</a></h2>
+<p>Goal: <strong>$10M</strong> intermediate, <strong>$100M</strong> long-term. Model = open-core.</p>
+<ul>
+<li><strong>Tag every roadmap/feature/release item FREE or COMMERCIAL.</strong></li>
+<li><strong>Flag commercial territory UPFRONT</strong> — before any work on the paid/private side, say so and confirm.</li>
+<li><strong>Boundary = the wire protocol.</strong> Device-side SDK + reference tooling = FREE/public. Fleet-scale-in-the-cloud = COMMERCIAL/private.</li>
+<li><strong>FREE:</strong> the whole on-device SDK (incl. on-device SoH), wire format, reference gateway + dashboards, NVS persistence, partial-excursion learning, more ports.</li>
+<li><strong>COMMERCIAL (not started — flag before touching):</strong> Fleet SaaS (per-device/mo recurring — the $-engine), advanced/certified algorithm packs, enterprise (compliance/on-prem/SLA). These live in a <em>future private repo</em>.</li>
+<li>Detailed strategy is in private memory (<code>strategy_open_core.md</code>), not the public repo. Licensing/pricing/entity = legal/financial, needs counsel.</li>
+</ul>
+<hr />
+<h2 id="what-shipped-this-session">What shipped this session<a class="headerlink" href="#what-shipped-this-session" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>What</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v0.10.1</td>
+<td>First v3 telemetry over BLE on real hardware. Fixed 3 BLE bugs: MTU 27→35 (v3 never fit before), gateway service-UUID matching (macOS name unreliable), re-advertise after disconnect.</td>
+</tr>
+<tr>
+<td>v0.10.2</td>
+<td>Docs/packaging fix (registry README).</td>
+</tr>
+<tr>
+<td><strong>v0.11.0</strong></td>
+<td><strong>Phase 8d State of Health, end-to-end.</strong> On-device <code>battery_soh</code> (opt-in <code>CONFIG_BATTERY_SOC_SOH</code>, integer-only, ~200 B flash, 0 new RAM) + <strong>wire v4</strong> (34 B, <code>soh_pct_x100</code> at offset 32, version 4 only when SoH on) → gateway → InfluxDB → Grafana "State of Health" panel. + redesigned dashboard (status tiles → gauges → trends). Hardware-validated E2E.</td>
+</tr>
+<tr>
+<td>v0.11.1</td>
+<td>Docs fix — absolute README image URL so the dashboard screenshot renders on the PlatformIO registry.</td>
+</tr>
+</tbody>
+</table>
+<p>Design/plan docs: <code>docs/plans/2026-05-29-phase-8d-soh-{design,plan}.md</code> + <code>2026-05-29-soh-cloud-{design,plan}.md</code>. Evidence: <code>docs/captures/2026-05-29-v4-soh-cloud-e2e.log</code>.</p>
+<hr />
+<h2 id="state-verification-run-first-in-the-next-session-30-s">State verification (run first in the next session, ~30 s)<a class="headerlink" href="#state-verification-run-first-in-the-next-session-30-s" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>/Users/aliapin/Downloads/project/ibattery-sdk
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>status<span class="w">                                   </span><span class="c1"># expect: clean</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>log<span class="w"> </span>--oneline<span class="w"> </span>origin/main..HEAD<span class="w">          </span><span class="c1"># expect: empty (in sync)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json;print(json.load(open(&#39;library.json&#39;))[&#39;version&#39;])&quot;</span><span class="w">   </span><span class="c1"># expect 0.11.1</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>gh<span class="w"> </span>release<span class="w"> </span>list<span class="w"> </span>--repo<span class="w"> </span>aliaksandr-liapin/ibattery-sdk<span class="w"> </span>--limit<span class="w"> </span><span class="m">3</span><span class="w">              </span><span class="c1"># expect v0.11.1 first</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>git<span class="w"> </span>tag<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>v0.11<span class="w">                          </span><span class="c1"># expect v0.11.0, v0.11.1</span>
+</code></pre></div>
+<h2 id="build-test-most-used">Build / test (most-used)<a class="headerlink" href="#build-test-most-used" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/opt/homebrew/bin:/usr/bin:/bin:/opt/nordic/ncs/toolchains/e5f4758bcf/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ZEPHYR_BASE</span><span class="o">=</span><span class="s2">&quot;/opt/nordic/ncs/v3.2.2/zephyr&quot;</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ZEPHYR_SDK_INSTALL_DIR</span><span class="o">=</span><span class="s2">&quot;/opt/nordic/ncs/toolchains/e5f4758bcf/opt/zephyr-sdk&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Host tests (21 suites)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nb">cd</span><span class="w"> </span>tests<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>ctest<span class="w"> </span>--test-dir<span class="w"> </span>build<span class="w"> </span>--output-on-failure
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Gateway tests (77)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nb">cd</span><span class="w"> </span>gateway<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>/Users/aliapin/.pyenv/versions/3.11.14/bin/python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>-q
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Firmware: BLE + INA219 + SoH (the v4 build)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>west<span class="w"> </span>build<span class="w"> </span>-b<span class="w"> </span>nucleo_l476rg<span class="w"> </span>app<span class="w"> </span>-d<span class="w"> </span>/tmp/build-soh<span class="w"> </span>--pristine<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span>-DSHIELD<span class="o">=</span>x_nucleo_idb05a1<span class="w"> </span>-DEXTRA_CONF_FILE<span class="o">=</span>boards/nucleo_l476rg_ble_current.conf<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span>-DCONFIG_BATTERY_SOC_SOH<span class="o">=</span>y<span class="w"> </span>-DZEPHYR_EXTRA_MODULES<span class="o">=</span><span class="s2">&quot;/opt/nordic/ncs/v3.2.2/modules/hal/stm32&quot;</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>west<span class="w"> </span>flash<span class="w"> </span>-d<span class="w"> </span>/tmp/build-soh<span class="w"> </span>--runner<span class="w"> </span>openocd<span class="w">     </span><span class="c1"># NUCLEO serial: /dev/cu.usbmodem1203</span>
+</code></pre></div>
+<hr />
+<h2 id="whats-available-to-work-on-menu-tagged">What's available to work on (menu, tagged)<a class="headerlink" href="#whats-available-to-work-on-menu-tagged" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Tier</th>
+<th>Effort</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NVS persistence for SoH</strong></td>
+<td><strong>FREE</strong></td>
+<td>~half-day</td>
+<td>Highest leverage. SoH is RAM-only today (relearns 100% on reboot). NVS infra exists (coulomb/cycle use it: keys 1/2, add key 3). Plan sketch in chat history. → likely v0.12.0.</td>
+</tr>
+<tr>
+<td>Partial-excursion learning</td>
+<td>FREE</td>
+<td>1–2 hr + build</td>
+<td>Faster SoH convergence (learn from partial cycles, not just full→empty).</td>
+</tr>
+<tr>
+<td>Promo blog post</td>
+<td>FREE</td>
+<td>1–2 hr</td>
+<td>"State of Health end-to-end on a coin cell." Funnel.</td>
+</tr>
+<tr>
+<td>nRF I2C remap experiment</td>
+<td>FREE</td>
+<td>~30 min</td>
+<td>Recover the defective nRF DK as backup BLE platform. Low value.</td>
+</tr>
+<tr>
+<td><strong>Fleet SaaS</strong></td>
+<td><strong>COMMERCIAL ⚠️</strong></td>
+<td>large</td>
+<td>First commercial-territory step → private repo. <strong>Flag + confirm before starting.</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="gotchas-lessons-learned-the-hard-way-this-session">Gotchas / lessons (learned the hard way this session)<a class="headerlink" href="#gotchas-lessons-learned-the-hard-way-this-session" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>BLE testing on macOS:</strong> run <code>ibattery-gateway scan/stream/run</code> from <strong>iTerm</strong>, NOT Claude Code — Claude.app lacks the Bluetooth TCC grant (bare pyenv python SIGABRTs). Non-BLE checks (serial, InfluxDB, Grafana) work from anywhere.</li>
+<li><strong>Wire version = TWO size constants.</strong> <code>BATTERY_SERIALIZE_V*_SIZE</code> (serializer) AND <code>BATTERY_TRANSPORT_WIRE_SIZE_V*</code> (transport, sizes <code>ble_send</code> bound + cache buffer). Bumping one without the other silently rejects packets (<code>Transport send failed: -2</code>). A <code>_Static_assert</code> now guards it. Host tests don't catch it — only the live BLE path does.</li>
+<li><strong>Adding a wire version touches:</strong> serialize sizes + transport sizes + all BLE MTU confs (now 37/41) + gateway decoder + influxdb_writer + BOTH dashboards.</li>
+<li><strong>Two Grafana dashboards:</strong> the LIVE provisioned one is <code>cloud/grafana/provisioning/dashboards/battery.json</code>; the README-export is <code>gateway/grafana/ibattery-dashboard.json</code>. Edit the right one.</li>
+<li><strong>Grafana 13 provisioning:</strong> <code>docker compose restart</code> after editing a provisioned dashboard may drop it (persisted volume). Validate JSON, then import via API or <code>down -v &amp;&amp; up</code>.</li>
+<li><strong>PlatformIO:</strong> <code>pio pkg pack</code> snapshots the working tree → finish ALL doc edits (esp. README, which is the only doc in the package — <code>docs/</code> is excluded) BEFORE packing. README images need <strong>absolute</strong> raw-GitHub URLs to render on the registry. <code>gh auth switch -u aliaksandr-liapin</code> before <code>gh release create</code> (switch back after). PlatformIO versions are immutable.</li>
+<li><strong>Container runtime is Rancher Desktop</strong> (not Docker.app) — <code>docker</code> CLI works; don't <code>open -a Docker</code>.</li>
+</ul>
+<hr />
+<h2 id="when-you-pick-this-up">When you pick this up<a class="headerlink" href="#when-you-pick-this-up" title="Permanent link">&para;</a></h2>
+<p>Paste into the new chat:</p>
+<blockquote>
+<p><em>"ibattery-sdk v0.11.1 — Phase 8d State of Health shipped end-to-end (on-device learning + wire v4 + gateway + InfluxDB + Grafana), released to GitHub + PlatformIO. Repo/remotes/memory in sync. Open-core: tag work FREE vs COMMERCIAL, flag commercial territory upfront ($10M→$100M goal). See <code>docs/SESSION_HANDOFF_2026-05-29.md</code>. No urgent work; the top FREE pickup is NVS persistence for SoH."</em></p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

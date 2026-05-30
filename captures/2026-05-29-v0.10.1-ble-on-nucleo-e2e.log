@@ -1,0 +1,76 @@
+=== BLE-on-NUCLEO end-to-end validation — v0.10.1 ===
+Date:     2026-05-29
+Board:    NUCLEO-L476RG + X-NUCLEO-IDB05A2 BLE shield + INA219 @ 0x40
+Firmware: app/boards/nucleo_l476rg_ble_current.conf
+          (BLE transport + INA219 current sense + coulomb counting)
+Gateway:  ibattery-gateway run  (bleak on macOS, run from iTerm)
+Stack:    InfluxDB 2.9.1 + Grafana 13.0.1 (cloud/docker-compose.yml)
+
+This is the first time v3 (32-byte) telemetry has traversed BLE on any
+platform. It validates three fixes shipped together:
+  1. Firmware BLE MTU: CONFIG_BT_L2CAP_TX_MTU 27 -> 35 (ACL 31 -> 39).
+     ATT_MTU 27 capped notification payloads at 24 bytes, so 32-byte v3
+     packets were silently dropped/truncated. They never went over BLE.
+  2. Gateway device matching: name-only match was unreliable on macOS
+     (CoreBluetooth populates device.name asynchronously). Now matches on
+     the advertised service UUID via find_device_by_filter (per-packet).
+  3. Firmware re-advertise: on_disconnect restarted advertising inline,
+     racing controller teardown and silently failing -> device vanished
+     until reboot. Now deferred to the system workqueue.
+
+--- (1) Firmware serial boot + telemetry (115200 8N1, /dev/cu.usbmodem1203) ---
+
+*** Booting nRF Connect SDK v3.2.2-74845e169be2 ***
+*** Using Zephyr OS v4.2.99-fe4f0106803e ***
+
+=== iBattery SDK — On-Target Validation ===
+Platform: STM32L4 (NUCLEO-L476RG)
+VDD read: VREFINT sensor
+Temp src: Die sensor (internal)
+Chemistry: CR2032 (3.0V)
+Transport: BLE enabled
+Charger:   disabled
+Current:   INA219 (coulomb counting)
+============================================
+
+[INA219] probe OK: 0x001c
+[INA219] init OK
+<inf> bt_hci_core: HCI transport: SPI
+<inf> bt_hci_core: Identity: DB:9F:9C:C6:12:B6 (random)
+<inf> bt_hci_core: HCI: version 4.2 (0x08) revision 0x3107, manufacturer 0x0030
+<inf> bt_hci_core: LMP: version 4.2 (0x08) subver 0x0030
+Battery SDK initialized OK
+[v3 t=29]   V=3315 mV T=25.54 C SOC=100.00% PWR=1 CYC=0 flags=0x00000000 I=2.80 mA Q=220.00 mAh
+[v3 t=2031] V=3315 mV T=25.54 C SOC=100.00% PWR=1 CYC=0 flags=0x00000000 I=2.80 mA Q=219.99 mAh
+
+--- (2) Gateway connect over BLE (iTerm; bleak) ---
+
+# Matched by SERVICE UUID with name still empty (the macOS case the fix targets):
+[INFO] gateway.scanner: Found iBattery at BC5B2560-DA36-BB48-DAEB-6807A5DA5C78 (name=None)
+[INFO] gateway.scanner: Connecting to BC5B2560-DA36-BB48-DAEB-6807A5DA5C78...
+[INFO] gateway.scanner: Connected to BC5B2560-DA36-BB48-DAEB-6807A5DA5C78
+[INFO] gateway.scanner: Subscribed to notifications on 12340002-5678-9abc-def0-123456789abc
+[  1] v3 | 3.322V | 24.55C | SoC 100.0% | IDLE | flags=0x00000000 | ts=98113ms
+[  2] v3 | 3.322V | 24.55C | SoC 100.0% | IDLE | flags=0x00000000 | ts=100115ms
+
+# Re-advertise fix: after Ctrl+C disconnect, the very next scan finds it again:
+[INFO] gateway.scanner: Found iBattery at BC5B2560-DA36-BB48-DAEB-6807A5DA5C78 (name='iBattery-STM32')
+[INFO] gateway.scanner: Connected to BC5B2560-DA36-BB48-DAEB-6807A5DA5C78
+
+--- (3) InfluxDB (telemetry bucket) — coulomb counter declining over BLE ---
+
+# flux: from(bucket:"telemetry") range(-90s) filter(_field=="coulomb_mah")
+2026-05-29T23:28:34Z  219.91
+2026-05-29T23:28:42Z  219.91
+2026-05-29T23:28:50Z  219.90
+2026-05-29T23:28:58Z  219.89
+2026-05-29T23:29:06Z  219.89
+2026-05-29T23:29:14Z  219.88
+2026-05-29T23:29:22Z  219.87
+
+# Latest snapshot:  current_ma=2.8  coulomb_mah=219.87  voltage_v=3.317
+# Q trends down monotonically at ~2.8 mA draw, matching the serial-side reading.
+# Grafana "Live Current (mA)" + "Remaining Charge (mAh)" panels render this data.
+
+Result: PASS. v3 telemetry (incl. real current_ma / coulomb_mah) flows
+firmware -> BLE -> gateway -> InfluxDB -> Grafana end-to-end.

@@ -1,0 +1,1100 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/plans/2026-05-29-phase-8d-soh-design/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Phase 8d: On-device State of Health (Capacity-Fade Learning) Design - iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-8d-on-device-state-of-health-capacity-fade-learning-design" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 8d: On-device State of Health (Capacity-Fade Learning) Design
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BATTERY_PROFILES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../RELEASE_NOTES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Solution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-core-insight" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The core insight
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#guards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guards
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#public-api-the-cloud-ready-seam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public API (the cloud-ready seam)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kconfig-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kconfig surface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-tests-teststest_soc_sohc-host-unity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit tests — tests/test_soc_soh.c (host, Unity)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hardware-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risks-and-deferred-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks and deferred work
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Risks and deferred work">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deferred-not-8d-mvp-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deferred (not 8d MVP scope)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#release-scope-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Release scope (MVP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="phase-8d-on-device-state-of-health-capacity-fade-learning-design">Phase 8d: On-device State of Health (Capacity-Fade Learning) Design<a class="headerlink" href="#phase-8d-on-device-state-of-health-capacity-fade-learning-design" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> ✅ Implemented &amp; released in v0.11.0
+<strong>Date:</strong> 2026-05-29
+<strong>Depends on:</strong> Phase 8a coulomb counting (<code>CONFIG_BATTERY_SOC_COULOMB</code>)</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Phases 8a–8c estimate <em>state</em> (the current SoC). Phase 8d estimates a
+<em>parameter</em>: the battery's true usable capacity, which fades 10–20% over
+service life. With today's fixed compile-time <code>CONFIG_BATTERY_CAPACITY_MAH</code>,
+an aged cell reads optimistically — it anchors to 100% when "full" but the
+integrator then counts down against a capacity the battery no longer has.</p>
+<p>Phase 8d learns the actual capacity from discharge excursions and exposes a
+<strong>State of Health (SoH)</strong> value. SoH/capacity-fade is the on-device primitive
+behind fleet predictive-maintenance ("which devices need battery
+replacement?") — the capability that feeds the ROADMAP's SaaS fleet-monitoring
+and "advanced SoC" commercial-license models.</p>
+<h2 id="problem">Problem<a class="headerlink" href="#problem" title="Permanent link">&para;</a></h2>
+<p>The coulomb integrator assumes <code>rated_capacity</code>. A healthy cell hits the
+empty-voltage anchor right as remaining charge <code>Q ≈ 0</code>. An aged cell hits
+empty-voltage <em>early</em> — while the integrator still reads <code>Q &gt; 0</code> — because it
+counted down against a capacity the cell no longer holds. That gap is the
+fade, and nothing in 8a–8c captures it.</p>
+<h2 id="solution">Solution<a class="headerlink" href="#solution" title="Permanent link">&para;</a></h2>
+<h3 id="the-core-insight">The core insight<a class="headerlink" href="#the-core-insight" title="Permanent link">&para;</a></h3>
+<p>The coulomb counter integrates <strong>real measured current</strong> (INA219), so the
+charge that flows between a full anchor and an empty anchor <em>is</em> the battery's
+true usable capacity for that cycle, independent of the rated constant.</p>
+<p>With Q-as-remaining semantics:</p>
+<ul>
+<li>At the <strong>full</strong> anchor, <code>Q</code> is reset to <code>rated_capacity</code>.</li>
+<li>The battery discharges; <code>Q</code> ticks down by the integrated current.</li>
+<li>At the <strong>empty</strong> anchor, read <code>Q</code> <em>just before</em> it resets to 0:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>measured_capacity = rated_capacity − Q_just_before_empty_reset
+</code></pre></div>
+<p>Healthy cell → <code>Q_before_empty ≈ 0</code> → measured ≈ rated. Aged 80% cell → hits
+empty-voltage while <code>Q ≈ 20%</code> → measured ≈ 0.8·rated. The difference is the
+fade.</p>
+<h3 id="algorithm">Algorithm<a class="headerlink" href="#algorithm" title="Permanent link">&para;</a></h3>
+<p>On a valid <strong>full→empty</strong> excursion:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>measured_x100 = rated_x100 − q_before_empty_x100
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>learned_x100  = learned_x100 + (measured_x100 − learned_x100) * alpha_soh / 1000
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>soh_pct_x100  = learned_x100 * 10000 / rated_x100
+</code></pre></div>
+<ul>
+<li>EMA smoothing (<code>alpha_soh</code>, x1000, Kconfig-tunable) guards against a single
+  anomalous excursion while converging in a few cycles.</li>
+<li>Integer-only; round-to-nearest in the EMA divide to avoid one-sided bias
+  (same lesson as 8c).</li>
+</ul>
+<h3 id="guards">Guards<a class="headerlink" href="#guards" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Update only when a full anchor genuinely preceded the empty anchor — reuse
+  the estimator's existing edge-detected <code>g_full_anchor_active</code> /
+  <code>g_empty_anchor_active</code> flags.</li>
+<li>Reject implausible measurements (<code>&lt; 0.30·rated</code> or <code>&gt; 1.20·rated</code>) as
+  partial cycles / noise.</li>
+<li>Discharge-direction only for the MVP.</li>
+<li>Initialize <code>learned = rated</code> (SoH 100%) until the first valid excursion.</li>
+</ul>
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>SoC estimator (anchor edge logic, 8a)
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>   │  on empty-anchor edge, if full-anchored first:
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>   ▼
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>battery_soh_observe_excursion(rated_x100, q_before_empty_x100)   (8d, NEW)
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>   │  EMA update of learned capacity
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>   ▼
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>battery_soh_get_pct_x100() / get_learned_capacity_mah_x100()      (public API)
+</code></pre></div>
+<ul>
+<li>New module <code>src/intelligence/battery_soh.c</code> + header
+  <code>include/battery_sdk/battery_soh.h</code>.</li>
+<li>The estimator calls <code>battery_soh_observe_excursion()</code> at the empty-anchor
+  edge (it already has <code>Q</code> and the rated capacity in scope there).</li>
+</ul>
+<blockquote>
+<p><strong>As-built note:</strong> the implementation split the single
+<code>observe_excursion(rated, q)</code> call above into a two-call arm/observe pair —
+<code>battery_soh_note_full_anchor()</code> at the full edge and
+<code>battery_soh_observe_empty_anchor(q_before_empty)</code> at the empty edge — with
+<code>rated</code> stored once at <code>battery_soh_init()</code>. This reuses the estimator's
+existing edge flags and keeps <code>rated</code> in one place. The data flow is
+identical to the diagram.
+- A few <code>int32</code> file-scope statics (learned capacity + init flag). No heap,
+  integer-only — consistent with SDK constraints.</p>
+</blockquote>
+<h3 id="public-api-the-cloud-ready-seam">Public API (the cloud-ready seam)<a class="headerlink" href="#public-api-the-cloud-ready-seam" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">battery_soh_get_pct_x100</span><span class="p">(</span><span class="kt">uint16_t</span><span class="w"> </span><span class="o">*</span><span class="n">soh_x100</span><span class="p">);</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kt">int</span><span class="w"> </span><span class="nf">battery_soh_get_learned_capacity_mah_x100</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">cap_x100</span><span class="p">);</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kt">int</span><span class="w"> </span><span class="nf">battery_soh_reset</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</code></pre></div>
+<p>RAM-only for the MVP. Scaling to cloud later is a thin additive layer: add a
+<code>soh_pct_x100</code> field to a wire <strong>v4</strong> (34 bytes) + gateway decode + InfluxDB
+field + a Grafana "State of Health" panel, reusing the v0.8.5 pattern. The
+getter makes this a drop-in with no rework. <strong>Not built in the MVP.</strong></p>
+<h2 id="kconfig-surface">Kconfig surface<a class="headerlink" href="#kconfig-surface" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BATTERY_SOC_SOH</code></td>
+<td>bool</td>
+<td><code>n</code></td>
+<td>Master enable; <code>depends on BATTERY_SOC_COULOMB</code></td>
+</tr>
+<tr>
+<td><code>BATTERY_SOC_SOH_ALPHA_X1000</code></td>
+<td>int</td>
+<td>TBD (~500)</td>
+<td>EMA blend per valid excursion; <code>range 0 1000</code></td>
+</tr>
+<tr>
+<td><code>BATTERY_SOC_SOH_REJECT_LO_PCT</code></td>
+<td>int</td>
+<td>30</td>
+<td>Reject measured below this % of rated</td>
+</tr>
+<tr>
+<td><code>BATTERY_SOC_SOH_REJECT_HI_PCT</code></td>
+<td>int</td>
+<td>120</td>
+<td>Reject measured above this % of rated</td>
+</tr>
+</tbody>
+</table>
+<h2 id="testing-strategy">Testing strategy<a class="headerlink" href="#testing-strategy" title="Permanent link">&para;</a></h2>
+<h3 id="unit-tests-teststest_soc_sohc-host-unity">Unit tests — <code>tests/test_soc_soh.c</code> (host, Unity)<a class="headerlink" href="#unit-tests-teststest_soc_sohc-host-unity" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Healthy excursion (<code>q_before_empty ≈ 0</code>) → SoH → ~100%.</li>
+<li>Aged excursion (<code>q_before_empty = 20% of rated</code>) → SoH → ~80%.</li>
+<li>EMA convergence over several consecutive aged excursions.</li>
+<li>Guard: implausible / partial excursions rejected (no update).</li>
+<li>Init: SoH = 100% before the first excursion.</li>
+<li>Round-to-nearest EMA has no accumulating bias over many updates.</li>
+</ul>
+<h3 id="hardware-validation">Hardware validation<a class="headerlink" href="#hardware-validation" title="Permanent link">&para;</a></h3>
+<p>Cycle a LiPo full→empty and confirm SoH tracks the measured capacity.
+<strong>Honest caveat:</strong> convergence needs deep discharge cycles, so it is slow on
+a CR2032 (months); a cycled LiPo demonstrates it in reasonable time.</p>
+<h2 id="risks-and-deferred-work">Risks and deferred work<a class="headerlink" href="#risks-and-deferred-work" title="Permanent link">&para;</a></h2>
+<h3 id="risks">Risks<a class="headerlink" href="#risks" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Slow convergence</strong> — inherent to full-cycle learning; documented, not a
+  bug. Future Approach 2 (partial-excursion ΔQ/ΔSoC) speeds it up.</li>
+<li><strong>Anchor dependence</strong> — SoH only updates when both anchors fire cleanly; a
+  device that never reaches empty never learns. Acceptable for an MVP.</li>
+</ul>
+<h3 id="deferred-not-8d-mvp-scope">Deferred (not 8d MVP scope)<a class="headerlink" href="#deferred-not-8d-mvp-scope" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Cloud telemetry (wire v4 + gateway + Grafana SoH panel).</li>
+<li>Non-volatile persistence (Zephyr NVS/settings) for offline-edge devices.</li>
+<li>Partial-excursion learning (Approach 2).</li>
+<li>Charge-direction learning for rechargeable cells.</li>
+<li>Current-sensor offset auto-calibration (the other 8d candidate) — separate.</li>
+</ul>
+<h2 id="release-scope-mvp">Release scope (MVP)<a class="headerlink" href="#release-scope-mvp" title="Permanent link">&para;</a></h2>
+<p>On-device SoH learning core: new module + API + opt-in Kconfig + host unit
+tests, full-excursion + EMA (Approach 1). RAM-only. Designed so the cloud
+layer drops in later without rework.</p>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>src/intelligence/battery_soc_estimator.c</code> — anchor edge logic (8a) where
+  the observe hook attaches.</li>
+<li><code>src/intelligence/battery_coulomb.c</code> — Q-as-remaining integrator.</li>
+<li><code>docs/plans/2026-05-29-phase-8c-fusion-design.md</code> — prior parameter/taste
+  precedent (complementary filter over Kalman).</li>
+<li><code>docs/ROADMAP.md</code> — monetization models (SaaS fleet monitoring, commercial
+  license) this capability underpins.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

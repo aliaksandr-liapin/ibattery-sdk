@@ -1,0 +1,1393 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/HARDWARE_TROUBLESHOOTING/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Hardware Troubleshooting Guide - iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hardware-troubleshooting-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Hardware Troubleshooting Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BATTERY_PROFILES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RELEASE_NOTES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#required-equipment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required equipment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#capture-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capture script
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#four-phase-debug-methodology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Four-phase debug methodology
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Four-phase debug methodology">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-verify-electrical-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Verify electrical layer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-verify-master-signaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Verify master signaling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-identify-the-slave-failure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Identify the slave failure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-isolate-the-root-cause" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Isolate the root cause
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-issues-with-cheap-ina219-clones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known issues with cheap INA219 clones
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#captured-trace-from-v080-diagnostic-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Captured trace from v0.8.0 diagnostic session
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resolved-v082-root-cause-was-breadboard-column-misalignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RESOLVED (v0.8.2): root cause was breadboard column misalignment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RESOLVED (v0.8.2): root cause was breadboard column misalignment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-signature-that-revealed-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The signature that revealed it
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lesson-breadboard-column-alignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lesson: breadboard column alignment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secondary-issue-analyzer-sees-ack-firmware-reads-nack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secondary issue: "analyzer sees ACK, firmware reads NACK"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#note-cheap-analyzer-probe-ribbons-have-bad-wires" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Note: cheap analyzer probe ribbons have bad wires
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#note-matching-channel-quirks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Note: matching channel quirks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cheap-clone-postscript" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cheap-clone postscript
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v083-follow-up-when-soldering-doesnt-fix-it-swap-the-mcu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.8.3 follow-up: when soldering doesn't fix it, swap the MCU
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="v0.8.3 follow-up: when soldering doesn&#39;t fix it, swap the MCU">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-systematic-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The systematic isolation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performing-a-swap-the-mcu-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performing a swap-the-MCU test
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lesson-have-a-second-platform-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lesson: have a second platform path
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-per-unit-limitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known per-unit limitation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-we-shipped-v081-without-on-target-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why we shipped v0.8.1 without on-target validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference-signal-voltages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick reference: signal voltages
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="hardware-troubleshooting-guide">Hardware Troubleshooting Guide<a class="headerlink" href="#hardware-troubleshooting-guide" title="Permanent link">&para;</a></h1>
+<p>Diagnostic playbook for the iBattery SDK's hardware bring-up,
+focused on the <strong>INA219 current sensor</strong> I2C subsystem.</p>
+<p>This guide documents the systematic methodology used to debug
+the INA219 connection on the nRF52840-DK during Phase 8a
+hardware validation. It is reusable for any I2C peripheral.</p>
+<hr />
+<h2 id="required-equipment">Required equipment<a class="headerlink" href="#required-equipment" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>USB logic analyzer</strong> (HiLetgo / Saleae clone, ~$10)</li>
+<li>8 channels, 24 MHz sample rate, FX2 chipset</li>
+<li><a href="https://www.amazon.com/HiLetgo-Analyzer-Channel-Compatible-Officially/dp/B077LSG5P2">HiLetgo on Amazon</a></li>
+<li><strong>PulseView / sigrok-cli</strong> (free, open-source)</li>
+<li>macOS: <code>brew install sigrok-cli libsigrokdecode</code></li>
+<li><strong>fx2lafw firmware files</strong> placed at <code>/opt/homebrew/share/sigrok-firmware/</code></li>
+<li><strong>Spare male-male jumper wires</strong> to tap I2C lines without breaking the circuit</li>
+</ul>
+<hr />
+<h2 id="capture-script">Capture script<a class="headerlink" href="#capture-script" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>./tools/i2c-analyzer/capture.sh<span class="w"> </span><span class="o">[</span>seconds<span class="o">]</span>
+</code></pre></div>
+<p>The script auto-detects the analyzer, captures during user-triggered
+reset, decodes I2C transactions, and saves the raw <code>.sr</code> trace for
+PulseView inspection.</p>
+<p>Channel mapping:
+- <strong>D0 (CH0)</strong> → SCL
+- <strong>D1 (CH1)</strong> → SDA
+- <strong>D2 (CH2)</strong> → INA219 Vcc (optional — power-sag detection)
+- <strong>GND</strong> → board GND (common reference)</p>
+<hr />
+<h2 id="four-phase-debug-methodology">Four-phase debug methodology<a class="headerlink" href="#four-phase-debug-methodology" title="Permanent link">&para;</a></h2>
+<h3 id="phase-1-verify-electrical-layer">Phase 1: Verify electrical layer<a class="headerlink" href="#phase-1-verify-electrical-layer" title="Permanent link">&para;</a></h3>
+<p>Goal: prove the bus signals reach the probes.</p>
+<ol>
+<li><strong>Idle voltage check.</strong> With the bus quiescent, capture each line.</li>
+<li>SDA and SCL should both read <strong>HIGH</strong> (3.3V).</li>
+<li>
+<p>If either reads LOW, the pull-up resistors are not active or the
+     probe isn't electrically connected to the line.</p>
+</li>
+<li>
+<p><strong>Vcc verification.</strong> Probe the INA219's Vcc pin row.</p>
+</li>
+<li>Must read HIGH continuously.</li>
+<li>
+<p>If LOW or flickering, check power-header wiring and breadboard contacts.</p>
+</li>
+<li>
+<p><strong>Probe wire health.</strong> A surprising number of cheap analyzer probe
+   wires have broken internal crimps. Test each wire by clipping it
+   to a known-HIGH signal — if it doesn't show HIGH, the wire is bad.</p>
+</li>
+</ol>
+<h3 id="phase-2-verify-master-signaling">Phase 2: Verify master signaling<a class="headerlink" href="#phase-2-verify-master-signaling" title="Permanent link">&para;</a></h3>
+<p>Goal: confirm the MCU's I2C peripheral correctly drives the bus.</p>
+<ol>
+<li>
+<p><strong>Trigger I2C activity.</strong> The SDK's <code>battery_hal_current_init()</code>
+   only attempts I2C at boot. To capture it, press the RESET button
+   (or run <code>west flash</code>) while the analyzer captures.</p>
+</li>
+<li>
+<p><strong>Decode the trace.</strong> With both SCL and SDA captured:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sigrok-cli<span class="w"> </span>-i<span class="w"> </span>/tmp/capture.sr<span class="w"> </span>-P<span class="w"> </span>i2c:scl<span class="o">=</span>D0:sda<span class="o">=</span>D1
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Expected pattern (chip not responding):</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Start
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Address read: 40
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>NACK
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>Stop
+</code></pre></div>
+   The master sends START, the 7-bit address <code>0x40</code>, the R/W bit,
+   then receives no ACK from the slave, then sends STOP.</p>
+</li>
+<li>
+<p><strong>Expected pattern (chip responding):</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Start
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Address write: 40
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>ACK
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Data: 00
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>ACK
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Data: 80
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>ACK
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>Data: 00
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>ACK
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>Stop
+</code></pre></div>
+   Each ACK is the slave pulling SDA low during the 9th clock pulse.</p>
+</li>
+</ol>
+<h3 id="phase-3-identify-the-slave-failure">Phase 3: Identify the slave failure<a class="headerlink" href="#phase-3-identify-the-slave-failure" title="Permanent link">&para;</a></h3>
+<p>If Phase 2 shows NACK on the address byte, scan the entire I2C bus
+to confirm the chip isn't at a different address:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Flash the i2cscan firmware (CONFIG_I2C_SHELL=y)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>west<span class="w"> </span>build<span class="w"> </span>-b<span class="w"> </span>nrf52840dk/nrf52840<span class="w"> </span>app<span class="w"> </span>-d<span class="w"> </span>build-scan<span class="w"> </span>--pristine<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>-DEXTRA_CONF_FILE<span class="o">=</span>boards/nrf52840dk_nrf52840_i2cscan.conf
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>west<span class="w"> </span>flash<span class="w"> </span>-d<span class="w"> </span>build-scan<span class="w"> </span>--runner<span class="w"> </span>jlink
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># Open the Zephyr shell and run the scan</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>screen<span class="w"> </span>/dev/cu.usbmodem*<span class="w"> </span><span class="m">115200</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>uart:~$<span class="w"> </span>i2c<span class="w"> </span>scan<span class="w"> </span>i2c@40003000
+</code></pre></div>
+<p>Possible outcomes:</p>
+<table>
+<thead>
+<tr>
+<th>Result</th>
+<th>Diagnosis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Device at 0x40</td>
+<td>Original wiring problem, chip is alive</td>
+</tr>
+<tr>
+<td>Device at 0x41/0x44/0x45</td>
+<td>A0/A1 address-select pads are misconfigured</td>
+</tr>
+<tr>
+<td><strong>Zero devices</strong></td>
+<td>Chip is dead or electrically disconnected from the I2C lines</td>
+</tr>
+<tr>
+<td>Many devices</td>
+<td>Bus is shorted somehow (rare)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-4-isolate-the-root-cause">Phase 4: Isolate the root cause<a class="headerlink" href="#phase-4-isolate-the-root-cause" title="Permanent link">&para;</a></h3>
+<p>Once Phase 3 shows zero devices but Phase 1 confirms bus electrical:</p>
+<ol>
+<li><strong>Swap to a different INA219 board</strong> (rule out chip-level damage).</li>
+<li><strong>Try the other I2C address pin assignment</strong> — swap SDA and SCL
+   wires at the master side (rules out silkscreen labeling errors
+   on cheap clone boards).</li>
+<li><strong>Replace with a verified-genuine board</strong> — Adafruit's official
+   INA219 (product #904) from a trusted source. Cheap clones from
+   Asian vendors are known to ship with chip-level defects in some
+   batches.</li>
+</ol>
+<hr />
+<h2 id="known-issues-with-cheap-ina219-clones">Known issues with cheap INA219 clones<a class="headerlink" href="#known-issues-with-cheap-ina219-clones" title="Permanent link">&para;</a></h2>
+<p>Verified during v0.8.0 hardware bring-up:</p>
+<ul>
+<li><strong>HiLetgo 2-pack INA219 (~$8)</strong> — both chips in the pack failed
+  to respond at any I2C address. Bus signaling was confirmed
+  electrically correct via logic analyzer; pull-up resistors on
+  the breakout boards worked; both chips silently refused to ACK.</li>
+<li><strong>Likely cause:</strong> factory defect in a specific manufacturing
+  batch, or ESD damage during packaging/handling.</li>
+<li><strong>Workaround:</strong> order from Adafruit directly, Amazon "Sold by
+  Adafruit Industries", or Mouser. The $5-10 price difference is
+  cheap insurance against multi-hour debugging.</li>
+</ul>
+<hr />
+<h2 id="captured-trace-from-v080-diagnostic-session">Captured trace from v0.8.0 diagnostic session<a class="headerlink" href="#captured-trace-from-v080-diagnostic-session" title="Permanent link">&para;</a></h2>
+<p>Decoded I2C from a real session showing the failure mode:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>i2c-1: Start
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>i2c-1: 1
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>i2c-1: 0
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>i2c-1: 0
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>i2c-1: 0
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>i2c-1: 0
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>i2c-1: 0
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>i2c-1: 0
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>i2c-1: 1
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>i2c-1: Read
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>i2c-1: Address read: 40
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>i2c-1: NACK
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>i2c-1: Stop
+</code></pre></div>
+<p>Interpretation:
+- Master drives address bits <code>10000001</code> correctly (= <code>0x40 &lt;&lt; 1 | R/W=1</code>)
+- Bus electrical layer is fine — bits clocked cleanly
+- Slave fails to pull SDA low on the 9th bit → NACK
+- Master terminates with STOP</p>
+<p>This trace alone proves the SDK firmware and the nRF52840-DK I2C
+peripheral are correct. The fault is on the slave side.</p>
+<hr />
+<h2 id="resolved-v082-root-cause-was-breadboard-column-misalignment">RESOLVED (v0.8.2): root cause was breadboard column misalignment<a class="headerlink" href="#resolved-v082-root-cause-was-breadboard-column-misalignment" title="Permanent link">&para;</a></h2>
+<p>The "0 devices found" failures from v0.8.0/v0.8.1 were <strong>not</strong> chip defects.
+The logic analyzer pinpointed the real cause:</p>
+<p><strong>One I2C jumper was plugged into a different breadboard column than its
+INA219 pin.</strong> On a breadboard, only holes in the <em>same vertical column</em> are
+connected. The nRF's SCL wire was one column off from the INA219's SCL pin,
+so the clock signal left the nRF but dead-ended in an unconnected column.</p>
+<h3 id="the-signature-that-revealed-it">The signature that revealed it<a class="headerlink" href="#the-signature-that-revealed-it" title="Permanent link">&para;</a></h3>
+<p>Capturing both lines during a scan:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>D3 (one line): 951 transition-blocks   → master actively driving it
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>D4 (other):      0 transition-blocks   → pull-up present (idle HIGH),
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>                                          but NO master signal
+</code></pre></div>
+<p>A line that idles HIGH (has a pull-up = chip pin connected) but shows zero
+master activity means: <strong>the chip's pin is on that breadboard column, but
+the MCU's wire is not.</strong> The two ends never meet. Re-aligning the wire to
+share the INA219 pin's exact column immediately produced ACKs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Start
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>Address write: 40
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>ACK            ← chip responds once both lines are truly connected
+</code></pre></div>
+<h3 id="lesson-breadboard-column-alignment">Lesson: breadboard column alignment<a class="headerlink" href="#lesson-breadboard-column-alignment" title="Permanent link">&para;</a></h3>
+<p>For every connection, the MCU jumper and the peripheral pin must be in the
+<strong>same numbered column</strong> (the vertical group of 5 connected holes). Stack
+them: peripheral pin in row <code>a</code>, jumper in row <code>b</code>, probe in row <code>c</code> — all
+in the same column. A wire in a different region of the breadboard, however
+close it looks, is electrically isolated.</p>
+<h3 id="secondary-issue-analyzer-sees-ack-firmware-reads-nack">Secondary issue: "analyzer sees ACK, firmware reads NACK"<a class="headerlink" href="#secondary-issue-analyzer-sees-ack-firmware-reads-nack" title="Permanent link">&para;</a></h3>
+<p>After fixing alignment, the analyzer captured clean ACKs but the nRF's
+<code>i2c scan</code> still intermittently reported 0 devices. This is a classic
+<strong>signal-integrity symptom</strong>: worn breadboard contacts add series resistance,
+so when the chip pulls SDA low for the ACK, the voltage at the MCU's pin
+doesn't reach a clean logic-low at the exact sampling instant. The analyzer
+(continuous sampling, high input impedance) catches the low; the MCU's
+one-shot sample misses it.</p>
+<p>Fix: a <strong>permanent connection</strong> — soldered header, or a fresh breadboard
+with unworn contacts. The nRF52840 TWIM is already at its minimum 100 kHz,
+so there is no slower-clock software workaround.</p>
+<h3 id="note-cheap-analyzer-probe-ribbons-have-bad-wires">Note: cheap analyzer probe ribbons have bad wires<a class="headerlink" href="#note-cheap-analyzer-probe-ribbons-have-bad-wires" title="Permanent link">&para;</a></h3>
+<p>During this debug session, ~50% of the probe wires in a HiLetgo USB
+Logic Analyzer's ribbon cable were found to have broken internal crimps
+(the green, yellow, red, and white wires consistently read flat regardless
+of what they were clipped to; amber and one other were good). <strong>Always
+verify each probe wire on a known HIGH signal before trusting it</strong> — clip
+it to Vcc and check for a HIGH reading. A flat-LOW reading on a wire
+clipped to Vcc means the wire is broken, not the bus.</p>
+<h3 id="note-matching-channel-quirks">Note: matching channel quirks<a class="headerlink" href="#note-matching-channel-quirks" title="Permanent link">&para;</a></h3>
+<p>In the same analyzer, CH0 itself was found defective — even the known-good
+amber probe read flat when plugged into CH0. CH3 and CH4 worked. <strong>If a
+probe reads flat after passing the Vcc-clip test, try a different channel
+on the analyzer.</strong></p>
+<h3 id="cheap-clone-postscript">Cheap-clone postscript<a class="headerlink" href="#cheap-clone-postscript" title="Permanent link">&para;</a></h3>
+<p>The two HiLetgo INA219 boards blamed earlier were most likely fine — they
+were victims of the same column-alignment error, not defective. Final
+confirmation used a genuine Adafruit INA219 (#904), but the lesson stands:
+<strong>verify wiring with a logic analyzer before condemning a chip.</strong></p>
+<hr />
+<h2 id="v083-follow-up-when-soldering-doesnt-fix-it-swap-the-mcu">v0.8.3 follow-up: when soldering doesn't fix it, swap the MCU<a class="headerlink" href="#v083-follow-up-when-soldering-doesnt-fix-it-swap-the-mcu" title="Permanent link">&para;</a></h2>
+<p>The v0.8.2 conclusion said only a soldered/permanent connection was needed
+for stable firmware-level reads on the nRF52840-DK. In v0.8.3 we soldered
+the male headers onto the INA219 PCB (eliminating the press-fit contact
+class of failure), but the firmware-level <code>i2c scan</code> on the <strong>specific
+nRF52840-DK unit (PCA10056 SN 1050258557)</strong> still returned <strong>0/6</strong> ACKs.
+Reseating, multiple wire swaps, and even swapping in a second known-good
+INA219 chip did not change the result.</p>
+<p>The diagnostic that finally closed the case was a <strong>swap-the-MCU isolation
+test</strong>: move the same INA219 (with the same wires) onto a different
+platform and see if it works there.</p>
+<h3 id="the-systematic-isolation">The systematic isolation<a class="headerlink" href="#the-systematic-isolation" title="Permanent link">&para;</a></h3>
+<p>After v0.8.2 soldering, on the <strong>same</strong> nRF52840-DK unit:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Soldered INA219 male header pins (replaced press-fit)</td>
+<td>0/6 — no change</td>
+</tr>
+<tr>
+<td>Adafruit "on" LED confirmed solid green</td>
+<td>rules out VCC + GND wires</td>
+</tr>
+<tr>
+<td>Replaced SCL jumper (fresh wire)</td>
+<td>0/6</td>
+</tr>
+<tr>
+<td>Replaced SDA jumper (fresh wire)</td>
+<td>0/6</td>
+</tr>
+<tr>
+<td>Verified nRF pins: SCL→P0.27, SDA→P0.26, red→VDD</td>
+<td>correct</td>
+</tr>
+<tr>
+<td>Swapped in a second soldered INA219</td>
+<td>0/6 at all addresses (0x40, 0x41, 0x44, 0x45)</td>
+</tr>
+<tr>
+<td>Same INA219 + same wires → NUCLEO-L476RG</td>
+<td><strong>6/6 immediately</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The swap-the-MCU result was definitive: two independent chips, three
+fresh wires, and the SDK firmware (compiled for STM32 from the same source
+tree) all worked perfectly together on a different MCU. The defect is
+<strong>local to that nRF52840-DK unit</strong> — most likely damaged P0.26/P0.27 GPIO
+pins (sustained from repeated plug-cycle wear), or an SBx solder-bridge
+misconfiguration on the board.</p>
+<h3 id="performing-a-swap-the-mcu-test">Performing a swap-the-MCU test<a class="headerlink" href="#performing-a-swap-the-mcu-test" title="Permanent link">&para;</a></h3>
+<p>The SDK's multi-platform support makes this isolation cheap. If a chip
+won't ACK on the nRF52840-DK after the bus is verified clean (analyzer
+captures showing master-driven SDA/SCL transitions), and after wiring,
+chip, and solder joints have been ruled out, do the following:</p>
+<ol>
+<li>
+<p><strong>Build the i2c-shell firmware for STM32:</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>west<span class="w"> </span>build<span class="w"> </span>-b<span class="w"> </span>nucleo_l476rg<span class="w"> </span>app<span class="w"> </span>-d<span class="w"> </span>/tmp/build-stm32-scan<span class="w"> </span>--pristine<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>-DEXTRA_CONF_FILE<span class="o">=</span>boards/nucleo_l476rg_i2cscan.conf<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>-DZEPHYR_EXTRA_MODULES<span class="o">=</span><span class="s2">&quot;/opt/nordic/ncs/v3.2.2/modules/hal/stm32&quot;</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Move the INA219 wires</strong> to the NUCLEO Arduino-compatible header:</p>
+</li>
+<li>VCC → 3V3 (CN6)</li>
+<li>GND → GND (CN6)</li>
+<li>SCL → D15 / PB8 (CN5)</li>
+<li>
+<p>SDA → D14 / PB9 (CN5)</p>
+</li>
+<li>
+<p><strong>Flash and scan:</strong>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>west<span class="w"> </span>flash<span class="w"> </span>-d<span class="w"> </span>/tmp/build-stm32-scan<span class="w"> </span>--runner<span class="w"> </span>openocd
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1"># then via serial shell:</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>i2c<span class="w"> </span>scan<span class="w"> </span>i2c@40005400
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Interpret:</strong></p>
+</li>
+<li><strong>Works on STM32, fails on nRF</strong> → the nRF DK unit (or the specific
+     GPIOs in use) is the defect. Consider remapping the nRF I2C to
+     alternate GPIOs (overlay change + rebuild), or switching to STM32
+     as your validation platform.</li>
+<li><strong>Fails on STM32 too</strong> → the failure is in the chip, wires, or
+     firmware. Re-examine those (do not blame the MCU).</li>
+</ol>
+<h3 id="lesson-have-a-second-platform-path">Lesson: have a second platform path<a class="headerlink" href="#lesson-have-a-second-platform-path" title="Permanent link">&para;</a></h3>
+<p>The cost of swapping to a different MCU once the SDK is portable is
+~30 minutes (overlay edit + build + flash + rewire). The cost of
+chasing a per-unit GPIO defect on a single board can be days. When
+in doubt, <strong>swap the MCU and reload the data</strong>.</p>
+<p>This isolation step has now been added to the diagnostic flow as a
+recommended Phase 5 of the methodology (after Phase 4 root-cause
+isolation fails to converge).</p>
+<h3 id="known-per-unit-limitation">Known per-unit limitation<a class="headerlink" href="#known-per-unit-limitation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>nRF52840-DK PCA10056 SN 1050258557</strong> — INA219 does not ACK on
+  P0.26 / P0.27 firmware-side, despite verified-correct wiring, fresh
+  jumpers, soldered INA219 headers, and two independent chips. The
+  same chips and wires work perfectly on NUCLEO-L476RG. Use STM32 as
+  the Phase 8a validation platform for this unit, or migrate to a
+  different DK.</li>
+</ul>
+<hr />
+<h2 id="why-we-shipped-v081-without-on-target-validation">Why we shipped v0.8.1 without on-target validation<a class="headerlink" href="#why-we-shipped-v081-without-on-target-validation" title="Permanent link">&para;</a></h2>
+<p>The full software stack (HAL, coulomb counter, SoC estimator,
+telemetry v3, gateway decoder) is verified by <strong>80+ host tests</strong>
+(16 C suites, 65 Python suites). Logic-analyzer captures further
+prove the firmware sends correct I2C transactions on real hardware.</p>
+<p>The remaining gap — end-to-end current measurement from a working
+INA219 — requires only a known-good INA219 board. Any genuine
+Adafruit (or other reputable vendor) INA219 will close that gap
+with zero code changes, because the SDK is wire-compatible with
+any device implementing the TI INA219 I2C protocol.</p>
+<hr />
+<h2 id="quick-reference-signal-voltages">Quick reference: signal voltages<a class="headerlink" href="#quick-reference-signal-voltages" title="Permanent link">&para;</a></h2>
+<p>For a healthy I2C bus with the INA219 connected:</p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>SDA</th>
+<th>SCL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Idle</td>
+<td>HIGH (3.3V)</td>
+<td>HIGH (3.3V)</td>
+</tr>
+<tr>
+<td>START condition</td>
+<td>falling edge</td>
+<td>HIGH</td>
+</tr>
+<tr>
+<td>Address transmit</td>
+<td>bit transitions</td>
+<td>clock pulses (100 kHz default)</td>
+</tr>
+<tr>
+<td>Slave ACK</td>
+<td>held LOW for 1 bit period</td>
+<td>clock pulse</td>
+</tr>
+<tr>
+<td>Slave NACK</td>
+<td>stays HIGH</td>
+<td>clock pulse</td>
+</tr>
+<tr>
+<td>STOP condition</td>
+<td>rising edge</td>
+<td>HIGH</td>
+</tr>
+</tbody>
+</table>
+<p>If your captures don't match this pattern, refer back to Phase 1.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

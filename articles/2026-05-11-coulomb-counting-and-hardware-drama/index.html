@@ -1,0 +1,1047 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/articles/2026-05-11-coulomb-counting-and-hardware-drama/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Why I Shipped Coulomb Counting Before the Hardware Worked - iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#why-i-shipped-coulomb-counting-before-the-hardware-worked" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Why I Shipped Coulomb Counting Before the Hardware Worked
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BATTERY_PROFILES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../RELEASE_NOTES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-voltage-lookup-table-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The voltage-lookup-table problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#designing-the-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Designing the architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-coulomb-counter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The coulomb counter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#voltage-anchoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Voltage anchoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-voltage-smoothing-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The voltage smoothing layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The voltage smoothing layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#median-filter-replaces-moving-average" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Median filter (replaces moving average)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soc-slew-limiter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SoC slew limiter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#and-then-the-hardware-didnt-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        And then the hardware didn't work
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-shipping-discipline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The shipping discipline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ci-as-accountability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI as accountability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="why-i-shipped-coulomb-counting-before-the-hardware-worked">Why I Shipped Coulomb Counting Before the Hardware Worked<a class="headerlink" href="#why-i-shipped-coulomb-counting-before-the-hardware-worked" title="Permanent link">&para;</a></h1>
+<p><em>An embedded battery SDK story about ambitious algorithms, stubborn breadboards, and the discipline of shipping anyway.</em></p>
+<hr />
+<p>I spent a weekend implementing coulomb counting for my open-source <a href="https://github.com/aliaksandr-liapin/ibattery-sdk">battery monitoring SDK</a>. The code is in production. The hardware doesn't actually work yet.</p>
+<p>That sentence used to make me anxious. Now I think it might be one of the most useful things I've learned about embedded engineering.</p>
+<h2 id="the-voltage-lookup-table-problem">The voltage-lookup-table problem<a class="headerlink" href="#the-voltage-lookup-table-problem" title="Permanent link">&para;</a></h2>
+<p>My SDK has been shipping state-of-charge estimation for months. The approach is simple: read the battery voltage, look it up in a curve like this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>4200 mV → 100%
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>3800 mV → ~50%
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>3000 mV → 0%   (LiPo cutoff)
+</code></pre></div>
+<p>This works fine for a CR2032 coin cell that discharges in a smooth, predictable curve. For LiPo it's a disaster.</p>
+<p>Three reasons:</p>
+<p><strong>1. The plateau region.</strong> Between 3.7V and 3.8V, a LiPo can have anywhere from 30% to 70% charge. The voltage barely moves. A 10mV measurement error becomes a 10% SoC error. You can't accurate-curve your way out of physics.</p>
+<p><strong>2. Load-induced sag.</strong> Every time the device transmits over Bluetooth, the battery voltage drops 200-500 mV for a few milliseconds. The voltage-LUT sees this as "battery suddenly at 60%!" Then the transmit ends, voltage recovers, and the SoC jumps back to 80%. Users see a percentage that flickers like a stock ticker.</p>
+<p><strong>3. Cell aging is invisible.</strong> A 500-cycle-old battery reads the same voltage at the same SoC as a fresh one — but it actually holds 80% of the original capacity. Voltage-LUT can't see this.</p>
+<p>The fix everyone agrees on: <strong>coulomb counting.</strong> Measure current going in and out, integrate over time, you know exactly how much charge has moved. It's how your phone, your laptop, your EV all really do it.</p>
+<h2 id="designing-the-architecture">Designing the architecture<a class="headerlink" href="#designing-the-architecture" title="Permanent link">&para;</a></h2>
+<p>I want this SDK to be a real product, not a hack. So before writing any code, I sat down to think about layering.</p>
+<p>What I landed on:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>INA219 chip (current sensor)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    │
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    ▼ I²C
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>┌─────────────────────────────────────┐
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>│  Current HAL (battery_hal_current)  │  ← swap backends (INA219, fuel gauge, shunt+ADC)
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>└─────────────────────────────────────┘
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    │
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    ▼
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>┌─────────────────────────────────────┐
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>│  Coulomb counter                    │  ← trapezoidal integration, NVS persistence
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>│  (integer-only, int64 accumulator)  │
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>└─────────────────────────────────────┘
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    │
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    ▼
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>┌─────────────────────────────────────┐
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>│  SoC estimator v2                   │  ← coulomb primary, voltage anchor at endpoints
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>└─────────────────────────────────────┘
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    │
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    ▼
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>┌─────────────────────────────────────┐
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>│  Telemetry v3 (32 bytes)            │  ← BLE notifications to gateway
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>│  + current_ma + coulomb_mah         │
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>└─────────────────────────────────────┘
+</code></pre></div>
+<p>Key constraints I imposed on myself:</p>
+<ul>
+<li><strong>Integer-only math.</strong> I'm targeting nRF52840 (Cortex-M4 with FPU), STM32L4 (with FPU), and ESP32-C3 (no FPU). All math must work without floats so the same code paths run on every platform.</li>
+<li><strong>Zero heap allocation.</strong> Embedded SDKs that malloc are embedded SDKs that mysteriously crash at 3 AM in a field deployment.</li>
+<li><strong>Backward compatible.</strong> Existing users with voltage-only setups must continue to work with zero changes. Coulomb counting is opt-in via Kconfig.</li>
+</ul>
+<h2 id="the-coulomb-counter">The coulomb counter<a class="headerlink" href="#the-coulomb-counter" title="Permanent link">&para;</a></h2>
+<p>Here's the heart of it. Trapezoidal integration with an int64 accumulator in 0.001 mAh units (sub-mAh precision):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">battery_coulomb_update</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="n">current_ma_x100</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">dt_ms</span><span class="p">)</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">g_initialized</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">BATTERY_STATUS_NOT_INITIALIZED</span><span class="p">;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">g_first_sample</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="n">g_prev_current</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_ma_x100</span><span class="p">;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="n">g_first_sample</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">BATTERY_STATUS_OK</span><span class="p">;</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="cm">/* Trapezoidal: average of previous and current sample */</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">avg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="kt">int64_t</span><span class="p">)</span><span class="n">g_prev_current</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">current_ma_x100</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="cm">/* Convert to x1000 mAh units:</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="cm">     *   delta = (avg_ma_x100 * dt_ms) / 360000</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="cm">     * Keep remainder to avoid truncation drift over multi-day runs. */</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">numerator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">avg</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="kt">int64_t</span><span class="p">)</span><span class="n">dt_ms</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">g_remainder</span><span class="p">;</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">delta_x1000</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numerator</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">360000</span><span class="p">;</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="n">g_remainder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numerator</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">delta_x1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">360000</span><span class="p">;</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="n">g_accumulated_mah_x1000</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">delta_x1000</span><span class="p">;</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="n">g_prev_current</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_ma_x100</span><span class="p">;</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">BATTERY_STATUS_OK</span><span class="p">;</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="p">}</span>
+</code></pre></div>
+<p>The remainder accumulator was a debugging gift. My first version had a 1% drift over 1800 samples — each step lost a fractional unit to integer truncation, and that loss compounded. The fix: carry the leftover into the next iteration. Now drift is mathematically zero.</p>
+<p>It survives reboot via NVS (non-volatile storage), saving every 60 seconds or whenever charge changes by more than 1 mAh.</p>
+<h2 id="voltage-anchoring">Voltage anchoring<a class="headerlink" href="#voltage-anchoring" title="Permanent link">&para;</a></h2>
+<p>Coulomb counting drifts. Voltage-LUT is accurate at the endpoints (full charge, cutoff) but lies in the middle.</p>
+<p>So I use voltage as a periodic calibration anchor:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cm">/* Anchor at full charge (LiPo): voltage near max AND current is tiny</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cm"> * (CV phase complete) */</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">voltage_mv</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">4180</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">abs_current_ma</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="n">battery_coulomb_reset</span><span class="p">(</span><span class="n">capacity_mah</span><span class="p">);</span><span class="w">  </span><span class="cm">/* declare 100% */</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">}</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="cm">/* Anchor at cutoff: voltage below safe threshold */</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">voltage_mv</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">3000</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="n">battery_coulomb_reset</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">  </span><span class="cm">/* declare 0% */</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">}</span>
+</code></pre></div>
+<p>The "low current at full voltage" check is the trick. During charging, a LiPo sits at 4.2V for hours while current tapers. The cell isn't actually full until current drops to a trickle (the "CV phase" of CC/CV charging). If you anchor purely on voltage, you'll claim 100% an hour too early.</p>
+<h2 id="the-voltage-smoothing-layer">The voltage smoothing layer<a class="headerlink" href="#the-voltage-smoothing-layer" title="Permanent link">&para;</a></h2>
+<p>While I had the project open, I added two more accuracy improvements that don't need hardware:</p>
+<h3 id="median-filter-replaces-moving-average">Median filter (replaces moving average)<a class="headerlink" href="#median-filter-replaces-moving-average" title="Permanent link">&para;</a></h3>
+<p>The existing moving-average filter dilutes BLE transmit sags but doesn't reject them. A 500 mV dip across 8 samples still pulls the average down 62 mV — enough to swing SoC by 10% on the LiPo plateau.</p>
+<p>Median filter throws outliers out completely:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">uint16_t</span><span class="w"> </span><span class="nf">median_of</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">battery_voltage_filter_t</span><span class="w"> </span><span class="o">*</span><span class="n">filter</span><span class="p">)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">{</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">sorted</span><span class="p">[</span><span class="n">BATTERY_VOLTAGE_FILTER_MAX_WINDOW_SIZE</span><span class="p">];</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">filter</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="cm">/* Insertion sort a copy — n ≤ 16, fast for tiny arrays */</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="n">memcpy</span><span class="p">(</span><span class="n">sorted</span><span class="p">,</span><span class="w"> </span><span class="n">filter</span><span class="o">-&gt;</span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">));</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">        </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sorted</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">        </span><span class="kt">size_t</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">sorted</span><span class="p">[</span><span class="n">j</span><span class="mi">-1</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">            </span><span class="n">sorted</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sorted</span><span class="p">[</span><span class="n">j</span><span class="mi">-1</span><span class="p">];</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">            </span><span class="n">j</span><span class="o">--</span><span class="p">;</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">        </span><span class="n">sorted</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">sorted</span><span class="p">[</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">                        </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="n">sorted</span><span class="p">[</span><span class="n">n</span><span class="o">/</span><span class="mi">2-1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sorted</span><span class="p">[</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="p">}</span>
+</code></pre></div>
+<p>The cost: O(n²) sort, but n is bounded at 16 — worst case 256 comparisons, executed at 0.5 Hz. The MCU spends more cycles blinking the status LED.</p>
+<h3 id="soc-slew-limiter">SoC slew limiter<a class="headerlink" href="#soc-slew-limiter" title="Permanent link">&para;</a></h3>
+<p>Even with a perfect voltage filter, the LUT has steep regions where a 20 mV change maps to a 5% SoC jump. Reality doesn't work that way: an IoT load can't physically discharge a battery 5% in 2 seconds.</p>
+<p>So I cap the rate of change:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">static</span><span class="w"> </span><span class="kt">uint16_t</span><span class="w"> </span><span class="nf">apply_slew_limit</span><span class="p">(</span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">new_soc</span><span class="p">)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="p">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">g_first_call</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">        </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">dt_ms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_uptime</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">g_prev_uptime</span><span class="p">;</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">        </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">max_delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dt_ms</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">60000</span><span class="p">;</span><span class="w">  </span><span class="cm">/* 5%/min */</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int32_t</span><span class="p">)</span><span class="n">new_soc</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="kt">int32_t</span><span class="p">)</span><span class="n">g_prev_soc</span><span class="p">;</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">delta</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">max_delta</span><span class="p">)</span><span class="w"> </span><span class="n">new_soc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">g_prev_soc</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">max_delta</span><span class="p">;</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">delta</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">-</span><span class="n">max_delta</span><span class="p">)</span><span class="w"> </span><span class="n">new_soc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">g_prev_soc</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">max_delta</span><span class="p">;</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="n">g_prev_soc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">new_soc</span><span class="p">;</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="n">g_prev_uptime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_uptime</span><span class="p">;</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="n">g_first_call</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">new_soc</span><span class="p">;</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">}</span>
+</code></pre></div>
+<p>Defense in depth: the median filter catches voltage outliers, the slew limiter catches SoC outliers if anything slips through.</p>
+<h2 id="and-then-the-hardware-didnt-work">And then the hardware didn't work<a class="headerlink" href="#and-then-the-hardware-didnt-work" title="Permanent link">&para;</a></h2>
+<p>I wired the INA219 to an ESP32-C3 DevKitM. Default I2C pins, default address (0x40). Powered on. Watched the serial log:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>[INA219] not found at 0x40 (rc=-14) — check wiring
+</code></pre></div>
+<p>OK, classic. Probably a loose breadboard contact. I swapped wires, pressed harder, tried both INA219 boards (I bought a 2-pack). Same result.</p>
+<p>I added an I²C scanner. The chip responded to the simple probe — its address showed up. But every register write got NACK'd. Reads through the proper <code>i2c_write_read</code> API also failed. Only the bare scan worked.</p>
+<p>Switched platforms to nRF52840-DK. Same INA219 board. Same wiring topology, just different pins. Different I²C controller from Nordic instead of Espressif. <strong>Zero devices found on the bus.</strong> The chip was completely invisible.</p>
+<p>After two hours of debugging — checking pull-up solder bridges on the DK, swapping wires, power-cycling, trying both INA219 boards — I had to admit: I don't know what's wrong. It could be:</p>
+<ul>
+<li>Cold solder joints on the INA219 header pins</li>
+<li>Breadboard contacts at end-of-life</li>
+<li>A clock-stretching quirk in the Espressif I²C driver</li>
+<li>Static damage to one of the chips</li>
+<li>Something I haven't thought of</li>
+</ul>
+<p><strong>I needed a logic analyzer.</strong> Without one, I'm guessing in the dark. Ordered a $10 <a href="https://www.amazon.com/HiLetgo-Analyzer-Channel-Compatible-Officially/dp/B077LSG5P2">HiLetgo USB 24MHz 8-channel analyzer</a> — arrives Monday.</p>
+<h2 id="the-shipping-discipline">The shipping discipline<a class="headerlink" href="#the-shipping-discipline" title="Permanent link">&para;</a></h2>
+<p>Here's where I had a choice. The lazy option: don't release until hardware works. The disciplined option: release the software and document the gap.</p>
+<p>I chose to ship.</p>
+<p>Reasons:</p>
+<ol>
+<li>
+<p><strong>The software is complete and verified.</strong> 14 host-based unit tests, all passing. 65 gateway tests, all passing. The math, the integration, the wire format, the gateway decoder — all proven. A logic analyzer is going to find a wiring problem, not a code problem.</p>
+</li>
+<li>
+<p><strong>It composes with the existing voltage-LUT path.</strong> Users without an INA219 see no behavior change. The HAL has a stub backend that returns "unsupported" — the SoC estimator detects this and falls back to voltage-only. Zero regression.</p>
+</li>
+<li>
+<p><strong>The Known Issues section is honest.</strong> <a href="https://github.com/aliaksandr-liapin/ibattery-sdk/blob/main/docs/RELEASE_NOTES.md">The release notes</a> document the exact failure mode. A potential adopter knows what they're getting.</p>
+</li>
+<li>
+<p><strong>Holding releases hostage to one flaky breadboard is bad strategy.</strong> I have working voltage smoothing (v0.9.0) that helps every single user immediately. Bundling it with stalled hardware validation would mean shipping nothing.</p>
+</li>
+</ol>
+<p>I tagged <strong>v0.8.0</strong> for coulomb counting (software complete, hardware pending) and <strong>v0.9.0</strong> for voltage smoothing (fully production-ready). Both are live on <a href="https://github.com/aliaksandr-liapin/ibattery-sdk/releases">GitHub</a>.</p>
+<h2 id="ci-as-accountability">CI as accountability<a class="headerlink" href="#ci-as-accountability" title="Permanent link">&para;</a></h2>
+<p>Before stopping for the day, I added a GitHub Actions workflow that builds the firmware for ESP32-C3 in three configurations — default, median filter, current sensing — on every commit. It also runs the host tests on Ubuntu and macOS, and the Python gateway tests.</p>
+<p>Now anyone landing a pull request gets concrete proof the code builds and the tests pass. The badge on the README isn't decoration; it's a contract.</p>
+<h2 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<p>Monday: logic analyzer arrives. I'll capture the I²C bus during boot, see exactly which byte gets NACK'd, fix the underlying issue. Ship v0.8.1 as a hardware-validation patch.</p>
+<p>Then <strong>Phase 8c</strong>: Kalman filter fusion. Combine voltage and current optimally, weighted by their relative confidence (voltage is noisy under load, coulomb counting drifts over weeks). Same public API as today; just a smarter estimator inside.</p>
+<p>This is the path real BMS firmware takes — phones, EVs, medical devices. The fact that an open-source SDK targeting CR2032s and breadboards can run the same algorithm is, honestly, the point. Battery intelligence shouldn't be a moat.</p>
+<h2 id="takeaways">Takeaways<a class="headerlink" href="#takeaways" title="Permanent link">&para;</a></h2>
+<p>If you're building embedded products and you're not sure when to ship:</p>
+<ol>
+<li><strong>Ship the software, document the hardware gap.</strong> Honesty is more credible than perfection.</li>
+<li><strong>Design for graceful degradation.</strong> If the new sensor isn't there, fall back to the old path. No regression.</li>
+<li><strong>Get a logic analyzer.</strong> Ten dollars buys you the difference between guessing and knowing.</li>
+<li><strong>Test what you can on the host.</strong> I have ~80 unit tests that run on Linux, macOS, and Windows. They caught the integer truncation drift bug long before any breadboard was involved.</li>
+<li><strong>Layer your design so you can replace any part.</strong> My HAL means swapping INA219 for a fuel-gauge IC later is a 100-line change, not a rewrite.</li>
+</ol>
+<p>The SDK is open-source and Apache 2.0. If you're working on a battery-powered IoT product and want to skip rewriting voltage curves and coulomb integrators from scratch:</p>
+<p><strong>Repo:</strong> https://github.com/aliaksandr-liapin/ibattery-sdk</p>
+<p>If you've solved the I²C-on-breadboard-on-Espressif puzzle before, I'd love to hear from you. The logic analyzer arrives Monday but human wisdom is faster.</p>
+<hr />
+<p><em>Next post will cover the Kalman filter fusion (Phase 8c), once Phase 8a is hardware-validated. Subscribe if you like battery math and honest engineering write-ups.</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
