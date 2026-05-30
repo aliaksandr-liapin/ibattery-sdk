@@ -1,6 +1,6 @@
 # Roadmap & Business Strategy
 
-## Current State (v0.11.0 — Phase 8 + State of Health end-to-end, all hardware-validated on NUCLEO-L476RG)
+## Current State (v0.11.1 — Phase 8 + State of Health end-to-end, all hardware-validated on NUCLEO-L476RG)
 
 v0.10.1 closed the deferred BLE end-to-end loop: v3 telemetry now flows
 firmware → BLE → gateway → InfluxDB → Grafana on real hardware (X-NUCLEO-IDB05A2

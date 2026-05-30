@@ -1,7 +1,7 @@
 {
     "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
     "name": "ibattery-sdk",
-    "version": "0.11.0",
+    "version": "0.11.1",
     "description": "Battery intelligence SDK for IoT — voltage measurement, SoC estimation (voltage-LUT + working coulomb counting via INA219 + optional voltage/coulomb signal fusion), temperature monitoring, power state management, BLE telemetry. Median voltage filter, SoC slew-rate limiter, and current-adaptive fusion for accuracy under load. Hardware-validated on NUCLEO-L476RG. Supports CR2032 and LiPo.",
     "keywords": "battery, soc, voltage, current, coulomb, ina219, iot, embedded, lipo, cr2032, telemetry, ble, power-management, zephyr",
     "homepage": "https://aliaksandr-liapin.github.io/ibattery-sdk/",

@@ -4,7 +4,7 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 
 ## Current State
 
-- **Version**: v0.11.0 (Phase 8d State of Health shipped end-to-end — on-device learning + wire v4 + Grafana panel; builds on v0.10.x BLE-on-NUCLEO E2E + Phase 8a/8b/8c)
+- **Version**: v0.11.1 (Phase 8d State of Health shipped end-to-end in v0.11.0 — on-device learning + wire v4 + Grafana panel; v0.11.1 = README image-URL fix for the registry. Builds on v0.10.x BLE-on-NUCLEO E2E + Phase 8a/8b/8c)
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
 - **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32), ESP32-C3 DevKitM — all hardware-verified

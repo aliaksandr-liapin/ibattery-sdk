@@ -1,5 +1,13 @@
 # Release Notes
 
+## v0.11.1 — Docs fix (registry image) — 2026-05-29
+
+Documentation-only release. **No code changes** — identical behavior to v0.11.0.
+The README's dashboard image used a repo-relative path, which renders on GitHub
+but not on the PlatformIO registry (the package excludes `docs/`). Switched to
+an absolute raw-GitHub URL so the screenshot renders everywhere. Republished
+because PlatformIO package versions are immutable.
+
 ## v0.11.0 — Phase 8d: State of Health, end-to-end — 2026-05-29
 
 On-device State-of-Health learning **plus** its cloud path, shipped together:
