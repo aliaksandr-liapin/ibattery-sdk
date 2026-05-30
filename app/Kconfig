@@ -181,7 +181,7 @@ config BATTERY_COULOMB_NVS_INTERVAL_S
       flash wear. Also saves on >1% SoC change regardless.
 
 config BATTERY_SOC_FUSION
-    bool "Phase 8c: voltage + coulomb signal fusion"
+    bool "Voltage + coulomb signal fusion"
     default n
     depends on BATTERY_SOC_COULOMB
     help
@@ -190,9 +190,9 @@ config BATTERY_SOC_FUSION
       shifts toward voltage when the battery is at rest (current below
       threshold) and toward coulomb under load (voltage sag is real).
 
-      Composes with the v0.8.4 anchor calibration (which still fires
-      at endpoints) and the Phase 8b slew limiter (which still applies
-      after fusion).
+      Composes with the endpoint anchor calibration (which still fires
+      at the discharge curve's endpoints) and the SoC slew limiter (which
+      still applies after fusion).
 
       Defaults to off. Enable per build to opt in.
 
@@ -204,7 +204,8 @@ config BATTERY_SOC_FUSION_ALPHA_REST_X1000
     default 30 if BATTERY_CHEMISTRY_LIPO
     range 0 1000
     help
-      Per-sample pull toward voltage-LUT SoC when |I| < I_THRESH.
+      Per-sample pull toward voltage-LUT SoC when the current magnitude
+      is below the rest/load threshold (I_THRESH_X100).
       Larger = faster drift correction. Default 5.0% per sample (CR2032)
       gives ~95% convergence in ~60 samples at 2s intervals.
       LiPo default is 3.0% (LUT is flatter in the middle plateau, so
@@ -215,7 +216,8 @@ config BATTERY_SOC_FUSION_ALPHA_LOAD_X1000
     default 5
     range 0 1000
     help
-      Per-sample pull toward voltage-LUT SoC when |I| >= I_THRESH.
+      Per-sample pull toward voltage-LUT SoC when the current magnitude
+      is at or above the rest/load threshold (I_THRESH_X100).
       Should be small -- voltage is unreliable under load (IR drop).
       Default 0.5% per sample, both chemistries.
 
@@ -223,10 +225,13 @@ config BATTERY_SOC_FUSION_I_THRESH_X100
     int "Current threshold (x100 mA) classifying rest vs load"
     default 200 if !BATTERY_CHEMISTRY_LIPO
     default 5000 if BATTERY_CHEMISTRY_LIPO
-    range 0 1000000
+    # Upper bound 500000 = 5000.00 mA (5 A) — generous even for a 500 mAh
+    # LiPo (10C); defaults are 2 mA (CR2032) / 50 mA (LiPo).
+    range 0 500000
     help
       Below this current magnitude, fusion uses ALPHA_REST.
-      Above (or equal), uses ALPHA_LOAD.
+      At or above it, uses ALPHA_LOAD. Units are x100 mA
+      (e.g. 200 = 2.00 mA).
 
 endif # BATTERY_SOC_FUSION
 

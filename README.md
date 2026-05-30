@@ -27,7 +27,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 | Phase 8a | Coulomb counting SoC (INA219 current sensor) | Done (v0.8.5) — hardware-validated on NUCLEO-L476RG; Q ticks down under load with Q-as-remaining semantics; `current_ma` + `coulomb_mah` persisted to InfluxDB + Grafana panels |
 | Phase 8b | Median voltage filter + SoC slew-rate limiter | Done (v0.9.0) — software-only, no hardware needed |
 | Phase 8c | Voltage + coulomb signal fusion (current-adaptive α) | Done (v0.10.0) — opt-in via `CONFIG_BATTERY_SOC_FUSION` (default off); +56 B flash, 0 new RAM; hardware-validated with 3 captures including load-vs-rest demo |
-| BLE E2E | v3 telemetry over BLE: firmware → gateway → InfluxDB → Grafana | Done (v0.10.1) — validated on NUCLEO-L476RG + X-NUCLEO-IDB05A1 shield; fixed BLE MTU (27→35), gateway service-UUID matching, and re-advertise-after-disconnect; real current/coulomb reach Grafana over BLE |
+| BLE E2E | v3 telemetry over BLE: firmware → gateway → InfluxDB → Grafana | Done (v0.10.1) — validated on NUCLEO-L476RG + X-NUCLEO-IDB05A2 shield; fixed BLE MTU (27→35), gateway service-UUID matching, and re-advertise-after-disconnect; real current/coulomb reach Grafana over BLE |
 
 ---
 

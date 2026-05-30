@@ -1,6 +1,6 @@
 === BLE-on-NUCLEO end-to-end validation — v0.10.1 ===
 Date:     2026-05-29
-Board:    NUCLEO-L476RG + X-NUCLEO-IDB05A1 BLE shield + INA219 @ 0x40
+Board:    NUCLEO-L476RG + X-NUCLEO-IDB05A2 BLE shield + INA219 @ 0x40
 Firmware: app/boards/nucleo_l476rg_ble_current.conf
           (BLE transport + INA219 current sense + coulomb counting)
 Gateway:  ibattery-gateway run  (bleak on macOS, run from iTerm)

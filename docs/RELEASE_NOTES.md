@@ -13,7 +13,7 @@ headers across README/index/ROADMAP now point at v0.10.2.
 
 ## v0.10.1 — BLE-on-NUCLEO end-to-end validation + three BLE fixes — 2026-05-29
 
-Closes the deferred v0.8.5 end-to-end validation: with an X-NUCLEO-IDB05A1
+Closes the deferred v0.8.5 end-to-end validation: with an X-NUCLEO-IDB05A2
 BLE shield on the bench, v3 telemetry was driven all the way from firmware
 through BLE → Python gateway → InfluxDB → Grafana for the first time. Real
 `current_ma` / `coulomb_mah` from the INA219 now light up the Live Current
