@@ -7,13 +7,15 @@
   "graphTooltip": 1,
   "id": null,
   "links": [],
+  "description": "iBattery telemetry \u2014 at-a-glance status tiles, health gauges, and trends.",
   "panels": [
     {
-      "title": "Voltage (V)",
-      "type": "timeseries",
+      "title": "Voltage",
+      "description": "Battery terminal voltage (latest sample).",
+      "type": "stat",
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 4,
+        "w": 5,
         "x": 0,
         "y": 0
       },
@@ -24,102 +26,7 @@
       "fieldConfig": {
         "defaults": {
           "unit": "volt",
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "spanNulls": false
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "tooltip": {
-          "mode": "single"
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": ""
-          },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"voltage_v\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"voltage\")",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "title": "Temperature (\u00b0C)",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "datasource": {
-        "type": "influxdb",
-        "uid": ""
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "celsius",
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "spanNulls": false
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "tooltip": {
-          "mode": "single"
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": ""
-          },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"temperature_c\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"temperature\")",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "title": "State of Charge",
-      "type": "gauge",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 8
-      },
-      "datasource": {
-        "type": "influxdb",
-        "uid": ""
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
+          "decimals": 2,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -129,15 +36,226 @@
               },
               {
                 "color": "orange",
-                "value": 20
+                "value": 2.5
+              },
+              {
+                "color": "green",
+                "value": 2.8
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": ""
+          },
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -15m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"voltage_v\")\n  |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)\n  |> yield(name: \"voltage_v\")",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Temperature",
+      "description": "Board/battery temperature.",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 5,
+        "y": 0
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": ""
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 5
+              },
+              {
+                "color": "yellow",
+                "value": 40
+              },
+              {
+                "color": "red",
+                "value": 55
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": ""
+          },
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -15m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"temperature_c\")\n  |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)\n  |> yield(name: \"temperature_c\")",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Current",
+      "description": "Instantaneous discharge current (INA219).",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 10,
+        "y": 0
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": ""
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "mamp",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
               },
               {
                 "color": "yellow",
                 "value": 50
               },
               {
+                "color": "red",
+                "value": 200
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": ""
+          },
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -15m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"current_ma\")\n  |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)\n  |> yield(name: \"current_ma\")",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Status",
+      "description": "Telemetry health. OK = all reads succeeded; FAULT = one or more error flags set.",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 15,
+        "y": 0
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": ""
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "OK",
+                  "color": "green"
+                }
+              }
+            },
+            {
+              "type": "range",
+              "options": {
+                "from": 1,
+                "to": 999999,
+                "result": {
+                  "text": "FAULT",
+                  "color": "red"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
                 "color": "green",
-                "value": 80
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
               }
             ]
           }
@@ -152,8 +270,9 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
       },
       "targets": [
         {
@@ -161,19 +280,20 @@
             "type": "influxdb",
             "uid": ""
           },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"soc_pct\")\n  |> last()\n  |> yield(name: \"soc\")",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"status_flags\")\n  |> last()\n  |> yield(name: \"status_flags\")",
           "refId": "A"
         }
       ]
     },
     {
       "title": "Power State",
+      "description": "Device power state machine.",
       "type": "stat",
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 8
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
       },
       "datasource": {
         "type": "influxdb",
@@ -259,7 +379,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "text",
                 "value": null
               }
             ]
@@ -275,9 +395,9 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "value",
-        "textMode": "auto",
-        "graphMode": "none"
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
       },
       "targets": [
         {
@@ -291,13 +411,14 @@
       ]
     },
     {
-      "title": "Raw Voltage (mV)",
-      "type": "timeseries",
+      "title": "State of Charge",
+      "description": "Estimated charge remaining (voltage-LUT + coulomb fusion).",
+      "type": "gauge",
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 8
+        "w": 12,
+        "x": 0,
+        "y": 4
       },
       "datasource": {
         "type": "influxdb",
@@ -305,64 +426,27 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "mvolt",
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "spanNulls": false
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "tooltip": {
-          "mode": "single"
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": ""
-          },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"voltage_mv\")\n  |> aggregateWindow(every: 10s, fn: last, createEmpty: false)\n  |> yield(name: \"voltage_mv\")",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "title": "Status Flags",
-      "type": "stat",
-      "gridPos": {
-        "h": 4,
-        "w": 8,
-        "x": 16,
-        "y": 16
-      },
-      "datasource": {
-        "type": "influxdb",
-        "uid": ""
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": null
               },
               {
-                "color": "red",
-                "value": 1
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
               }
             ]
           }
@@ -377,9 +461,8 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "value",
-        "textMode": "auto",
-        "graphMode": "none"
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
       },
       "targets": [
         {
@@ -387,19 +470,20 @@
             "type": "influxdb",
             "uid": ""
           },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"status_flags\")\n  |> last()\n  |> yield(name: \"flags\")",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"soc_pct\")\n  |> last()\n  |> yield(name: \"soc_pct\")",
           "refId": "A"
         }
       ]
     },
     {
-      "title": "Live Current (mA)",
-      "type": "timeseries",
+      "title": "State of Health",
+      "description": "Learned usable capacity / rated capacity. Stays at 100% until the battery completes a full discharge cycle, then tracks capacity fade. <80% typically signals replacement.",
+      "type": "gauge",
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 0,
-        "y": 20
+        "x": 12,
+        "y": 4
       },
       "datasource": {
         "type": "influxdb",
@@ -407,14 +491,82 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "mamp",
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "yellow",
+                "value": 80
+              },
+              {
+                "color": "green",
+                "value": 90
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": ""
+          },
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"soh_pct\")\n  |> last()\n  |> yield(name: \"soh_pct\")",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Voltage (V) \u2014 trend",
+      "description": "30 s mean \u2014 smooths ADC quantization so a stable cell reads flat.",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 12
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": ""
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "decimals": 3,
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
             "lineWidth": 2,
             "fillOpacity": 10,
-            "spanNulls": false
+            "spanNulls": false,
+            "showPoints": "never",
+            "lineInterpolation": "smooth"
           }
         },
         "overrides": []
@@ -434,19 +586,20 @@
             "type": "influxdb",
             "uid": ""
           },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"current_ma\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"current\")",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"voltage_v\")\n  |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)\n  |> yield(name: \"voltage_v\")",
           "refId": "A"
         }
       ]
     },
     {
       "title": "Remaining Charge (mAh)",
+      "description": "Coulomb-counter remaining charge.",
       "type": "timeseries",
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 20
+        "w": 8,
+        "x": 8,
+        "y": 12
       },
       "datasource": {
         "type": "influxdb",
@@ -455,15 +608,17 @@
       "fieldConfig": {
         "defaults": {
           "unit": "none",
+          "decimals": 2,
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
             "lineWidth": 2,
             "fillOpacity": 10,
-            "spanNulls": false
-          },
-          "decimals": 2
+            "spanNulls": false,
+            "showPoints": "never",
+            "lineInterpolation": "smooth"
+          }
         },
         "overrides": []
       },
@@ -482,19 +637,20 @@
             "type": "influxdb",
             "uid": ""
           },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"coulomb_mah\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"coulomb\")",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"coulomb_mah\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"coulomb_mah\")",
           "refId": "A"
         }
       ]
     },
     {
-      "title": "State of Health (%)",
+      "title": "State of Health (%) \u2014 trend",
+      "description": "Capacity-fade over time \u2014 the fleet predictive-maintenance view.",
       "type": "timeseries",
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 28
+        "w": 8,
+        "x": 16,
+        "y": 12
       },
       "datasource": {
         "type": "influxdb",
@@ -503,15 +659,17 @@
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
+          "decimals": 2,
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
             "lineWidth": 2,
             "fillOpacity": 10,
-            "spanNulls": false
+            "spanNulls": false,
+            "showPoints": "never",
+            "lineInterpolation": "smooth"
           },
-          "decimals": 2,
           "min": 0,
           "max": 100
         },
@@ -532,7 +690,7 @@
             "type": "influxdb",
             "uid": ""
           },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"soh_pct\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"soh\")",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"soh_pct\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"soh_pct\")",
           "refId": "A"
         }
       ]
@@ -556,5 +714,5 @@
   "timezone": "",
   "title": "iBattery Telemetry",
   "uid": "ibattery-telemetry",
-  "version": 2
+  "version": 3
 }
