@@ -359,6 +359,24 @@ target_compile_definitions(test_soc_estimator_fusion PRIVATE
 
 target_link_libraries(test_soc_estimator_fusion PRIVATE unity)
 
+# ── SoH test (Phase 8d) ───────────────────────────────────────────────────
+add_executable(test_soc_soh
+    test_soc_soh.c
+    ${SDK_SRC}/intelligence/battery_soh.c
+)
+target_include_directories(test_soc_soh PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}
+    ${SDK_SRC}/intelligence
+    ${unity_SOURCE_DIR}/src
+)
+target_compile_definitions(test_soc_soh PRIVATE
+    CONFIG_BATTERY_SOC_SOH_ALPHA_X1000=500
+    CONFIG_BATTERY_SOC_SOH_REJECT_LO_PCT=30
+    CONFIG_BATTERY_SOC_SOH_REJECT_HI_PCT=120
+)
+target_link_libraries(test_soc_soh PRIVATE unity)
+
 # ── Median voltage filter test ─────────────────────────────────────────────
 add_executable(test_voltage_filter_median
     test_voltage_filter_median.c
@@ -419,3 +437,4 @@ add_test(NAME soc_coulomb_cr2032 COMMAND test_soc_coulomb_cr2032)
 add_test(NAME soc_slew_limit COMMAND test_soc_slew_limit)
 add_test(NAME soc_fusion COMMAND test_soc_fusion)
 add_test(NAME soc_estimator_fusion COMMAND test_soc_estimator_fusion)
+add_test(NAME soc_soh COMMAND test_soc_soh)
