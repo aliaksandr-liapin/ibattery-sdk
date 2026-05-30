@@ -50,3 +50,6 @@ coverage/
 # Docker Compose persistent data (named volumes, not typically on disk, but just in case)
 cloud/influxdb-data/
 cloud/grafana-data/
+
+# Git worktrees (isolated dev workspaces)
+.worktrees/
