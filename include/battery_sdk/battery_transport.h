@@ -23,7 +23,12 @@ extern "C" {
 #define BATTERY_TRANSPORT_WIRE_SIZE_V1 20
 #define BATTERY_TRANSPORT_WIRE_SIZE_V2 24
 #define BATTERY_TRANSPORT_WIRE_SIZE_V3 32
-#define BATTERY_TRANSPORT_WIRE_SIZE    BATTERY_TRANSPORT_WIRE_SIZE_V3
+#define BATTERY_TRANSPORT_WIRE_SIZE_V4 34
+/* Largest wire format the transport must carry. MUST track the highest
+ * BATTERY_SERIALIZE_V*_SIZE — it sizes the BLE backend's cached buffer and
+ * bounds ble_send(). Keeping it below the serialized size silently rejects
+ * the largest packets (e.g. v4 was rejected with INVALID_ARG until bumped). */
+#define BATTERY_TRANSPORT_WIRE_SIZE    BATTERY_TRANSPORT_WIRE_SIZE_V4
 
 /**
  * Transport backend operations — compile-time vtable.

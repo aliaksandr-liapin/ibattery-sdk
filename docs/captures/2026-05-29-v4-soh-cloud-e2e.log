@@ -1,0 +1,53 @@
+=== SoH cloud layer (wire v4) end-to-end validation ===
+Date:     2026-05-29
+Board:    NUCLEO-L476RG + X-NUCLEO-IDB05A2 BLE shield + INA219 @ 0x40
+Firmware: nucleo_l476rg_ble_current.conf + CONFIG_BATTERY_SOC_SOH=y (wire v4, MTU 37)
+Gateway:  ibattery-gateway run (worktree v4 decoder, from iTerm)
+Stack:    InfluxDB 2.9.1 + Grafana 13.0.1
+
+First time State of Health traversed the full pipeline:
+firmware -> BLE -> gateway -> InfluxDB -> Grafana.
+
+--- (1) Firmware emits v4 (serial, /dev/cu.usbmodem1203) ---
+
+[v4 t=16047] V=3322 mV T=24.88 C SOC=99.99% PWR=1 CYC=0 flags=0x00000000 I=2.80 mA Q=219.98 mAh
+# version tag is "v4" (34-byte packet); SoH carried in the packet, computed on-device.
+
+--- (2) Bug found by THIS E2E (fixed) ---
+
+First gateway run connected + subscribed but NO telemetry arrived. Serial showed:
+  Transport send failed: -2        (BATTERY_STATUS_INVALID_ARG)
+Root cause: the transport layer has its OWN size constants, separate from the
+serializer. BATTERY_TRANSPORT_WIRE_SIZE was still pinned to v3 (32), so ble_send()
+rejected the 34-byte v4 packet (len > 32) and the BLE cache buffer was undersized.
+The plan/serializer change (battery_serialize.h V4_SIZE=34) had missed it.
+Fix: BATTERY_TRANSPORT_WIRE_SIZE_V4=34, BATTERY_TRANSPORT_WIRE_SIZE -> V4, plus a
+_Static_assert(BATTERY_TRANSPORT_WIRE_SIZE >= BATTERY_SERIALIZE_V4_SIZE) so it can't
+silently regress. (Host unit tests passed throughout — the BLE backend bound is
+firmware-only; only the hardware E2E exercised it.)
+
+--- (3) Gateway decodes v4 over BLE (iTerm) ---
+
+[INFO] gateway.scanner: Found iBattery at FC600650-...-5E9A526E2E5C (name='iBattery-STM32')
+[INFO] gateway.scanner: Connected ... Subscribed to notifications on 12340002-...
+[  1] v4 | 3.321V | 24.88C | SoC 100.0% | IDLE | flags=0x00000000 | +2.80mA 220.0mAh | ts=52090ms
+[  2] v4 | 3.321V | 24.55C | SoC 100.0% | IDLE | flags=0x00000000 | +2.80mA 219.9mAh | ts=54093ms
+...
+[  7] v4 | 3.321V | 24.88C | SoC 100.0% | IDLE | flags=0x00000000 | +2.80mA 219.9mAh | ts=64107ms
+
+--- (4) InfluxDB (telemetry bucket) — soh_pct field present ---
+
+# flux: last() over -90s on battery_telemetry
+soh_pct      = 100      <-- NEW v4 field, decoded + written by the gateway
+coulomb_mah  = 219.93
+soc_pct      = 99.97
+# SoH reads 100% (rated) — expected; it only moves after a full discharge cycle.
+
+--- (5) Grafana ---
+
+Dashboard "iBattery Telemetry" (uid ibattery-telemetry, provisioned from
+cloud/grafana/provisioning/dashboards/battery.json) now includes a
+"State of Health (%)" timeseries panel querying soh_pct. Confirmed present via API.
+
+Result: PASS. v4 / SoH flows firmware -> BLE -> gateway -> InfluxDB -> Grafana.
+Back-compatible with v1-v3 (gateway auto-detects by length; SoH-off firmware stays v3).
