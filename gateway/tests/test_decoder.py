@@ -9,6 +9,7 @@ from gateway.decoder import (
     WIRE_SIZE_V1,
     WIRE_SIZE_V2,
     WIRE_SIZE_V3,
+    WIRE_SIZE_V4,
     decode_packet,
     format_packet,
 )
@@ -301,6 +302,32 @@ class TestDecodePacketV3:
         assert result["cycle_count"] == 500
         assert result["current_ma"] == pytest.approx(-123.45)
         assert result["coulomb_mah"] == pytest.approx(987.65)
+
+
+class TestDecodePacketV4:
+    """Tests for v4 (34-byte) packets — adds soh_pct_x100."""
+
+    def test_decode_v4_includes_soh(self):
+        # v3 layout + uint16 soh (8750 = 87.50%)
+        data = struct.pack(
+            "<BIiiHBIIiiH",
+            4, 1000, 3700, 2500, 8500, 2, 0,  # version..flags
+            5,                                  # cycle_count
+            280, 22000,                         # current_ma_x100, coulomb_mah_x100
+            8750,                               # soh_pct_x100
+        )
+        assert len(data) == WIRE_SIZE_V4 == 34
+        out = decode_packet(data)
+        assert out["version"] == 4
+        assert out["soh_pct"] == 87.5
+        assert out["coulomb_mah"] == 220.0  # v3 fields still decoded
+
+    def test_decode_v3_soh_defaults_zero(self):
+        data = struct.pack(
+            "<BIiiHBIIii", 3, 1000, 3700, 2500, 8500, 2, 0, 5, 280, 22000
+        )
+        out = decode_packet(data)
+        assert out["soh_pct"] == 0.0
 
 
 class TestDecodeErrors:
