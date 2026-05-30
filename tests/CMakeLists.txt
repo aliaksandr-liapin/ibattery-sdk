@@ -377,6 +377,32 @@ target_compile_definitions(test_soc_soh PRIVATE
 )
 target_link_libraries(test_soc_soh PRIVATE unity)
 
+# ── SoC estimator + SoH integration test (Phase 8d) ───────────────────────
+add_executable(test_soc_soh_estimator
+    test_soc_soh_estimator.c
+    ${SDK_SRC}/intelligence/battery_soc_estimator.c
+    ${SDK_SRC}/intelligence/battery_soc_lut.c
+    ${SDK_SRC}/intelligence/battery_coulomb.c
+    ${SDK_SRC}/intelligence/battery_soh.c
+    mocks/mock_voltage.c
+    mocks/mock_current.c
+    mocks/mock_nvs.c
+    mocks/mock_sdk_state.c
+)
+target_include_directories(test_soc_soh_estimator PRIVATE
+    ${SDK_INCLUDE} ${SDK_SRC} ${SDK_SRC}/core ${SDK_SRC}/intelligence
+    ${SDK_SRC}/hal ${unity_SOURCE_DIR}/src
+)
+target_compile_definitions(test_soc_soh_estimator PRIVATE
+    CONFIG_BATTERY_SOC_COULOMB=1
+    CONFIG_BATTERY_SOC_SOH=1
+    CONFIG_BATTERY_SOC_SOH_ALPHA_X1000=500
+    CONFIG_BATTERY_SOC_SOH_REJECT_LO_PCT=30
+    CONFIG_BATTERY_SOC_SOH_REJECT_HI_PCT=120
+    CONFIG_BATTERY_CAPACITY_MAH=220
+)
+target_link_libraries(test_soc_soh_estimator PRIVATE unity)
+
 # ── Median voltage filter test ─────────────────────────────────────────────
 add_executable(test_voltage_filter_median
     test_voltage_filter_median.c
@@ -438,3 +464,4 @@ add_test(NAME soc_slew_limit COMMAND test_soc_slew_limit)
 add_test(NAME soc_fusion COMMAND test_soc_fusion)
 add_test(NAME soc_estimator_fusion COMMAND test_soc_estimator_fusion)
 add_test(NAME soc_soh COMMAND test_soc_soh)
+add_test(NAME soc_soh_estimator COMMAND test_soc_soh_estimator)

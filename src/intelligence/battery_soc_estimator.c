@@ -19,6 +19,10 @@
 #include <battery_sdk/battery_soc_fusion.h>
 #endif
 
+#if defined(CONFIG_BATTERY_SOC_SOH)
+#include <battery_sdk/battery_soh.h>
+#endif
+
 #ifndef CONFIG_BATTERY_CAPACITY_MAH
 #define CONFIG_BATTERY_CAPACITY_MAH 1000
 #endif
@@ -133,6 +137,9 @@ int battery_soc_estimator_init(void)
     g_coulomb_soc_valid = false;
     g_full_anchor_active = false;
     g_empty_anchor_active = false;
+#if defined(CONFIG_BATTERY_SOC_SOH)
+    battery_soh_init((int32_t)CONFIG_BATTERY_CAPACITY_MAH * 100);
+#endif
 #endif
 #if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
     g_slew_initialized = false;
@@ -210,6 +217,14 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
                 /* Edge into empty region — calibrate to 0 mAh. */
                 g_coulomb_soc_x100 = 0;
                 g_coulomb_soc_valid = true;
+#if defined(CONFIG_BATTERY_SOC_SOH)
+                {
+                    int32_t q_before = 0;
+                    if (battery_coulomb_get_mah_x100(&q_before) == BATTERY_STATUS_OK) {
+                        battery_soh_observe_empty_anchor(q_before);
+                    }
+                }
+#endif
                 (void)battery_coulomb_reset(0);
                 g_empty_anchor_active = true;
             }
@@ -222,6 +237,9 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
                 g_coulomb_soc_valid = true;
                 (void)battery_coulomb_reset(full_mah_x100);
                 g_full_anchor_active = true;
+#if defined(CONFIG_BATTERY_SOC_SOH)
+                battery_soh_note_full_anchor();
+#endif
             }
             g_empty_anchor_active = false;
         } else {
