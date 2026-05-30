@@ -18,6 +18,22 @@
  *   0-19         Same as v1
  *  20      4    cycle_count         (uint32 LE)
  *  ──     24    Total
+ *
+ * Wire format v3 (32 bytes, little-endian):
+ *
+ *   0-23         Same as v2
+ *  24      4    current_ma_x100     (int32  LE)
+ *  28      4    coulomb_mah_x100    (int32  LE)
+ *  ──     32    Total
+ *
+ * Wire format v4 (34 bytes, little-endian):
+ *
+ *   0-31         Same as v3
+ *  32      2    soh_pct_x100        (uint16 LE)
+ *  ──     34    Total
+ *
+ * Versions are a superset ladder: a vN buffer contains all fields of
+ * v1..vN. The gateway auto-detects the version by buffer length.
  */
 
 #ifndef BATTERY_SERIALIZE_H
@@ -39,7 +55,8 @@ extern "C" {
 /**
  * Pack a telemetry packet into a wire buffer.
  *
- * Writes 24 bytes (v2 format) when version >= 2, 20 bytes for v1.
+ * Writes the number of bytes for pkt->telemetry_version: 20 (v1), 24 (v2),
+ * 32 (v3), or 34 (v4). See battery_serialize_wire_size().
  *
  * @param pkt      Source packet (must not be NULL)
  * @param buf      Destination buffer (must not be NULL, >= BATTERY_SERIALIZE_BUF_SIZE)
@@ -52,7 +69,8 @@ int battery_serialize_pack(const struct battery_telemetry_packet *pkt,
 /**
  * Unpack a wire buffer into a telemetry packet.
  *
- * Accepts both 20-byte (v1) and 24-byte (v2) buffers.
+ * Accepts 20-byte (v1), 24-byte (v2), 32-byte (v3), and 34-byte (v4)
+ * buffers. Fields beyond the buffer's length are set to 0.
  *
  * @param buf      Source buffer (must not be NULL, >= 20 bytes)
  * @param buf_len  Size of buf in bytes
@@ -65,8 +83,8 @@ int battery_serialize_unpack(const uint8_t *buf, uint8_t buf_len,
 /**
  * Get the wire size for the given packet version.
  *
- * @param version  Telemetry version (1 or 2).
- * @return Wire size in bytes (20 for v1, 24 for v2+).
+ * @param version  Telemetry version (1..4; higher clamps to the latest).
+ * @return Wire size in bytes: 20 (v1), 24 (v2), 32 (v3), 34 (v4+).
  */
 static inline uint8_t battery_serialize_wire_size(uint8_t version)
 {

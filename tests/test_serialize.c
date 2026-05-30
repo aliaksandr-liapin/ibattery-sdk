@@ -525,6 +525,20 @@ void test_v3_unpack_leaves_soh_zero(void)
     TEST_ASSERT_EQUAL_UINT16(0, dst.soh_pct_x100);
 }
 
+void test_v4_version_short_buffer_zeroes_soh(void)
+{
+    /* version byte says 4 but only 32 bytes provided — the buf_len guard
+     * must zero soh_pct_x100 rather than read past the buffer. */
+    struct battery_telemetry_packet src = make_v4_packet();
+    struct battery_telemetry_packet dst;
+    uint8_t buf[BATTERY_SERIALIZE_BUF_SIZE];
+    battery_serialize_pack(&src, buf, sizeof(buf));   /* buf[0] == 4 */
+    TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK,
+                          battery_serialize_unpack(buf, 32, &dst));
+    TEST_ASSERT_EQUAL_UINT8(4, dst.telemetry_version);
+    TEST_ASSERT_EQUAL_UINT16(0, dst.soh_pct_x100);
+}
+
 /* ── Test runner ─────────────────────────────────────────────────── */
 
 int main(void)
@@ -573,6 +587,7 @@ int main(void)
     RUN_TEST(test_v4_roundtrip);
     RUN_TEST(test_pack_v4_buffer_too_small);
     RUN_TEST(test_v3_unpack_leaves_soh_zero);
+    RUN_TEST(test_v4_version_short_buffer_zeroes_soh);
 
     return UNITY_END();
 }
