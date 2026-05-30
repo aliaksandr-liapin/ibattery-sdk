@@ -235,6 +235,39 @@ config BATTERY_SOC_FUSION_I_THRESH_X100
 
 endif # BATTERY_SOC_FUSION
 
+config BATTERY_SOC_SOH
+    bool "State-of-Health (capacity-fade learning)"
+    default n
+    depends on BATTERY_SOC_COULOMB
+    help
+      Learns the battery's true usable capacity from full->empty discharge
+      excursions and exposes State of Health (SoH = learned / rated). The
+      coulomb integral between a full and an empty anchor is the actual
+      delivered charge; an aged cell delivers less, which shows up as SoH
+      below 100%. RAM-only (relearns on reboot). Opt-in; default off.
+
+if BATTERY_SOC_SOH
+
+config BATTERY_SOC_SOH_ALPHA_X1000
+    int "SoH EMA blend per valid excursion (x1000)"
+    default 500
+    range 0 1000
+    help
+      Per-excursion pull of learned capacity toward the freshly measured
+      value. 500 = 50% (converges in a few cycles); smaller is steadier.
+
+config BATTERY_SOC_SOH_REJECT_LO_PCT
+    int "Reject measured capacity below this % of rated"
+    default 30
+    range 0 100
+
+config BATTERY_SOC_SOH_REJECT_HI_PCT
+    int "Reject measured capacity above this % of rated"
+    default 120
+    range 100 200
+
+endif # BATTERY_SOC_SOH
+
 config BATTERY_CHARGER_TP4056
     bool "TP4056 charger IC GPIO status detection"
     default n
