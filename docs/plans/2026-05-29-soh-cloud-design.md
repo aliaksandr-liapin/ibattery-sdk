@@ -1,6 +1,6 @@
 # SoH Cloud Layer (wire v4 + gateway + Grafana) Design
 
-**Status:** Approved design (brainstorm) — not yet implemented
+**Status:** ✅ Implemented & released in v0.11.0
 **Date:** 2026-05-29
 **Depends on:** Phase 8d on-device SoH MVP (`CONFIG_BATTERY_SOC_SOH`, merged to main)
 

@@ -82,7 +82,7 @@ cd tests && mkdir -p build && cd build
 cmake .. && make && ctest --output-on-failure
 ```
 
-14 test suites, Unity framework (includes coulomb counter, current HAL stub, SoC coulomb).
+21 test suites, Unity framework (includes coulomb counter, SoC coulomb, SoH, fusion, current HAL stub, serialize v1–v4).
 
 ### Python gateway tests
 
@@ -90,7 +90,7 @@ cmake .. && make && ctest --output-on-failure
 cd gateway && pip install -e . && pytest
 ```
 
-65 tests across 6 files (includes v3 packet decoding).
+77 tests (includes v4 packet decoding, SoH, scanner service-UUID matching).
 
 ### Gateway CLI
 

@@ -26,10 +26,10 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 - HAL abstraction layer — core logic is platform-independent portable C
 - LiPo 500mAh powering nRF52840-DK via TP4056 HW-373 (USB-C) — real battery power verified
 - TP4056 charging confirmed (voltage rise on USB-C connect); CHRG/STDBY GPIO signals simulated with jumper wires (LED pad soldering pending)
-- Python BLE gateway (bleak) → InfluxDB 2.x → Grafana 11-panel dashboard (Docker Compose)
+- Python BLE gateway (bleak) → InfluxDB 2.x → Grafana dashboard (Docker Compose)
 - `ibattery-gateway` CLI: scan, stream, run, analytics (health, anomalies, rul, cycles)
 - Cloud analytics: battery health scoring, real-time + historical anomaly detection, RUL estimation, cycle analysis
-- 11 C test suites (Unity) + 65 Python tests (pytest), zero hardware required to run
+- 21 C test suites (Unity) + 77 Python tests (pytest), zero hardware required to run
 - Zephyr RTOS integration with clean layered architecture
 - Production-quality codebase: no layer violations, consistent conventions, full documentation
 

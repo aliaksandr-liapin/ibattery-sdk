@@ -274,12 +274,12 @@ ibattery-gateway (Python / bleak)        gateway/
     ▼
 Docker Compose stack                     cloud/
     ├── InfluxDB 2.x      time-series storage (port 8086)
-    └── Grafana            11-panel dashboard (port 3000)
+    └── Grafana            dashboard (port 3000)
 ```
 
 The gateway connects to either platform via BLE, decodes the v1/v2 wire format
 defined in `battery_serialize.c`, runs real-time anomaly checks on each packet,
-and writes measurement points to InfluxDB. Grafana provides an 11-panel
+and writes measurement points to InfluxDB. Grafana provides a
 "iBattery Telemetry" dashboard with voltage, SoC, temperature, power state,
 cycle count, health score, anomaly log, RUL, and trend panels.
 

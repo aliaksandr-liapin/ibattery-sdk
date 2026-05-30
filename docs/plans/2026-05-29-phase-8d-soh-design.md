@@ -1,6 +1,6 @@
 # Phase 8d: On-device State of Health (Capacity-Fade Learning) Design
 
-**Status:** Approved design (brainstorm) — not yet implemented
+**Status:** ✅ Implemented & released in v0.11.0
 **Date:** 2026-05-29
 **Depends on:** Phase 8a coulomb counting (`CONFIG_BATTERY_SOC_COULOMB`)
 

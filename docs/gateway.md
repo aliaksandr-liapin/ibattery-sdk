@@ -98,4 +98,4 @@ ibattery-gateway analytics cycles      # Charge cycle analysis
 
 ### Grafana dashboard
 
-Import `grafana/ibattery-dashboard.json` into Grafana for an 11-panel dashboard.
+Import `grafana/ibattery-dashboard.json` into Grafana for the iBattery dashboard.

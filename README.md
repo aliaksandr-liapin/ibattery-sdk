@@ -107,13 +107,13 @@ See [Hardware Wiring Guide](docs/WIRING.md) for pin diagrams and circuit schemat
 - Coulomb counting SoC estimation via INA219 current sensor (voltage-anchored, NVS-persisted)
 - Charge cycle counter with NVS flash persistence (CHARGING→CHARGED transitions)
 - Python BLE gateway with auto-reconnect (bleak) → InfluxDB 2.x → Grafana dashboard
-- Docker Compose cloud stack: InfluxDB time-series storage + 11-panel Grafana dashboard
+- Docker Compose cloud stack: InfluxDB time-series storage + Grafana dashboard
 - `ibattery-gateway` CLI: scan, stream, run, analytics (health, anomalies, rul, cycles)
 - Real-time and historical anomaly detection (voltage, temperature, SoC inconsistency)
 - Battery health scoring, remaining useful life (RUL) estimation, cycle analysis
 - Full battery state machine: ACTIVE, IDLE (30s), SLEEP (120s), CRITICAL, CHARGING, DISCHARGING, CHARGED
 - TP4056 charger IC integration via GPIO (Kconfig-gated: `CONFIG_BATTERY_CHARGER_TP4056`)
-- Host-based unit tests (Unity framework, 11 C test suites + 65 Python tests)
+- Host-based unit tests (Unity framework, 21 C test suites + 77 Python tests)
 
 ---
 
@@ -163,7 +163,7 @@ Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 lib_deps = aliaksandr-liapin/ibattery-sdk@^0.11.1
 ```
 
-The `^0.10.0` constraint pulls v0.10.0 or any newer 0.10.x release. v0.10.0 adds Phase 8c (voltage+coulomb signal fusion) on top of the working Phase 8a coulomb counter (v0.8.4) and Phase 8b voltage smoothing (v0.9.0).
+The `^0.11.0` constraint pulls v0.11.0 or any newer 0.11.x release. v0.11.0 ships Phase 8d State of Health (on-device learning + wire v4 + Grafana panel) on top of Phases 8a–8c.
 
 ### Run unit tests (host, no hardware needed)
 

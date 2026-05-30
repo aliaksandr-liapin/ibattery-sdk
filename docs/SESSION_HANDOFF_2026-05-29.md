@@ -1,192 +1,102 @@
-# Session Handoff — Phase 8 Series Complete
-
-> **UPDATE (later, 2026-05-29): v0.10.1 shipped.** A follow-up session closed
-> the BLE-on-NUCLEO E2E loop (was listed below as "blocked on shield"). v3
-> telemetry now flows firmware → BLE → gateway → InfluxDB → Grafana on real
-> hardware, with real current/coulomb. Fixed three latent BLE bugs (MTU 27→35,
-> gateway service-UUID matching, re-advertise after disconnect). Tagged
-> `v0.10.1`, GitHub released, PlatformIO published. Evidence:
-> `docs/captures/2026-05-29-v0.10.1-ble-on-nucleo-e2e.log`. The menu item below
-> is struck through; everything else here is still accurate history.
+# Session Handoff — State of Health shipped end-to-end (v0.11.1)
 
 **Date:** 2026-05-29
-**Last release:** v0.10.2 (docs/packaging fix — corrects the bundled README in the 0.10.1 tarball; no code change). Functional milestone is v0.10.1.
-**Status:** All work wrapped. Repo + remotes + registry + memory all synchronized. **Ready for any next direction.**
+**Last release:** **v0.11.1** (tagged, GitHub released, PlatformIO published)
+**Status:** All work wrapped. Repo + remotes + registry + memory in sync. Working tree clean. **Ready for any next direction.**
 
-This document is the cold-start brief for the next chat session. Open the next chat with the one-line summary at the bottom, and that session will know enough to pick up cleanly without re-deriving context.
-
----
-
-## The big picture (one paragraph)
-
-The ibattery-sdk's Phase 8 advanced-SoC roadmap is fully closed end-to-end. Phase 8a (coulomb counting) is hardware-validated on NUCLEO-L476RG after the swap-the-MCU diagnostic revealed a per-unit GPIO defect on the original nRF52840-DK. Phase 8b (voltage smoothing) was already shipped in v0.9.0. Phase 8c (voltage+coulomb signal fusion via complementary filter with current-adaptive α) shipped today as v0.10.0, opt-in via `CONFIG_BATTERY_SOC_FUSION` (default off). The PlatformIO registry shows v0.10.0 as the latest installable version. 19 host tests + 67 gateway tests pass. 0 open GitHub issues. Five hardware capture logs preserved in `docs/captures/` as evidence-of-fix for the v0.8.x bug-fix arc and the v0.10.0 fusion validation.
+This is the cold-start brief for the next chat. Paste the one-liner at the bottom into the new window.
 
 ---
 
-## What's done
+## Big picture (one paragraph)
 
-### Releases shipped today (2026-05-29, in order)
+ibattery-sdk is an open-core embedded battery-intelligence SDK (Zephyr C) with a full pipeline: firmware → BLE → Python gateway → InfluxDB → Grafana. Phases 8a–8c (coulomb counting, voltage smoothing, voltage+coulomb fusion) shipped earlier. **This session** validated BLE-on-NUCLEO end-to-end (v0.10.1/0.10.2), then built **Phase 8d State of Health** — on-device capacity-fade learning *and* its cloud path — and shipped it as **v0.11.0**, plus a Grafana dashboard redesign and a v0.11.1 docs fix. SoH now travels firmware→BLE→gateway→InfluxDB→Grafana via a new **wire v4**. Everything was built the disciplined way (brainstorm → design → plan → subagent-driven TDD with spec/quality/final reviews → hardware E2E). 21 host + 77 gateway tests pass.
 
-| Tag | What it did |
+---
+
+## Open-core strategy (READ THIS — governs all future work)
+
+Goal: **$10M** intermediate, **$100M** long-term. Model = open-core.
+
+- **Tag every roadmap/feature/release item FREE or COMMERCIAL.**
+- **Flag commercial territory UPFRONT** — before any work on the paid/private side, say so and confirm.
+- **Boundary = the wire protocol.** Device-side SDK + reference tooling = FREE/public. Fleet-scale-in-the-cloud = COMMERCIAL/private.
+- **FREE:** the whole on-device SDK (incl. on-device SoH), wire format, reference gateway + dashboards, NVS persistence, partial-excursion learning, more ports.
+- **COMMERCIAL (not started — flag before touching):** Fleet SaaS (per-device/mo recurring — the $-engine), advanced/certified algorithm packs, enterprise (compliance/on-prem/SLA). These live in a *future private repo*.
+- Detailed strategy is in private memory (`strategy_open_core.md`), not the public repo. Licensing/pricing/entity = legal/financial, needs counsel.
+
+---
+
+## What shipped this session
+
+| Tag | What |
 |---|---|
-| `v0.8.3` | Phase 8a hardware-validated on NUCLEO-L476RG (swap-the-MCU breakthrough — original nRF DK has per-unit GPIO defect on P0.26/P0.27) |
-| `v0.8.4` | Coulomb counter bug fix: Bug A (Q-as-remaining sign flip) + Bug B (one-shot anchor edge-detection). Closed issue #1. TDD regression test `tests/test_soc_coulomb_cr2032.c` added. |
-| `v0.8.5` | Gateway persists `current_ma` and `coulomb_mah` to InfluxDB; Grafana dashboard gains Live Current + Remaining Charge panels. Closed issue #2. |
-| `v0.9.1` | PlatformIO registry consolidation — `library.json` bumped so external users pulling via PIO get the union of v0.9.0 (Phase 8b) + the v0.8.x hardware-validation arc. |
-| `v0.10.0` | Phase 8c voltage+coulomb signal fusion. Complementary filter with current-adaptive α. Opt-in via Kconfig. +56 B flash, 0 new RAM. Hardware-validated with 3 captures. |
+| v0.10.1 | First v3 telemetry over BLE on real hardware. Fixed 3 BLE bugs: MTU 27→35 (v3 never fit before), gateway service-UUID matching (macOS name unreliable), re-advertise after disconnect. |
+| v0.10.2 | Docs/packaging fix (registry README). |
+| **v0.11.0** | **Phase 8d State of Health, end-to-end.** On-device `battery_soh` (opt-in `CONFIG_BATTERY_SOC_SOH`, integer-only, ~200 B flash, 0 new RAM) + **wire v4** (34 B, `soh_pct_x100` at offset 32, version 4 only when SoH on) → gateway → InfluxDB → Grafana "State of Health" panel. + redesigned dashboard (status tiles → gauges → trends). Hardware-validated E2E. |
+| v0.11.1 | Docs fix — absolute README image URL so the dashboard screenshot renders on the PlatformIO registry. |
 
-### What's persisted in the repo
-
-- **Source code**: `src/intelligence/battery_soc_fusion.c` + `include/battery_sdk/battery_soc_fusion.h` (new, Phase 8c)
-- **Tests**: `tests/test_soc_fusion.c` (10 unit tests) + `tests/test_soc_estimator_fusion.c` (6 integration tests) + `tests/test_soc_coulomb_cr2032.c` (v0.8.4 regression)
-- **Hardware capture evidence** in `docs/captures/`:
-  - `2026-05-29-v0.8.3-q-pinned-bug-evidence.log` — Q stuck at 220 mAh (the bug)
-  - `2026-05-29-v0.8.4-q-ticks-down-fix-evidence.log` — Q ticks 219.98 → 219.75 mAh (the fix)
-  - `2026-05-29-v0.10.0-drift-correction.log` — FUSION=y baseline, ΔQ matches theory
-  - `2026-05-29-v0.10.0-load-vs-rest.log` — 10/10 toggles cleanly detected, adaptive α verified
-  - `2026-05-29-v0.10.0-fusion-off-regression.log` — FUSION=n byte-identical to v0.8.4
-- **Design docs** in `docs/plans/`:
-  - `2026-05-29-phase-8c-fusion-design.md` (the approved design from brainstorming)
-  - `2026-05-29-phase-8c-fusion-plan.md` (the TDD implementation plan)
-- **Promotional drafts** in `docs/articles/`:
-  - `2026-05-29-swap-the-mcu.md` (dev.to article — published)
-  - `2026-05-29-swap-the-mcu-discord.md` (Discord post — posted to Zephyr #general)
-  - `2026-05-29-swap-the-mcu-hackaday.md` (Hackaday tip email — sent)
-  - `2026-05-29-swap-the-mcu-reddit.md` (Reddit draft — parked due to spam-filter Rule 4)
-- **Updated docs**: `RELEASE_NOTES.md`, `ROADMAP.md`, `SDK_API.md`, `HARDWARE_TROUBLESHOOTING.md` (swap-the-MCU section), `CLAUDE.md`, `README.md`, `docs/index.md`, `library.json` — all current to v0.10.0
-
-### Promotion done
-
-- **dev.to:** "When Soldering Doesn't Fix It: Swap the MCU" — published https://dev.to/aliaksandrliapin/when-soldering-doesnt-fix-it-swap-the-mcu-f58
-- **Zephyr Discord `#general`:** posted (trimmed swap-the-MCU story)
-- **Hackaday tip line** (tips@hackaday.com): emailed, awaiting potential coverage
-- **Reddit r/embedded:** drafted, auto-flagged by Rule 4, parked
-
-v0.10.0 itself has no promotional coverage yet — could be a future blog angle if energy is there. Suggested angle: "Fusing voltage and coulomb without going full Kalman" (or similar — the design doc has plenty of material).
+Design/plan docs: `docs/plans/2026-05-29-phase-8d-soh-{design,plan}.md` + `2026-05-29-soh-cloud-{design,plan}.md`. Evidence: `docs/captures/2026-05-29-v4-soh-cloud-e2e.log`.
 
 ---
 
-## State verification commands
-
-These let a new session confirm everything from this handoff in ~30 seconds.
+## State verification (run first in the next session, ~30 s)
 
 ```bash
 cd /Users/aliapin/Downloads/project/ibattery-sdk
-
-# Repo state
-git status                                          # expect: working tree clean
-git log --oneline origin/main..HEAD                  # expect: empty (in sync)
-git tag | grep "v0\.\(8\|9\|10\)" | sort -V         # expect: v0.8.0 ... v0.10.0
-
-# Open issues
-gh issue list --repo aliaksandr-liapin/ibattery-sdk --state open      # expect: empty
-
-# Recent releases
-gh release list --repo aliaksandr-liapin/ibattery-sdk --limit 5       # expect: v0.10.0 first
-
-# library.json points at v0.10.0
-python3 -c "import json; print(json.load(open('library.json'))['version'])"   # expect: 0.10.0
+git status                                   # expect: clean
+git log --oneline origin/main..HEAD          # expect: empty (in sync)
+python3 -c "import json;print(json.load(open('library.json'))['version'])"   # expect 0.11.1
+gh release list --repo aliaksandr-liapin/ibattery-sdk --limit 3              # expect v0.11.1 first
+git tag | grep v0.11                          # expect v0.11.0, v0.11.1
 ```
 
----
-
-## Build / test commands (most-used)
+## Build / test (most-used)
 
 ```bash
-# PATH setup — homebrew git FIRST, then Nordic toolchain
 export PATH="/opt/homebrew/bin:/usr/bin:/bin:/opt/nordic/ncs/toolchains/e5f4758bcf/bin:$PATH"
 export ZEPHYR_BASE="/opt/nordic/ncs/v3.2.2/zephyr"
 export ZEPHYR_SDK_INSTALL_DIR="/opt/nordic/ncs/toolchains/e5f4758bcf/opt/zephyr-sdk"
 
-# Host tests (no hardware needed)
-cd tests/build && ctest --output-on-failure         # expect: 19 pass
-
-# Gateway tests
-cd gateway && /Users/aliapin/.pyenv/versions/3.11.14/bin/python3 -m pytest    # expect: 67 pass
-
-# STM32 firmware (the validated platform)
-west build -b nucleo_l476rg app -d /tmp/build-stm32 --pristine -- \
-    -DEXTRA_CONF_FILE=boards/nucleo_l476rg_i2cscan.conf \
-    -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32" \
-    -DCONFIG_BATTERY_SOC_FUSION=y      # or omit for FUSION=n
-west flash -d /tmp/build-stm32 --runner openocd
-
-# NUCLEO serial port (when connected)
-# /dev/cu.usbmodem1203
+# Host tests (21 suites)
+cd tests && cmake -S . -B build && cmake --build build && ctest --test-dir build --output-on-failure
+# Gateway tests (77)
+cd gateway && /Users/aliapin/.pyenv/versions/3.11.14/bin/python3 -m pytest -q
+# Firmware: BLE + INA219 + SoH (the v4 build)
+west build -b nucleo_l476rg app -d /tmp/build-soh --pristine -- \
+  -DSHIELD=x_nucleo_idb05a1 -DEXTRA_CONF_FILE=boards/nucleo_l476rg_ble_current.conf \
+  -DCONFIG_BATTERY_SOC_SOH=y -DZEPHYR_EXTRA_MODULES="/opt/nordic/ncs/v3.2.2/modules/hal/stm32"
+west flash -d /tmp/build-soh --runner openocd     # NUCLEO serial: /dev/cu.usbmodem1203
 ```
 
 ---
 
-## What's available to work on (menu, non-blocking)
+## What's available to work on (menu, tagged)
 
-Ranked roughly by leverage. None of these are urgent.
-
-| Item | Effort | Why it might matter |
-|---|---|---|
-| **Phase 8d brainstorm** — capacity-aging learning + coulomb drift correction | 1–2 hr design + days of implementation | Natural next big-picture step. The "Phase 8 series" is closed; Phase 8d would be a new chapter focused on parameter estimation (vs. state estimation). Demand-driven — only do if there's a real use case. |
-| **nRF I2C remap experiment** | ~30 min | Closes v0.8.5's "known limitation" on the broken nRF52840-DK PCA10056 SN 1050258557. Definitive yes/no on whether the GPIO damage is isolated to P0.26/P0.27 or wider. If it works, the nRF DK becomes a backup validation platform. |
-| ~~**BLE-on-NUCLEO E2E loop**~~ | ✅ Done in v0.10.1 | Shield arrived; v3 telemetry validated firmware → BLE → gateway → InfluxDB → Grafana. Fixed three latent BLE bugs. See RELEASE_NOTES v0.10.1 + `docs/captures/2026-05-29-v0.10.1-ble-on-nucleo-e2e.log`. |
-| **v0.10.0 promotional follow-up** | 1–2 hr | dev.to blog post on Phase 8c. Angle: "Fusing voltage and coulomb without going full Kalman" or "Why current-adaptive α is honest physics." |
-| **Polish / Minor findings deferred from code reviews** | <30 min | Things like the `\|I\|` notation in Kconfig help text, the loose `range 0 1000000` on `I_THRESH_X100`, the "Phase 8c:" prefix on the prompt aging poorly. All in the v0.10.0 review threads. |
-| **Hackaday coverage check** | 5 min/day | Watch inbox for ~2 weeks; if no response, the tip didn't land — that's fine. |
-| **Q-not-ticking spawned task follow-up** (from earlier today) | already closed | Spawned task investigated the v0.8.3 bug-finding; resulted in issues #1 + #2 which are both closed. No further action. |
+| Item | Tier | Effort | Notes |
+|---|---|---|---|
+| **NVS persistence for SoH** | **FREE** | ~half-day | Highest leverage. SoH is RAM-only today (relearns 100% on reboot). NVS infra exists (coulomb/cycle use it: keys 1/2, add key 3). Plan sketch in chat history. → likely v0.12.0. |
+| Partial-excursion learning | FREE | 1–2 hr + build | Faster SoH convergence (learn from partial cycles, not just full→empty). |
+| Promo blog post | FREE | 1–2 hr | "State of Health end-to-end on a coin cell." Funnel. |
+| nRF I2C remap experiment | FREE | ~30 min | Recover the defective nRF DK as backup BLE platform. Low value. |
+| **Fleet SaaS** | **COMMERCIAL ⚠️** | large | First commercial-territory step → private repo. **Flag + confirm before starting.** |
 
 ---
 
-## Known limitations (carry-over)
+## Gotchas / lessons (learned the hard way this session)
 
-- **nRF52840-DK PCA10056 SN 1050258557** — per-unit GPIO defect on P0.26/P0.27. NUCLEO-L476RG is the validated Phase 8 platform for this DK. Documented in `docs/HARDWARE_TROUBLESHOOTING.md`.
-- **ESP32-C3 INA219** — Zephyr driver unstable at boot; raw I2C fallback works but breadboard contacts cause NACKs. Documented in `src/hal/battery_hal_current_zephyr.c`.
-- **BLE on NUCLEO** — requires `x_nucleo_idb05a1` shield (not yet on bench).
-- **Phase 8c α tuning** — defaults are starting points; per-device tuning may be needed. All 3 tunables are Kconfigs.
-
----
-
-## Environmental gotchas (learned the hard way today)
-
-- **`west build` requires all three env vars**: PATH (homebrew git BEFORE Nordic toolchain), ZEPHYR_BASE, ZEPHYR_SDK_INSTALL_DIR. The Task 1 verification snippet in `docs/plans/2026-05-29-phase-8c-fusion-plan.md` initially missed ZEPHYR_SDK_INSTALL_DIR — fixed in execution.
-- **`gh release create` needs the right account.** Repo is under `aliaksandr-liapin`; the multi-account `gh` CLI default may be on `aliapin-maker`. Use `gh auth switch -u aliaksandr-liapin` before `gh release create`. The `aliapin-maker` token lacks `workflow` scope which is required for release creation.
-- **PlatformIO does NOT auto-publish from git tags.** Each version requires manual `pio pkg publish /tmp/ibattery-sdk-VERSION.tar.gz --no-interactive`. The v0.8.x tags between v0.7.0 and v0.9.0 were never published to PIO because of this.
-- **Reddit r/embedded Rule 4** auto-flags long-form posts with external links — even if methodology-first and link-at-the-bottom. The safe pattern: post knowledge-share text only, drop links into reply comments if someone asks.
-- **`pio pkg pack` writes to a specific output dir** controlled by `-o`; the tarball name is auto-generated from `library.json`. `tar tzf` to inspect contents before `pio pkg publish`.
+- **BLE testing on macOS:** run `ibattery-gateway scan/stream/run` from **iTerm**, NOT Claude Code — Claude.app lacks the Bluetooth TCC grant (bare pyenv python SIGABRTs). Non-BLE checks (serial, InfluxDB, Grafana) work from anywhere.
+- **Wire version = TWO size constants.** `BATTERY_SERIALIZE_V*_SIZE` (serializer) AND `BATTERY_TRANSPORT_WIRE_SIZE_V*` (transport, sizes `ble_send` bound + cache buffer). Bumping one without the other silently rejects packets (`Transport send failed: -2`). A `_Static_assert` now guards it. Host tests don't catch it — only the live BLE path does.
+- **Adding a wire version touches:** serialize sizes + transport sizes + all BLE MTU confs (now 37/41) + gateway decoder + influxdb_writer + BOTH dashboards.
+- **Two Grafana dashboards:** the LIVE provisioned one is `cloud/grafana/provisioning/dashboards/battery.json`; the README-export is `gateway/grafana/ibattery-dashboard.json`. Edit the right one.
+- **Grafana 13 provisioning:** `docker compose restart` after editing a provisioned dashboard may drop it (persisted volume). Validate JSON, then import via API or `down -v && up`.
+- **PlatformIO:** `pio pkg pack` snapshots the working tree → finish ALL doc edits (esp. README, which is the only doc in the package — `docs/` is excluded) BEFORE packing. README images need **absolute** raw-GitHub URLs to render on the registry. `gh auth switch -u aliaksandr-liapin` before `gh release create` (switch back after). PlatformIO versions are immutable.
+- **Container runtime is Rancher Desktop** (not Docker.app) — `docker` CLI works; don't `open -a Docker`.
 
 ---
 
-## File map of where to find things
+## When you pick this up
 
-| Looking for | Path |
-|---|---|
-| Per-release narrative + evidence | `docs/RELEASE_NOTES.md` |
-| Roadmap status by phase | `docs/ROADMAP.md` |
-| Public C API reference | `docs/SDK_API.md` |
-| Hardware debug methodology + swap-the-MCU technique | `docs/HARDWARE_TROUBLESHOOTING.md` |
-| Hardware capture logs (gold-standard evidence) | `docs/captures/` |
-| Design docs for each phase | `docs/plans/` |
-| Promotional drafts (dev.to, Discord, Hackaday, Reddit) | `docs/articles/` |
-| Project status overview | `README.md` and `docs/index.md` |
-| AI/Claude context | `CLAUDE.md` |
-| PlatformIO metadata | `library.json` |
-| Auto-memory for AI sessions | `~/.claude/projects/.../memory/` (project_state.md is the main file) |
+Paste into the new chat:
 
----
-
-## When you (or the new chat) pick this up
-
-Paste this opener into the new chat to get the next session up to speed in one message:
-
-> *"ibattery-sdk v0.10.1 shipped — Phase 8 series complete AND the BLE-on-NUCLEO E2E loop is now validated end-to-end (firmware → BLE → gateway → InfluxDB → Grafana on real hardware, three latent BLE bugs fixed). Tagged, GitHub released, PlatformIO published. Repo + remotes + memory all synchronized. See `docs/SESSION_HANDOFF_2026-05-29.md` for the full handoff. No urgent work pending; pick from the available-options menu in that doc."*
-
-That gives a fresh chat:
-- The state it can rely on without re-deriving (v0.10.0, Phase 8 done, no urgent items)
-- A pointer to this doc for the menu of next moves
-- A clear "I don't need to do anything specific" framing, so the new chat doesn't invent work
-
-### Recommended first action for the next session
-
-**Whatever the next session wants to start with, run the state-verification commands above first.** It's 30 seconds and establishes that nothing has rotted since this handoff was written. Then read `docs/RELEASE_NOTES.md` top entry + the "What's available to work on" menu in this doc.
-
----
-
-## Footnote
-
-Today (2026-05-29) shipped 5 releases. That's an unusual pace. If subsequent sessions feel like they're moving slower, that's normal — today was the convergence of months of accumulated v0.8.x debt + a working hardware rig + a productive design session for v0.10.0. Don't try to match the cadence; match the discipline (TDD, hardware evidence, doc + ship + memory refresh per release).
+> *"ibattery-sdk v0.11.1 — Phase 8d State of Health shipped end-to-end (on-device learning + wire v4 + gateway + InfluxDB + Grafana), released to GitHub + PlatformIO. Repo/remotes/memory in sync. Open-core: tag work FREE vs COMMERCIAL, flag commercial territory upfront ($10M→$100M goal). See `docs/SESSION_HANDOFF_2026-05-29.md`. No urgent work; the top FREE pickup is NVS persistence for SoH."*
