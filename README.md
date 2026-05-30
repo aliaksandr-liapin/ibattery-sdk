@@ -88,7 +88,7 @@ See [Hardware Wiring Guide](docs/WIRING.md) for pin diagrams and circuit schemat
 - LiPo single-cell (3.7 V nominal) discharge curve LUT (11-point, extra density in knee region)
 - `CONFIG_BATTERY_CHEMISTRY` Kconfig: selects CR2032 or LiPo LUT + gates temp compensation on LiPo only
 - BLE telemetry transport with custom GATT service and notification characteristic
-- Wire format v1 (20 bytes), v2 (24 bytes with `cycle_count`), and v3 (32 bytes with `current_ma` + `coulomb_mah`) — backward compatible
+- Wire format v1 (20 bytes), v2 (24 bytes with `cycle_count`), v3 (32 bytes with `current_ma` + `coulomb_mah`), and v4 (34 bytes with `soh_pct`) — backward compatible
 - Compile-time transport backend selection via Kconfig (BLE or mock)
 - Dual output: serial printk + BLE notifications (when `CONFIG_BATTERY_TRANSPORT=y`)
 - Coulomb counting SoC estimation via INA219 current sensor (voltage-anchored, NVS-persisted)
