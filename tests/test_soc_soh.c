@@ -65,6 +65,44 @@ void test_unarmed_observe_is_noop(void)
     TEST_ASSERT_EQUAL_INT32(RATED, cap);
 }
 
+void test_repeated_aged_excursions_converge(void)
+{
+    /* Repeated 80% excursions -> learned converges toward 17600 (80%). */
+    for (int i = 0; i < 12; i++) {
+        battery_soh_note_full_anchor();
+        battery_soh_observe_empty_anchor(4400);
+    }
+    int32_t cap; battery_soh_get_learned_capacity_mah_x100(&cap);
+    TEST_ASSERT_INT32_WITHIN(50, 17600, cap);  /* ~80% */
+}
+
+void test_implausible_low_rejected(void)
+{
+    /* q_before = 90% rated -> measured = 10% < REJECT_LO (30%) -> rejected. */
+    battery_soh_note_full_anchor();
+    battery_soh_observe_empty_anchor((RATED * 90) / 100);
+    int32_t cap; battery_soh_get_learned_capacity_mah_x100(&cap);
+    TEST_ASSERT_EQUAL_INT32(RATED, cap);
+}
+
+void test_implausible_high_rejected(void)
+{
+    /* q_before negative -> measured > rated; > REJECT_HI (120%) when large. */
+    battery_soh_note_full_anchor();
+    battery_soh_observe_empty_anchor(-(RATED / 2));  /* measured = 1.5*rated */
+    int32_t cap; battery_soh_get_learned_capacity_mah_x100(&cap);
+    TEST_ASSERT_EQUAL_INT32(RATED, cap);
+}
+
+void test_reset_restores_100pct(void)
+{
+    battery_soh_note_full_anchor();
+    battery_soh_observe_empty_anchor(4400);  /* drops below 100% */
+    battery_soh_reset();
+    uint16_t soh; battery_soh_get_pct_x100(&soh);
+    TEST_ASSERT_EQUAL_UINT16(10000, soh);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -74,5 +112,9 @@ int main(void)
     RUN_TEST(test_healthy_excursion_keeps_100pct);
     RUN_TEST(test_aged_excursion_moves_toward_measured);
     RUN_TEST(test_unarmed_observe_is_noop);
+    RUN_TEST(test_repeated_aged_excursions_converge);
+    RUN_TEST(test_implausible_low_rejected);
+    RUN_TEST(test_implausible_high_rejected);
+    RUN_TEST(test_reset_restores_100pct);
     return UNITY_END();
 }
