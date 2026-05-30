@@ -1,5 +1,30 @@
 # Release Notes
 
+## Unreleased — Phase 8d: on-device State of Health (capacity-fade learning)
+
+First *parameter*-estimation feature (8a–8c were *state* estimation). Learns
+the battery's true usable capacity from full→empty discharge excursions: the
+coulomb integral between a full anchor and an empty anchor is the actual
+delivered charge, so an aged cell that hits empty-voltage while charge remains
+shows up as SoH below 100%. Opt-in via `CONFIG_BATTERY_SOC_SOH` (default n);
+zero impact when disabled.
+
+- **Module:** `battery_soh` — `measured = rated − Q_before_empty`, smoothed
+  with an integer EMA (round-to-nearest), plausibility guard (reject < 30% or
+  > 120% of rated). Public API: `battery_soh_get_pct_x100`,
+  `battery_soh_get_learned_capacity_mah_x100`, `battery_soh_reset`.
+- **Integration:** the SoC estimator arms SoH at the full-anchor edge and
+  feeds it `Q` (captured before the coulomb reset) at the empty-anchor edge.
+- **Footprint:** ~200 B flash, **0 new RAM** on the L476RG; integer-only.
+- **Tests:** `test_soc_soh` (11) + `test_soc_soh_estimator` (2) → 21 suites.
+- **Tunables (Kconfig):** `BATTERY_SOC_SOH_ALPHA_X1000` (500),
+  `BATTERY_SOC_SOH_REJECT_LO_PCT` (30), `BATTERY_SOC_SOH_REJECT_HI_PCT` (120).
+- **Limitations:** converges only over full discharge cycles (slow on CR2032);
+  discharge-direction only; RAM-only (relearns on reboot). Cloud telemetry
+  (wire v4 + Grafana SoH panel) and NVS persistence are deferred — the public
+  getter is designed so they drop in without rework. Design + plan:
+  `docs/plans/2026-05-29-phase-8d-soh-design.md` / `-plan.md`.
+
 ## v0.10.2 — Docs/packaging fix — 2026-05-29
 
 Documentation-and-packaging-only release. **No code changes** — firmware,

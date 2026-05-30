@@ -200,10 +200,23 @@ narrative.
   cleanly to the bias-dominated noise model here
 
 What was deferred (not 8c scope):
-- Battery aging / capacity learning — Phase 8d candidate
-- Coulomb counter drift correction (INA219 ±1%) — Phase 8d candidate
+- Battery aging / capacity learning — ✅ Phase 8d MVP implemented (State of
+  Health via full→empty excursion learning; opt-in `CONFIG_BATTERY_SOC_SOH`,
+  branch `feature/phase-8d-soh`). Underpins the fleet/SaaS monetization path.
+- Coulomb counter drift correction (INA219 ±1%) — still a future 8d candidate
+  (current-offset auto-calibration), not in the SoH MVP.
 - Smooth α interpolation — YAGNI, step function matches physical knee
 - Runtime α tuning via API — compile-time is enough
+
+#### Phase 8d: State of Health (capacity-fade learning) — MVP
+
+First parameter-estimation feature (8a–8c were state estimation). Learns true
+usable capacity from full→empty discharge excursions and reports SoH. Opt-in,
+integer-only, RAM-only MVP; cloud telemetry + NVS persistence deferred. SoH is
+the on-device primitive behind fleet predictive-maintenance ("which devices
+need battery replacement?") — the capability that feeds the SaaS fleet-
+monitoring and "advanced SoC" commercial-license models. Design + plan:
+`docs/plans/2026-05-29-phase-8d-soh-{design,plan}.md`.
 
 ### Long-term (6+ months)
 

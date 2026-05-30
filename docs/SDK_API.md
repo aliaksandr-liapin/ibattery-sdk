@@ -198,6 +198,24 @@ Voltages above 4200 mV clamp to 100%. Voltages below 3000 mV clamp to 0%. Extra 
 
 ---
 
+## battery_soh.h — State of Health (Phase 8d)
+
+Opt-in via `CONFIG_BATTERY_SOC_SOH` (requires `CONFIG_BATTERY_SOC_COULOMB`). Learns the battery's true usable capacity from full→empty discharge excursions and reports State of Health. When the feature is disabled the module is not compiled and the estimator hooks are removed by the preprocessor.
+
+```c
+int battery_soh_get_pct_x100(uint16_t *soh_x100_out);
+int battery_soh_get_learned_capacity_mah_x100(int32_t *cap_x100_out);
+int battery_soh_reset(void);
+```
+
+- `battery_soh_get_pct_x100` — SoH in 0.01% units (0..10000), i.e. `learned_capacity / rated_capacity`. Returns `BATTERY_STATUS_NOT_INITIALIZED` if called before the estimator initializes SoH.
+- `battery_soh_get_learned_capacity_mah_x100` — learned usable capacity in 0.01 mAh units.
+- `battery_soh_reset` — restore learned capacity to the rated value.
+
+Learning happens automatically inside the SoC estimator: it arms at the full-anchor edge and, at the empty-anchor edge, computes `measured = rated − remaining_charge` and blends it into the learned capacity with an EMA (`BATTERY_SOC_SOH_ALPHA_X1000`). Implausible excursions (outside `REJECT_LO_PCT`..`REJECT_HI_PCT` of rated) are ignored. SoH converges only over deep discharge cycles and is RAM-only (relearns on reboot) in this release.
+
+---
+
 ## battery_power_manager.h — Power State
 
 ```c

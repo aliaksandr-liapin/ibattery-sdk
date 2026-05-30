@@ -14,7 +14,8 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 - **v0.10.1 status**: ✅ BLE-on-NUCLEO end-to-end validated — first time v3 (32-byte) telemetry traversed BLE on real hardware. Fixed three bugs: BLE MTU too small for v3 (27→35, all platforms), gateway name-matching unreliable on macOS (now service-UUID via `find_device_by_filter`), and firmware not re-advertising after disconnect (now deferred to workqueue). Real current/coulomb reach Grafana over BLE. Evidence: `docs/captures/2026-05-29-v0.10.1-ble-on-nucleo-e2e.log`.
 - **Known hardware limitation**: nRF52840-DK PCA10056 SN 1050258557 has a per-unit GPIO defect on P0.26/P0.27 — see `docs/HARDWARE_TROUBLESHOOTING.md` "swap-the-MCU" section.
 - **BLE testing on macOS**: bleak (scan/stream/run) must run from a Bluetooth-permitted app like **iTerm**, NOT Claude Code — Claude.app lacks the Bluetooth TCC grant and the bare pyenv python has no `NSBluetoothAlwaysUsageDescription`, so CoreBluetooth calls SIGABRT. Non-BLE checks (serial, InfluxDB, Grafana) work from anywhere.
-- **Next milestone**: open. Phase 8 series is complete. Future candidates: Phase 8d (capacity-aging learning, coulomb drift correction), new feature areas, or focused polish.
+- **Phase 8d status**: 🚧 On-device State of Health (capacity-fade learning) — MVP implemented on branch `feature/phase-8d-soh` (not yet merged/released). `battery_soh` module learns usable capacity from full→empty excursions; opt-in via `CONFIG_BATTERY_SOC_SOH`; integer-only, ~200 B flash, 0 new RAM. 21 host suites pass; NUCLEO firmware compiles with it enabled. Cloud telemetry + NVS persistence deferred. See `docs/plans/2026-05-29-phase-8d-soh-{design,plan}.md`.
+- **Next milestone**: merge Phase 8d MVP, then optionally its cloud layer (wire v4 + Grafana SoH panel). Other candidates: nRF I2C remap experiment, promo blog post.
 - **Distribution**: PlatformIO registry + Zephyr module + GitHub Pages docs
 
 ## Build Commands
@@ -137,6 +138,7 @@ HAL (platform-specific)
 | `CONFIG_BATTERY_TRANSPORT` | `y/n` | `y` (BLE notifications) |
 | `CONFIG_BATTERY_CURRENT_SENSE` | `y/n` | `n` (INA219 I2C current sensor) |
 | `CONFIG_BATTERY_SOC_COULOMB` | `y/n` | `y` if CURRENT_SENSE (coulomb counting SoC) |
+| `CONFIG_BATTERY_SOC_SOH` | `y/n` | `n` (Phase 8d State-of-Health / capacity-fade learning; needs SOC_COULOMB) |
 | `CONFIG_BATTERY_CAPACITY_MAH` | `int` | `220` (CR2032) / `1000` (LiPo) |
 
 ## Wire Format
