@@ -26,6 +26,8 @@ zero impact when disabled.
   and writes a `soh_pct` InfluxDB field; a "State of Health (%)" Grafana panel
   renders it. Back-compatible with v1–v3. Design + plan:
   `docs/plans/2026-05-29-soh-cloud-design.md` / `-plan.md`.
+- **Dashboard:** refreshed Grafana layout (status tiles → health gauges →
+  trends). Screenshot: `docs/images/grafana-dashboard.png`.
 - **Limitations:** converges only over full discharge cycles (slow on CR2032);
   discharge-direction only; RAM-only (relearns on reboot). NVS persistence is
   still deferred. On-device design + plan:

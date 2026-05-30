@@ -31,6 +31,19 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 
 ---
 
+## Dashboard
+
+Live telemetry over BLE on the Grafana dashboard — at-a-glance status tiles
+(voltage, temperature, current, status, power state), State-of-Charge and
+State-of-Health gauges, and trend charts (voltage, remaining charge, SoH fade).
+
+![iBattery Grafana dashboard](docs/images/grafana-dashboard.png)
+
+> Bring it up with `cd cloud && docker compose up -d` (Grafana on
+> http://localhost:3000), then run `ibattery-gateway run` to stream live data.
+
+---
+
 ## Hardware
 
 ### nRF52840-DK (primary target)
@@ -207,6 +220,14 @@ Battery SDK initialized OK
 |--------|-------|------|-------------|
 | 24 | `current_ma_x100` | `int32_t` | Current in 0.01 mA units (from INA219) |
 | 28 | `coulomb_mah_x100` | `int32_t` | Accumulated charge in 0.01 mAh units |
+
+### v4 (34 bytes, extends v3)
+
+| Offset | Field | Type | Description |
+|--------|-------|------|-------------|
+| 32 | `soh_pct_x100` | `uint16_t` | State of Health in 0.01% units |
+
+Emitted only when `CONFIG_BATTERY_SOC_SOH=y` (then `BATTERY_TELEMETRY_VERSION=4`, otherwise 3). The decoder accepts v1–v4 by length for backward compatibility.
 
 ---
 
