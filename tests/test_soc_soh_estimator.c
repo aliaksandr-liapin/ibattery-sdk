@@ -72,7 +72,8 @@ void test_aged_excursion_drops_soh_below_100(void)
     uint16_t soc;
     int32_t q;
 
-    /* 1) Full anchor: CR2032 at rest above 2950 mV. SoH arms, Q := 22000. */
+    /* 1) Full anchor: any V >= 2950 (SOC_ANCHOR_FULL_MV) fires it; 3322 is a
+     *    typical CR2032 rest reading. SoH arms, Q := 22000. */
     mock_voltage_set_mv(3322);
     mock_current_set_value(0);
     TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK,
@@ -129,13 +130,15 @@ void test_healthy_excursion_keeps_soh_at_100(void)
 {
     uint16_t soc;
 
-    /* Full anchor arms SoH, Q := 22000. */
+    /* Full anchor arms SoH, Q := 22000 (any V >= 2950; 3322 typical). */
     mock_voltage_set_mv(3322);
     mock_current_set_value(0);
     TEST_ASSERT_EQUAL_INT(BATTERY_STATUS_OK,
                           battery_soc_estimator_get_pct_x100(&soc));
 
-    /* Drain Q to exactly 0 in the mid region. */
+    /* Reset Q to 0 (a fully-drained healthy cell) before the empty edge.
+     * Using reset() rather than draining via update() — this test only cares
+     * that Q == 0 reaches the empty anchor, not how it got there. */
     mock_voltage_set_mv(2500);
     (void)battery_coulomb_reset(0);
 

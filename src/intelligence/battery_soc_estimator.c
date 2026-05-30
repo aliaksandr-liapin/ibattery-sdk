@@ -219,6 +219,13 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
                 g_coulomb_soc_valid = true;
 #if defined(CONFIG_BATTERY_SOC_SOH)
                 {
+                    /* Feed SoH the remaining charge BEFORE the reset below
+                     * zeroes it. The read cannot fail on this path (coulomb
+                     * is initialized whenever this branch runs); if it ever
+                     * did, we intentionally skip the update — feeding a bad Q
+                     * into the EMA would be worse than dropping one excursion.
+                     * SoH stays armed in that (unreachable) case, which is
+                     * acceptable: the next empty edge would simply re-measure. */
                     int32_t q_before = 0;
                     if (battery_coulomb_get_mah_x100(&q_before) == BATTERY_STATUS_OK) {
                         battery_soh_observe_empty_anchor(q_before);
