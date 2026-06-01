@@ -363,11 +363,13 @@ target_link_libraries(test_soc_estimator_fusion PRIVATE unity)
 add_executable(test_soc_soh
     test_soc_soh.c
     ${SDK_SRC}/intelligence/battery_soh.c
+    mocks/mock_nvs.c
 )
 target_include_directories(test_soc_soh PRIVATE
     ${SDK_INCLUDE}
     ${SDK_SRC}
     ${SDK_SRC}/intelligence
+    ${SDK_SRC}/hal
     ${unity_SOURCE_DIR}/src
 )
 target_compile_definitions(test_soc_soh PRIVATE

@@ -11,7 +11,10 @@
 
 #define RATED 22000  /* 220.00 mAh (CR2032), x100 */
 
-void setUp(void) { battery_soh_init(RATED); }
+/* mock_nvs control: clear simulated flash so each test starts fresh. */
+extern void mock_nvs_reset(void);
+
+void setUp(void) { mock_nvs_reset(); battery_soh_init(RATED); }
 void tearDown(void) {}
 
 void test_init_reports_100pct(void)

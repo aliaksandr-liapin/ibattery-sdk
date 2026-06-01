@@ -6,6 +6,7 @@
 #include <battery_sdk/battery_status.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "../hal/battery_hal_nvs.h"
 
 static int32_t g_rated_x100;
 static int32_t g_learned_x100;
@@ -18,9 +19,30 @@ int battery_soh_init(int32_t rated_mah_x100)
         return BATTERY_STATUS_INVALID_ARG;
     }
     g_rated_x100 = rated_mah_x100;
-    g_learned_x100 = rated_mah_x100;
+    g_learned_x100 = rated_mah_x100;   /* default: first-boot / no NVS */
     g_armed = false;
     g_initialized = true;
+
+    /* Best-effort restore. NVS failures degrade silently to RAM-only. */
+    if (battery_hal_nvs_init() == BATTERY_STATUS_OK) {
+        uint32_t stored_rated = 0;
+        uint32_t stored_learned = 0;
+        int rc_rated = battery_hal_nvs_read_u32(BATTERY_NVS_KEY_SOH_RATED,
+                                                &stored_rated);
+        int rc_learn = battery_hal_nvs_read_u32(BATTERY_NVS_KEY_SOH_LEARNED,
+                                                &stored_learned);
+        if (rc_rated == BATTERY_STATUS_OK && rc_learn == BATTERY_STATUS_OK &&
+            (int32_t)stored_rated == g_rated_x100) {
+            /* Same battery profile — trust the learned value. */
+            g_learned_x100 = (int32_t)stored_learned;
+        } else {
+            /* First boot or profile changed — stamp current rated/learned. */
+            (void)battery_hal_nvs_write_u32(BATTERY_NVS_KEY_SOH_RATED,
+                                            (uint32_t)g_rated_x100);
+            (void)battery_hal_nvs_write_u32(BATTERY_NVS_KEY_SOH_LEARNED,
+                                            (uint32_t)g_learned_x100);
+        }
+    }
     return BATTERY_STATUS_OK;
 }
 
@@ -96,5 +118,10 @@ int battery_soh_observe_empty_anchor(int32_t q_before_empty_x100)
     int32_t num = delta * (int32_t)CONFIG_BATTERY_SOC_SOH_ALPHA_X1000;
     int32_t step = (num >= 0) ? (num + 500) / 1000 : (num - 500) / 1000;
     g_learned_x100 += step;
+
+    /* Persist the freshly learned capacity (best-effort; excursions are
+     * rare so flash wear is a non-issue). */
+    (void)battery_hal_nvs_write_u32(BATTERY_NVS_KEY_SOH_LEARNED,
+                                    (uint32_t)g_learned_x100);
     return BATTERY_STATUS_OK;
 }
