@@ -239,6 +239,9 @@ config BATTERY_SOC_SOH
     bool "State-of-Health (capacity-fade learning)"
     default n
     depends on BATTERY_SOC_COULOMB
+    select NVS
+    select FLASH
+    select FLASH_MAP
     help
       Learns the battery's true usable capacity from full->empty discharge
       excursions and exposes State of Health (SoH = learned / rated). The
