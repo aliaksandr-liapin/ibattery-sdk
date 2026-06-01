@@ -46,9 +46,29 @@ void test_learned_restores_across_reboot(void)
     TEST_ASSERT_EQUAL_INT32(learned1, learned2);  /* restored, not reset to RATED */
 }
 
+void test_profile_change_discards_stored_learned(void)
+{
+    /* Flash holds a learned value from a DIFFERENT rated capacity. */
+    mock_nvs_set_stored_value_key(KEY_SOH_RATED, 100000);   /* 1000 mAh pack */
+    mock_nvs_set_stored_value_key(KEY_SOH_LEARNED, 80000);  /* 80% of that  */
+
+    /* Boot with the CR2032 profile (RATED = 22000). */
+    TEST_ASSERT_EQUAL(BATTERY_STATUS_OK, battery_soh_init(RATED));
+
+    int32_t learned = 0;
+    battery_soh_get_learned_capacity_mah_x100(&learned);
+    TEST_ASSERT_EQUAL_INT32(RATED, learned);  /* stale value rejected */
+
+    /* And the current rated should now be stamped to flash. */
+    uint32_t stamped = 0;
+    TEST_ASSERT_TRUE(mock_nvs_get_value_key(KEY_SOH_RATED, &stamped));
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)RATED, stamped);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_learned_restores_across_reboot);
+    RUN_TEST(test_profile_change_discards_stored_learned);
     return UNITY_END();
 }
