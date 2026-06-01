@@ -101,6 +101,38 @@ void test_write_failure_still_learns_in_session(void)
     TEST_ASSERT_TRUE(learned < RATED);          /* RAM learning unaffected */
 }
 
+void test_excursion_persists_exact_value(void)
+{
+    /* A valid excursion must write the EXACT learned value to the right key. */
+    TEST_ASSERT_EQUAL(BATTERY_STATUS_OK, battery_soh_init(RATED));
+    run_aged_excursion(4400);  /* measured=17600; EMA a=0.5: 22000->19800 */
+
+    int32_t learned = 0;
+    battery_soh_get_learned_capacity_mah_x100(&learned);
+    TEST_ASSERT_EQUAL_INT32(19800, learned);
+
+    uint32_t flash = 0;
+    TEST_ASSERT_TRUE(mock_nvs_get_value_key(KEY_SOH_LEARNED, &flash));
+    TEST_ASSERT_EQUAL_UINT32(19800u, flash);  /* RAM and flash agree */
+}
+
+void test_rejected_excursion_does_not_perturb_stored_value(void)
+{
+    /* First boot stamps learned=rated to flash. */
+    TEST_ASSERT_EQUAL(BATTERY_STATUS_OK, battery_soh_init(RATED));
+
+    /* Implausible excursion: measured = 22000-20000 = 2000 (< 30% floor). */
+    run_aged_excursion(20000);
+
+    int32_t learned = 0;
+    battery_soh_get_learned_capacity_mah_x100(&learned);
+    TEST_ASSERT_EQUAL_INT32(RATED, learned);   /* RAM unchanged */
+
+    uint32_t flash = 0;
+    TEST_ASSERT_TRUE(mock_nvs_get_value_key(KEY_SOH_LEARNED, &flash));
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)RATED, flash);  /* flash unchanged */
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -109,5 +141,7 @@ int main(void)
     RUN_TEST(test_reset_persists_across_reboot);
     RUN_TEST(test_first_boot_no_nvs_defaults_to_rated);
     RUN_TEST(test_write_failure_still_learns_in_session);
+    RUN_TEST(test_excursion_persists_exact_value);
+    RUN_TEST(test_rejected_excursion_does_not_perturb_stored_value);
     return UNITY_END();
 }
