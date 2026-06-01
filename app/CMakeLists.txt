@@ -28,7 +28,7 @@ target_sources(app PRIVATE
 )
 
 # NVS HAL: real Zephyr NVS or stub
-if(CONFIG_BATTERY_CYCLE_COUNTER)
+if(CONFIG_BATTERY_CYCLE_COUNTER OR CONFIG_BATTERY_SOC_SOH)
     target_sources(app PRIVATE ../src/hal/battery_hal_nvs_zephyr.c)
 else()
     target_sources(app PRIVATE ../src/hal/battery_hal_nvs_stub.c)

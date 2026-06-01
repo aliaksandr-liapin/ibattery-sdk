@@ -51,7 +51,7 @@ zephyr_library_sources_ifdef(CONFIG_BATTERY_CHARGER_TP4056
 )
 
 # NVS HAL: real Zephyr NVS or stub
-if(CONFIG_BATTERY_CYCLE_COUNTER)
+if(CONFIG_BATTERY_CYCLE_COUNTER OR CONFIG_BATTERY_SOC_SOH)
     zephyr_library_sources(src/hal/battery_hal_nvs_zephyr.c)
 else()
     zephyr_library_sources(src/hal/battery_hal_nvs_stub.c)

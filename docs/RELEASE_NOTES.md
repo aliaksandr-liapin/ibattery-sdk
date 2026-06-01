@@ -1,5 +1,30 @@
 # Release Notes
 
+## v0.12.0 — SoH NVS persistence — 2026-06-01
+
+State of Health now **survives a power-cycle**. Previously `battery_soh` learned
+usable capacity in RAM only and reset to 100% on every reboot; it now persists
+the learned capacity to flash (Zephyr NVS) and restores it on boot. Opt-in via
+the existing `CONFIG_BATTERY_SOC_SOH`; no API or wire-format change.
+
+- **Persistence:** restore-on-init behind a **rated-capacity guard** — the stored
+  learned value is trusted only if the stored rated capacity matches the current
+  `CONFIG_BATTERY_CAPACITY_MAH`, so reflashing a different battery profile can't
+  feed a stale SoH. Best-effort write-through on each valid excursion and on
+  `battery_soh_reset()`. New NVS keys `SOH_LEARNED`/`SOH_RATED`.
+- **Best-effort contract:** every NVS call is failure-tolerant — the RAM value is
+  always authoritative, and an NVS error never changes a return code.
+- **Build:** the real Zephyr NVS source now compiles whenever `CYCLE_COUNTER ||
+  SOC_SOH`, and `BATTERY_SOC_SOH` selects `NVS/FLASH/FLASH_MAP` (mirroring the
+  cycle counter) so a SoH-only firmware links. In a SoH build the coulomb
+  counter's existing flash restore also activates (SoC continuity across reboot;
+  recalibrated at the first anchor edge).
+- **Footprint:** **0 new static RAM**; integer-only; flash cost ≈ a handful of
+  NVS calls. Serial telemetry now also prints `SOH=` (guarded by `SOC_SOH`).
+- **Tests:** new `test_soh_persistence` (7) → **22 host suites**. On-device
+  write+restore validated on real STM32 flash (NUCLEO-L476RG):
+  `docs/captures/2026-06-01-soh-nvs-persistence-e2e.log`.
+
 ## v0.11.1 — Docs fix (registry image) — 2026-05-29
 
 Documentation-only release. **No code changes** — identical behavior to v0.11.0.

@@ -18,6 +18,8 @@ extern "C" {
 /** NVS key identifiers. */
 #define BATTERY_NVS_KEY_CYCLE_COUNT  1
 #define BATTERY_NVS_KEY_COULOMB_MAH  2
+#define BATTERY_NVS_KEY_SOH_LEARNED  3
+#define BATTERY_NVS_KEY_SOH_RATED    4
 
 /**
  * Initialize the NVS subsystem.

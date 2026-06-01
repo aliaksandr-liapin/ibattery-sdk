@@ -1,0 +1,69 @@
+# SoH NVS Persistence — On-Device Validation (NUCLEO-L476RG)
+
+Date:    2026-06-01
+Board:   NUCLEO-L476RG + X-NUCLEO-IDB05A1 (BLE) + INA219 (current)
+Build:   build-stm32-ble-cur, CONFIG_BATTERY_SOC_SOH=y, CR2032 profile, CONFIG_BATTERY_CAPACITY_MAH=220
+Branch:  feat/soh-nvs-persistence
+Wire:    v4 (SoH at offset 32)
+
+## Goal
+
+Prove on REAL STM32 NVS flash that a learned SoH value survives a power-cycle /
+reflash — the one part of the new persistence code that host mocks cannot prove.
+
+## Setup constraint
+
+Board powered by USB only (no battery, no bench PSU). On NUCLEO the "battery
+voltage" is VDD read via VREFINT, fixed at ~3.32 V — permanently in the CR2032
+full region (>=2950 mV), never reaching the empty region (<=2000 mV). So a
+natural voltage-driven full->empty excursion is impossible here; that anchor
+chain is unchanged since v0.11.0 and already hardware-validated. To exercise the
+NEW persistence path, a TEMPORARY instrumented build forced one excursion
+(reverted afterwards, never committed): note_full_anchor + observe_empty_anchor(
+q_before=11000) => measured = 22000-11000 = 11000 (50%); EMA(alpha=0.5) lands
+learned at 16500 => SOH 75.00%.
+
+## Phase 0 — baseline: fresh NVS reads 100%
+
+(initial flash of the clean firmware; blank SoH keys -> learned defaults to rated)
+
+    [v4 t=142197] V=3322 mV ... I=2.80 mA Q=219.89 mAh SOH=100.00%
+
+## Phase 1 — WRITE: instrumented build forces an excursion, persists to NVS
+
+    === iBattery SDK — On-Target Validation ===   (fresh boot, t reset)
+    Battery SDK initialized OK
+    [SOH_HWTEST] forced excursion q_before=11000 -> expect SOH 75.00%
+    [v4 t=33]   V=3321 mV ... Q=220.00 mAh SOH=75.00%
+    [v4 t=2035] V=3321 mV ... Q=219.99 mAh SOH=75.00%
+    [v4 t=4038] V=3322 mV ... Q=219.99 mAh SOH=75.00%
+
+SOH transitioned 100.00% -> 75.00% and the learned capacity (16500 x100 mAh) was
+written to the STM32 "storage" NVS partition.
+
+## Phase 2 — RESTORE: reflash the CLEAN committed firmware (NVS partition preserved)
+
+The clean image has NO instrumentation — no code path can recompute 75%. The
+only source of a non-100% value on boot is a read-back from flash.
+
+    ----- REFLASH CLEAN 10:32:39 -----
+    *** Booting nRF Connect SDK v3.2.2 ***
+    === iBattery SDK — On-Target Validation ===   (fresh boot, t reset)
+    ...
+    [v4 t=10044] V=3322 mV ... Q=219.99 mAh SOH=75.00%
+    [v4 t=12047] V=3323 mV ... Q=219.99 mAh SOH=75.00%
+    [v4 t=14049] V=3322 mV ... Q=219.99 mAh SOH=75.00%
+
+First telemetry line after a full reflash + reset reads SOH=75.00%, restored from
+real STM32 NVS flash — NOT the fresh-device 100% default.
+
+## Result: PASS
+
+- WRITE to real flash:     SOH 100% -> 75% on the forced excursion (Phase 1).
+- RESTORE from real flash: SOH 75% on first boot of the clean build (Phase 2).
+- Rated guard:             value was restored (stored rated == current rated),
+                           confirming the guard's match path on-device.
+
+The voltage-anchor learning chain itself was not re-exercised here (no battery/
+PSU); it is unchanged from v0.11.0. A future capture with a battery + PSU can
+demonstrate the end-to-end voltage-driven excursion + BLE -> Grafana SoH panel.

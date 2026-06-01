@@ -363,11 +363,13 @@ target_link_libraries(test_soc_estimator_fusion PRIVATE unity)
 add_executable(test_soc_soh
     test_soc_soh.c
     ${SDK_SRC}/intelligence/battery_soh.c
+    mocks/mock_nvs.c
 )
 target_include_directories(test_soc_soh PRIVATE
     ${SDK_INCLUDE}
     ${SDK_SRC}
     ${SDK_SRC}/intelligence
+    ${SDK_SRC}/hal
     ${unity_SOURCE_DIR}/src
 )
 target_compile_definitions(test_soc_soh PRIVATE
@@ -376,6 +378,24 @@ target_compile_definitions(test_soc_soh PRIVATE
     CONFIG_BATTERY_SOC_SOH_REJECT_HI_PCT=120
 )
 target_link_libraries(test_soc_soh PRIVATE unity)
+
+# ── SoH NVS persistence test ───────────────────────────────────────────────
+add_executable(test_soh_persistence
+    test_soh_persistence.c
+    ${SDK_SRC}/intelligence/battery_soh.c
+    mocks/mock_nvs.c
+)
+target_include_directories(test_soh_persistence PRIVATE
+    ${SDK_INCLUDE} ${SDK_SRC} ${SDK_SRC}/intelligence ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+target_compile_definitions(test_soh_persistence PRIVATE
+    CONFIG_BATTERY_SOC_SOH_ALPHA_X1000=500
+    CONFIG_BATTERY_SOC_SOH_REJECT_LO_PCT=30
+    CONFIG_BATTERY_SOC_SOH_REJECT_HI_PCT=120
+    CONFIG_BATTERY_CAPACITY_MAH=220
+)
+target_link_libraries(test_soh_persistence PRIVATE unity)
 
 # ── SoC estimator + SoH integration test (Phase 8d) ───────────────────────
 add_executable(test_soc_soh_estimator
@@ -465,3 +485,4 @@ add_test(NAME soc_fusion COMMAND test_soc_fusion)
 add_test(NAME soc_estimator_fusion COMMAND test_soc_estimator_fusion)
 add_test(NAME soc_soh COMMAND test_soc_soh)
 add_test(NAME soc_soh_estimator COMMAND test_soc_soh_estimator)
+add_test(NAME soh_persistence COMMAND test_soh_persistence)

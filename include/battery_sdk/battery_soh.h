@@ -6,9 +6,12 @@
  * anchor is the actual delivered charge. Smooths the learned capacity
  * with an integer EMA and reports SoH = learned / rated.
  *
- * Stateful, integer-only, no heap. RAM-only (no persistence in the MVP).
+ * Stateful, integer-only, no heap. Learned capacity persists to flash (NVS)
+ * and is restored on init behind a rated-capacity guard (best-effort; RAM
+ * value is always authoritative).
  *
- * Design doc: docs/plans/2026-05-29-phase-8d-soh-design.md
+ * Design docs: docs/plans/2026-05-29-phase-8d-soh-design.md,
+ *              docs/plans/2026-06-01-soh-nvs-persistence-design.md
  */
 
 #ifndef BATTERY_SDK_BATTERY_SOH_H

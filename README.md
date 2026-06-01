@@ -11,7 +11,7 @@ Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS
 
 ---
 
-## Current Status: Phase 8 + State of Health, end-to-end (v0.11.1)
+## Current Status: Phase 8 + State of Health (now persistent), end-to-end (v0.12.0)
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -150,7 +150,7 @@ manifest:
   projects:
     - name: ibattery-sdk
       remote: aliaksandr-liapin
-      revision: v0.11.1
+      revision: v0.12.0
       path: modules/lib/ibattery-sdk
 ```
 
@@ -160,10 +160,10 @@ Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 
 ```ini
 ; platformio.ini
-lib_deps = aliaksandr-liapin/ibattery-sdk@^0.11.1
+lib_deps = aliaksandr-liapin/ibattery-sdk@^0.12.0
 ```
 
-The `^0.11.0` constraint pulls v0.11.0 or any newer 0.11.x release. v0.11.0 ships Phase 8d State of Health (on-device learning + wire v4 + Grafana panel) on top of Phases 8a–8c.
+The `^0.12.0` constraint pulls v0.12.0 or any newer 0.12.x release. v0.12.0 adds NVS persistence so State of Health survives a power-cycle, on top of v0.11.0's Phase 8d SoH (on-device learning + wire v4 + Grafana panel) and Phases 8a–8c.
 
 ### Run unit tests (host, no hardware needed)
 
