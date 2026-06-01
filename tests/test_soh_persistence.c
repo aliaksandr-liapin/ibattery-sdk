@@ -65,10 +65,28 @@ void test_profile_change_discards_stored_learned(void)
     TEST_ASSERT_EQUAL_UINT32((uint32_t)RATED, stamped);
 }
 
+void test_reset_persists_across_reboot(void)
+{
+    TEST_ASSERT_EQUAL(BATTERY_STATUS_OK, battery_soh_init(RATED));
+    run_aged_excursion(4400);          /* fade it */
+    battery_soh_reset();               /* back to 100% */
+
+    int32_t after_reset = 0;
+    battery_soh_get_learned_capacity_mah_x100(&after_reset);
+    TEST_ASSERT_EQUAL_INT32(RATED, after_reset);
+
+    /* Reboot — the reset must survive, not resurrect the faded value. */
+    TEST_ASSERT_EQUAL(BATTERY_STATUS_OK, battery_soh_init(RATED));
+    int32_t after_reboot = 0;
+    battery_soh_get_learned_capacity_mah_x100(&after_reboot);
+    TEST_ASSERT_EQUAL_INT32(RATED, after_reboot);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_learned_restores_across_reboot);
     RUN_TEST(test_profile_change_discards_stored_learned);
+    RUN_TEST(test_reset_persists_across_reboot);
     return UNITY_END();
 }

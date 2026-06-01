@@ -83,6 +83,8 @@ int battery_soh_reset(void)
     }
     g_learned_x100 = g_rated_x100;
     g_armed = false;
+    (void)battery_hal_nvs_write_u32(BATTERY_NVS_KEY_SOH_LEARNED,
+                                    (uint32_t)g_learned_x100);
     return BATTERY_STATUS_OK;
 }
 
