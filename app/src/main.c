@@ -105,6 +105,11 @@ int main(void)
                        ? (pkt.coulomb_mah_x100 % 100)
                        : -(pkt.coulomb_mah_x100 % 100));
 #endif
+#if IS_ENABLED(CONFIG_BATTERY_SOC_SOH)
+            printk(" SOH=%u.%02u%%",
+                   pkt.soh_pct_x100 / 100U,
+                   pkt.soh_pct_x100 % 100U);
+#endif
             printk("\n");
 
 #if IS_ENABLED(CONFIG_BATTERY_TRANSPORT)
