@@ -82,11 +82,32 @@ void test_reset_persists_across_reboot(void)
     TEST_ASSERT_EQUAL_INT32(RATED, after_reboot);
 }
 
+void test_first_boot_no_nvs_defaults_to_rated(void)
+{
+    mock_nvs_set_init_rc(BATTERY_STATUS_ERROR);  /* NVS unavailable */
+    TEST_ASSERT_EQUAL(BATTERY_STATUS_OK, battery_soh_init(RATED));
+    int32_t learned = 0;
+    battery_soh_get_learned_capacity_mah_x100(&learned);
+    TEST_ASSERT_EQUAL_INT32(RATED, learned);
+}
+
+void test_write_failure_still_learns_in_session(void)
+{
+    TEST_ASSERT_EQUAL(BATTERY_STATUS_OK, battery_soh_init(RATED));
+    mock_nvs_set_write_rc(BATTERY_STATUS_IO);   /* writes fail */
+    run_aged_excursion(4400);
+    int32_t learned = 0;
+    battery_soh_get_learned_capacity_mah_x100(&learned);
+    TEST_ASSERT_TRUE(learned < RATED);          /* RAM learning unaffected */
+}
+
 int main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_learned_restores_across_reboot);
     RUN_TEST(test_profile_change_discards_stored_learned);
     RUN_TEST(test_reset_persists_across_reboot);
+    RUN_TEST(test_first_boot_no_nvs_defaults_to_rated);
+    RUN_TEST(test_write_failure_still_learns_in_session);
     return UNITY_END();
 }
