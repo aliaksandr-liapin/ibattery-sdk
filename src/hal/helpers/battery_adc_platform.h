@@ -72,8 +72,11 @@
 #define BATTERY_ADC_VDD_GAIN        ADC_GAIN_1
 #define BATTERY_ADC_VDD_REFERENCE   ADC_REF_INTERNAL
 #define BATTERY_ADC_VDD_REF_MV      3300   /* VREF+ = VDDA = 3.3 V */
-/* Longest STM32L4 sampling time (640.5 cycles) for the high-impedance divider. */
-#define BATTERY_ADC_VDD_ACQ_TIME    ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 640)
+/* Longest supported sampling time for the high-impedance divider.  Use
+ * ADC_ACQ_TIME_MAX (the driver maps it to its longest entry) rather than a
+ * hardcoded tick count, which must match the device's sampling_time_table
+ * exactly or the STM32 ADC driver rejects it at runtime. */
+#define BATTERY_ADC_VDD_ACQ_TIME    ADC_ACQ_TIME_MAX
 
 /* NTC channel — external pin (PA0 = ADC1 channel 5), unchanged. */
 #define BATTERY_ADC_NTC_INPUT       5
