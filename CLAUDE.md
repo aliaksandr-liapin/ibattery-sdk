@@ -4,7 +4,7 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 
 ## Current State
 
-- **Version**: v0.12.0 (SoH NVS persistence — learned capacity survives a power-cycle; opt-in via existing `CONFIG_BATTERY_SOC_SOH`, no API/wire change. Builds on v0.11.0 Phase 8d State of Health end-to-end + v0.10.x BLE-on-NUCLEO E2E + Phase 8a/8b/8c)
+- **Version**: v0.13.0 (External-ADC battery-voltage sense — opt-in `CONFIG_BATTERY_VOLTAGE_EXTERNAL_ADC`, reads V from a divider on an ADC pin instead of VDD/VREFINT, enabling a PPK2/real-cell voltage excursion. Builds on v0.12.0 SoH NVS persistence + v0.11.0 Phase 8d State of Health end-to-end + Phase 8a/8b/8c)
 - **GitHub**: https://github.com/aliaksandr-liapin/ibattery-sdk
 - **License**: Apache 2.0
 - **Platforms**: nRF52840-DK, NUCLEO-L476RG (STM32), ESP32-C3 DevKitM — all hardware-verified

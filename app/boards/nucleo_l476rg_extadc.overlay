@@ -1,0 +1,19 @@
+/*
+ * External-ADC battery-voltage sense for NUCLEO-L476RG.
+ *
+ * Adds ADC1 channel 9 on PA4 (Arduino A2) so battery voltage can be read from
+ * an external resistor divider (see CONFIG_BATTERY_VOLTAGE_EXTERNAL_ADC).
+ * A2/PA4 is used (not A1) because the X-NUCLEO-IDB05A1 BLE shield claims A0
+ * (IRQ) and A1 (SPI CS).
+ * Applied on top of the auto-included nucleo_l476rg.overlay via
+ * -DEXTRA_DTC_OVERLAY_FILE=boards/nucleo_l476rg_extadc.overlay
+ *
+ * Wire the divider per docs/WIRING.md:
+ *   V_sense(+) -> [100k] -> A2/PA4 -> [100k] -> GND   (+ 100 nF A2->GND)
+ */
+
+&adc1 {
+	pinctrl-0 = <&adc1_in9_pa4>;
+	pinctrl-names = "default";
+	status = "okay";
+};
