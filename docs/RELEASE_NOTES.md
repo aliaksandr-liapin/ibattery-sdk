@@ -1,5 +1,31 @@
 # Release Notes
 
+## v0.13.0 — External-ADC voltage sense + hardware-validated SoH excursion — 2026-06-01
+
+Adds an opt-in path to read battery voltage from an **external resistor divider
+on an ADC pin** instead of the internal VDD/VREFINT, and uses it to validate the
+full State-of-Health learning chain on real hardware for the first time.
+
+- **`CONFIG_BATTERY_VOLTAGE_EXTERNAL_ADC`** (default n): on STM32L4, read battery
+  voltage from **A2 / PA4 (ADC1_IN9)** via a divider, with the ratio set by
+  `CONFIG_BATTERY_VOLTAGE_DIVIDER_RATIO` (default 2 for an equal pair). Lets a
+  real cell — or a bench source-measure unit (Nordic PPK2) — drive the sensed
+  voltage independently of the MCU supply, so a full→empty excursion can be
+  exercised without browning out the board. Reuses the existing ESP32 divider
+  HAL path (channel-id, acquisition-time, and self-calibration are now
+  platform-overridable); divider scaling is a tested, overflow-guarded helper.
+- **Board files:** `boards/nucleo_l476rg_ble_extadc.conf` + `..._extadc.overlay`
+  (PA4 analog pinctrl). Default builds are unchanged (still VDD/VREFINT).
+- **Tests:** new `test_adc_divider` (5) → **23 host suites**.
+- **Hardware E2E (first of its kind):** on a NUCLEO-L476RG + PPK2 rig, a genuine
+  voltage-driven excursion (full anchor → ~31 mA real discharge through the
+  INA219 → empty anchor) made SoH **learn 83.30%**, which then **survived a
+  reset** (restored from NVS). Capture:
+  `docs/captures/2026-06-01-soh-voltage-excursion-extadc-e2e.log`.
+- **Known item:** the external divider reads ~6–9% low vs the source (resistor
+  tolerance / ADC gain) — a calibration/trim item; it does not affect SoH, which
+  depends on charge between anchors, not absolute volts.
+
 ## v0.12.0 — SoH NVS persistence — 2026-06-01
 
 State of Health now **survives a power-cycle**. Previously `battery_soh` learned

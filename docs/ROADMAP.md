@@ -1,6 +1,6 @@
 # Roadmap & Business Strategy
 
-## Current State (v0.12.0 — Phase 8 + State of Health end-to-end, SoH now persists across reboot (NVS); all hardware-validated on NUCLEO-L476RG)
+## Current State (v0.13.0 — Phase 8 + State of Health end-to-end; SoH persists across reboot (NVS) and its learning chain is hardware-validated via a real PPK2 voltage excursion; opt-in external-ADC voltage sense; all on NUCLEO-L476RG)
 
 v0.10.1 closed the deferred BLE end-to-end loop: v3 telemetry now flows
 firmware → BLE → gateway → InfluxDB → Grafana on real hardware (X-NUCLEO-IDB05A2
