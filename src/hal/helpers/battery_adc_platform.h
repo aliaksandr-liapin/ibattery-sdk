@@ -72,6 +72,7 @@
 #define BATTERY_ADC_VDD_GAIN        ADC_GAIN_1
 #define BATTERY_ADC_VDD_REFERENCE   ADC_REF_INTERNAL
 #define BATTERY_ADC_VDD_REF_MV      3300   /* VREF+ = VDDA = 3.3 V */
+#define BATTERY_ADC_VDD_CALIBRATE   1      /* STM32 ADC needs self-cal for an accurate external read */
 /* Longest supported sampling time for the high-impedance divider.  Use
  * ADC_ACQ_TIME_MAX (the driver maps it to its longest entry) rather than a
  * hardcoded tick count, which must match the device's sampling_time_table

@@ -105,6 +105,12 @@ int battery_hal_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out)
 #ifndef BATTERY_ADC_VDD_ACQ_TIME
 #define BATTERY_ADC_VDD_ACQ_TIME     ADC_ACQ_TIME_DEFAULT
 #endif
+/* Run ADC self-calibration before each read.  STM32 needs this for an
+ * accurate external-pin reading (a large fixed offset otherwise); platforms
+ * with their own calibration (ESP32) leave it 0. */
+#ifndef BATTERY_ADC_VDD_CALIBRATE
+#define BATTERY_ADC_VDD_CALIBRATE    0
+#endif
 
 #define BATTERY_ADC_CHANNEL_ID       BATTERY_ADC_VDD_CHANNEL_ID
 
@@ -141,6 +147,7 @@ int battery_hal_adc_read_raw(int16_t *raw_out)
         .buffer       = &g_adc_sample_buffer,
         .buffer_size  = sizeof(g_adc_sample_buffer),
         .resolution   = BATTERY_ADC_RESOLUTION,
+        .calibrate    = BATTERY_ADC_VDD_CALIBRATE,
     };
 
     if (raw_out == NULL) {
