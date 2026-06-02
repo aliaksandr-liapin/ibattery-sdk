@@ -41,6 +41,45 @@
 
 #elif defined(CONFIG_SOC_SERIES_STM32L4X)
 
+#if defined(CONFIG_BATTERY_VOLTAGE_EXTERNAL_ADC)
+
+/*
+ * External-sense path (opt-in).  Battery voltage is read from an external
+ * resistor divider on Arduino A1 / PA1 = ADC1_IN6, instead of the internal
+ * VDD/VREFINT.  This lets a real cell (or a bench source-measure unit such as
+ * the Nordic PPK2) drive the sensed voltage independently of the MCU supply,
+ * so a full->empty excursion can be exercised without browning out the board.
+ *
+ *   V_batt --- [R1] ---+--- [R2] --- GND        ratio = (R1 + R2) / R2
+ *                      |                         (100k/100k => ratio 2)
+ *                    PA1 / A1 (ADC1_IN6)
+ *
+ * The divider's ~50k source impedance needs a long ADC acquisition time;
+ * a 100 nF cap across R2 is recommended (see docs/WIRING.md).
+ */
+#define BATTERY_ADC_VDD_USE_DIVIDER    1
+#define BATTERY_ADC_VDD_DIVIDER_RATIO  CONFIG_BATTERY_VOLTAGE_DIVIDER_RATIO
+
+#define BATTERY_ADC_DT_NODE         DT_NODELABEL(adc1)
+
+/* PA1 = ADC1 channel 6.  No CONFIG_ADC_CONFIGURABLE_INPUTS on STM32, so the
+ * channel_id IS the hardware channel. */
+#define BATTERY_ADC_VDD_INPUT       6
+#define BATTERY_ADC_VDD_CHANNEL_ID  6
+#define BATTERY_ADC_VDD_GAIN        ADC_GAIN_1
+#define BATTERY_ADC_VDD_REFERENCE   ADC_REF_INTERNAL
+#define BATTERY_ADC_VDD_REF_MV      3300   /* VREF+ = VDDA = 3.3 V */
+/* Longest STM32L4 sampling time (640.5 cycles) for the high-impedance divider. */
+#define BATTERY_ADC_VDD_ACQ_TIME    ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 640)
+
+/* NTC channel — external pin (PA0 = ADC1 channel 5), unchanged. */
+#define BATTERY_ADC_NTC_INPUT       5
+#define BATTERY_ADC_NTC_GAIN        ADC_GAIN_1
+#define BATTERY_ADC_NTC_REFERENCE   ADC_REF_INTERNAL
+#define BATTERY_ADC_NTC_REF_MV      3300
+
+#else  /* internal VREFINT path (default) */
+
 /*
  * STM32L4 cannot read VDD directly.  Instead the ADC measures VREFINT
  * (an internal ~1.21 V bandgap) against VDDA, and VDD is computed:
@@ -72,6 +111,8 @@
 #define BATTERY_ADC_NTC_GAIN        ADC_GAIN_1
 #define BATTERY_ADC_NTC_REFERENCE   ADC_REF_INTERNAL
 #define BATTERY_ADC_NTC_REF_MV      3300
+
+#endif /* CONFIG_BATTERY_VOLTAGE_EXTERNAL_ADC */
 
 /* ── ESP32-C3 series ──────────────────────────────────────────────── */
 

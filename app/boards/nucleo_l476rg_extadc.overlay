@@ -1,0 +1,17 @@
+/*
+ * External-ADC battery-voltage sense for NUCLEO-L476RG.
+ *
+ * Adds ADC1 channel 6 on PA1 (Arduino A1) so battery voltage can be read from
+ * an external resistor divider (see CONFIG_BATTERY_VOLTAGE_EXTERNAL_ADC).
+ * Applied on top of the auto-included nucleo_l476rg.overlay via
+ * -DEXTRA_DTC_OVERLAY_FILE=boards/nucleo_l476rg_extadc.overlay
+ *
+ * Wire the divider per docs/WIRING.md:
+ *   V_sense(+) -> [100k] -> A1/PA1 -> [100k] -> GND   (+ 100 nF A1->GND)
+ */
+
+&adc1 {
+	pinctrl-0 = <&adc1_in6_pa1>;
+	pinctrl-names = "default";
+	status = "okay";
+};

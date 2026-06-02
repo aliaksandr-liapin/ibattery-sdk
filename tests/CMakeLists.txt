@@ -146,6 +146,16 @@ target_include_directories(test_ntc_lut PRIVATE
 
 target_link_libraries(test_ntc_lut PRIVATE unity)
 
+# ── ADC voltage-divider scaling helper test ─────────────────────────────────
+add_executable(test_adc_divider
+    test_adc_divider.c
+)
+target_include_directories(test_adc_divider PRIVATE
+    ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+target_link_libraries(test_adc_divider PRIVATE unity)
+
 # ── Serialization test ──────────────────────────────────────────────────────
 add_executable(test_serialize
     test_serialize.c
@@ -486,3 +496,4 @@ add_test(NAME soc_estimator_fusion COMMAND test_soc_estimator_fusion)
 add_test(NAME soc_soh COMMAND test_soc_soh)
 add_test(NAME soc_soh_estimator COMMAND test_soc_soh_estimator)
 add_test(NAME soh_persistence COMMAND test_soh_persistence)
+add_test(NAME adc_divider COMMAND test_adc_divider)

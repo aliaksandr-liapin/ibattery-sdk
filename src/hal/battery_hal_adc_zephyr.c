@@ -7,6 +7,7 @@
 #include <zephyr/drivers/adc.h>
 
 #include "helpers/battery_adc_platform.h"
+#include "helpers/battery_adc_scale.h"
 
 /*
  * ── STM32: Use Zephyr vref sensor for VDD measurement ──────────────
@@ -89,9 +90,23 @@ int battery_hal_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out)
 #define BATTERY_ADC_RESOLUTION       12
 #define BATTERY_ADC_GAIN             BATTERY_ADC_VDD_GAIN
 #define BATTERY_ADC_REFERENCE        BATTERY_ADC_VDD_REFERENCE
-#define BATTERY_ADC_ACQ_TIME         ADC_ACQ_TIME_DEFAULT
-#define BATTERY_ADC_CHANNEL_ID       0
 #define BATTERY_ADC_INPUT_POSITIVE   BATTERY_ADC_VDD_INPUT
+
+/*
+ * Channel id and acquisition time are platform-overridable.  Platforms that
+ * use CONFIG_ADC_CONFIGURABLE_INPUTS (nRF, ESP32) leave channel_id = 0 and
+ * select the input via input_positive.  STM32 has no configurable inputs, so
+ * channel_id must equal the hardware channel and a long acquisition time is
+ * needed for the high source impedance of a 100k/100k divider.
+ */
+#ifndef BATTERY_ADC_VDD_CHANNEL_ID
+#define BATTERY_ADC_VDD_CHANNEL_ID   0
+#endif
+#ifndef BATTERY_ADC_VDD_ACQ_TIME
+#define BATTERY_ADC_VDD_ACQ_TIME     ADC_ACQ_TIME_DEFAULT
+#endif
+
+#define BATTERY_ADC_CHANNEL_ID       BATTERY_ADC_VDD_CHANNEL_ID
 
 static const struct device *g_adc_dev = DEVICE_DT_GET(BATTERY_ADC_NODE);
 static int16_t g_adc_sample_buffer;
@@ -99,7 +114,7 @@ static int16_t g_adc_sample_buffer;
 static const struct adc_channel_cfg g_vdd_channel_cfg = {
     .gain             = BATTERY_ADC_GAIN,
     .reference        = BATTERY_ADC_REFERENCE,
-    .acquisition_time = BATTERY_ADC_ACQ_TIME,
+    .acquisition_time = BATTERY_ADC_VDD_ACQ_TIME,
     .channel_id       = BATTERY_ADC_CHANNEL_ID,
 #if defined(CONFIG_ADC_CONFIGURABLE_INPUTS)
     .input_positive   = BATTERY_ADC_INPUT_POSITIVE,
@@ -160,7 +175,7 @@ int battery_hal_adc_raw_to_pin_mv(int16_t raw, int32_t *mv_out)
     }
 
     /* Apply voltage divider ratio to reconstruct battery voltage. */
-    value *= BATTERY_ADC_VDD_DIVIDER_RATIO;
+    value = battery_adc_apply_divider(value, BATTERY_ADC_VDD_DIVIDER_RATIO);
 
     *mv_out = value;
     return BATTERY_STATUS_OK;

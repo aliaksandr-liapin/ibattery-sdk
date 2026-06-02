@@ -135,6 +135,27 @@ config BATTERY_CURRENT_SENSE
       Required for coulomb counting SoC estimation.
       The INA219 must be defined in the board's devicetree overlay.
 
+config BATTERY_VOLTAGE_EXTERNAL_ADC
+    bool "Read battery voltage from an external ADC pin + resistor divider"
+    default n
+    help
+      Read battery voltage from an external resistor divider on an ADC pin
+      instead of the internal VDD path (STM32 VREFINT).  This lets a real
+      cell or a bench source-measure unit (e.g. Nordic PPK2) drive the sensed
+      voltage independently of the MCU supply, so a full->empty excursion can
+      be exercised without browning out the board.  STM32L4 reads Arduino A1 /
+      PA1 (ADC1_IN6); the board overlay must enable that channel.  ESP32-C3
+      always uses an external divider regardless of this option.
+
+config BATTERY_VOLTAGE_DIVIDER_RATIO
+    int "Battery voltage divider ratio (R1+R2)/R2"
+    default 2
+    range 1 16
+    depends on BATTERY_VOLTAGE_EXTERNAL_ADC
+    help
+      Ratio applied to the ADC pin voltage to reconstruct battery voltage.
+      For R1 = R2 (e.g. 100k/100k) the ratio is 2 (V_batt = V_pin * 2).
+
 config BATTERY_SOC_COULOMB
     bool "Coulomb counting SoC estimation"
     default y if BATTERY_CURRENT_SENSE
