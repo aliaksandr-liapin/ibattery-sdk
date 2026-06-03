@@ -11,6 +11,7 @@
 
 #if __has_include(<autoconf.h>)
 #include <autoconf.h>
+#include <zephyr/sys/printk.h>  /* printk() used in the init-failure warnings below */
 #endif
 
 #if defined(CONFIG_BATTERY_TRANSPORT)

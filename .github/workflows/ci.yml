@@ -47,3 +47,13 @@ jobs:
         run: |
           cd gateway
           python -m pytest tests/ -v
+
+  build-config-sync:
+    name: Build-config drift guard
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check app-path vs Zephyr-module-path are in sync
+        run: python3 scripts/check_build_sync.py
