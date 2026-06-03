@@ -83,7 +83,7 @@ See [Hardware Wiring Guide](WIRING.md) for pin diagrams and circuit schematics.
 - Battery health scoring, remaining useful life (RUL) estimation, cycle analysis
 - Full battery state machine: ACTIVE, IDLE (30s), SLEEP (120s), CRITICAL, CHARGING, DISCHARGING, CHARGED
 - TP4056 charger IC integration via GPIO (Kconfig-gated: `CONFIG_BATTERY_CHARGER_TP4056`)
-- Host-based unit tests (Unity framework, 23 C test suites + 77 Python tests)
+- Host-based unit tests (Unity framework, 23 C test suites + 113 Python tests)
 
 ---
 
