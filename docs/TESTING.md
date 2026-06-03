@@ -6,9 +6,9 @@ The Battery SDK uses **host-based unit tests** that compile and run on the devel
 
 **Framework:** [Unity](https://github.com/ThrowTheSwitch/Unity) v2.6.0 (fetched automatically via CMake FetchContent)
 
-**Firmware test count:** 11 C test suites (Unity)
+**Firmware test count:** 23 C test suites (Unity)
 
-**Gateway test count:** 65 Python tests (pytest)
+**Gateway test count:** 77 Python tests (pytest)
 
 ---
 
