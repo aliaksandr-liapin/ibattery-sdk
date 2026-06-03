@@ -1,3 +1,7 @@
+> ⚠️ **Superseded** — historical snapshot. Current handoff:
+> [`SESSION_HANDOFF_2026-06-02.md`](SESSION_HANDOFF_2026-06-02.md). The SDK is at
+> v0.13.0 now; this file describes the v0.11.1 state.
+
 # Session Handoff — State of Health shipped end-to-end (v0.11.1)
 
 **Date:** 2026-05-29
