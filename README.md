@@ -200,7 +200,7 @@ Battery SDK initialized OK
 
 | Offset | Field | Type | Description |
 |--------|-------|------|-------------|
-| 0 | `telemetry_version` | `uint8_t` | Protocol version (1 or 2) |
+| 0 | `telemetry_version` | `uint8_t` | Protocol version (1–4); see wire format below |
 | 1 | `timestamp_ms` | `uint32_t` | Uptime in milliseconds |
 | 5 | `voltage_mv` | `int32_t` | Filtered battery voltage in mV |
 | 9 | `temperature_c_x100` | `int32_t` | Temperature in 0.01 C units |

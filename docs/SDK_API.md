@@ -212,7 +212,7 @@ int battery_soh_reset(void);
 - `battery_soh_get_learned_capacity_mah_x100` — learned usable capacity in 0.01 mAh units.
 - `battery_soh_reset` — restore learned capacity to the rated value.
 
-Learning happens automatically inside the SoC estimator: it arms at the full-anchor edge and, at the empty-anchor edge, computes `measured = rated − remaining_charge` and blends it into the learned capacity with an EMA (`BATTERY_SOC_SOH_ALPHA_X1000`). Implausible excursions (outside `REJECT_LO_PCT`..`REJECT_HI_PCT` of rated) are ignored. SoH converges only over deep discharge cycles and is RAM-only (relearns on reboot) in this release.
+Learning happens automatically inside the SoC estimator: it arms at the full-anchor edge and, at the empty-anchor edge, computes `measured = rated − remaining_charge` and blends it into the learned capacity with an EMA (`BATTERY_SOC_SOH_ALPHA_X1000`). Implausible excursions (outside `REJECT_LO_PCT`..`REJECT_HI_PCT` of rated) are ignored. SoH converges only over deep discharge cycles. Learned capacity persists to flash (NVS) and is restored on boot behind a rated-capacity guard (v0.12.0+).
 
 ---
 
@@ -411,8 +411,6 @@ Query whether a remote client is connected.
 |--------|------|---------|-------------|
 | `CONFIG_BATTERY_TRANSPORT` | bool | n | Enable transport subsystem |
 | `CONFIG_BATTERY_TRANSPORT_BLE` | bool | — | BLE GATT backend |
-| `CONFIG_BATTERY_BLE_DEVICE_NAME` | string | "iBattery" | Advertised device name |
-| `CONFIG_BATTERY_BLE_ADV_INTERVAL_MS` | int | 1000 | Advertising interval (20-10240 ms) |
 
 ### Voltage Filter & SoC Smoothing (Kconfig)
 
