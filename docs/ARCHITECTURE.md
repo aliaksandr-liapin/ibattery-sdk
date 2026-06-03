@@ -248,7 +248,7 @@
 - `bt_enable()` with semaphore-based synchronous init, then connectable advertising
 - Drop policy: silently succeeds when no client subscribed (no error on unsubscribed send)
 - Connection callbacks manage ref-counted `bt_conn`, resume advertising on disconnect
-- Device name configurable via `CONFIG_BATTERY_BLE_DEVICE_NAME` (default "iBattery")
+- Device name set via Zephyr's `CONFIG_BT_DEVICE_NAME` (default "iBattery")
 - Resource overhead: ~62 KB flash, ~12 KB RAM (BLE stack)
 
 ---

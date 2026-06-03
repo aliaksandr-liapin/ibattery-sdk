@@ -72,7 +72,7 @@ See [Hardware Wiring Guide](WIRING.md) for pin diagrams and circuit schematics.
 - LiPo single-cell (3.7 V nominal) discharge curve LUT (11-point, extra density in knee region)
 - `CONFIG_BATTERY_CHEMISTRY` Kconfig: selects CR2032 or LiPo LUT + gates temp compensation on LiPo only
 - BLE telemetry transport with custom GATT service and notification characteristic
-- Wire format v1 (20 bytes), v2 (24 bytes with `cycle_count`), and v3 (32 bytes with `current_ma` + `coulomb_mah`) — backward compatible
+- Wire format v1 (20 bytes), v2 (24 bytes with `cycle_count`), v3 (32 bytes with `current_ma` + `coulomb_mah`), and v4 (34 bytes with `soh_pct`) — backward compatible
 - Compile-time transport backend selection via Kconfig (BLE or mock)
 - Dual output: serial printk + BLE notifications (when `CONFIG_BATTERY_TRANSPORT=y`)
 - Charge cycle counter with NVS flash persistence (CHARGING→CHARGED transitions)
@@ -170,7 +170,7 @@ Battery SDK initialized OK
 
 | Offset | Field | Type | Description |
 |--------|-------|------|-------------|
-| 0 | `telemetry_version` | `uint8_t` | Protocol version (1 or 2) |
+| 0 | `telemetry_version` | `uint8_t` | Protocol version (1–4); see wire format below |
 | 1 | `timestamp_ms` | `uint32_t` | Uptime in milliseconds |
 | 5 | `voltage_mv` | `int32_t` | Filtered battery voltage in mV |
 | 9 | `temperature_c_x100` | `int32_t` | Temperature in 0.01 C units |
@@ -190,6 +190,12 @@ Battery SDK initialized OK
 |--------|-------|------|-------------|
 | 24 | `current_ma_x100` | `int32_t` | Current in 0.01 mA units (from INA219) |
 | 28 | `coulomb_mah_x100` | `int32_t` | Accumulated charge in 0.01 mAh units |
+
+### v4 (34 bytes, extends v3)
+
+| Offset | Field | Type | Description |
+|--------|-------|------|-------------|
+| 32 | `soh_pct_x100` | `uint16_t` | State of Health in 0.01% units; emitted only when `CONFIG_BATTERY_SOC_SOH=y` (version is 4 then, else 3) |
 
 ---
 
