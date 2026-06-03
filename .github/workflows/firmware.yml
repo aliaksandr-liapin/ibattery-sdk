@@ -77,3 +77,22 @@ jobs:
             ${{ github.workspace }}/ibattery-sdk/app \
             -d build-output \
             --pristine -- ${{ matrix.extra_args }}
+
+      # Verify the SDK builds + links when consumed as a Zephyr MODULE
+      # (root CMakeLists.txt + Kconfig.ibattery via zephyr/module.yml), not via
+      # the app's target_sources path. This is the SDK's primary distribution
+      # mode and previously drifted/broke silently. Runs once (default config).
+      - name: Verify Zephyr-module consumption path
+        if: matrix.config == 'default'
+        env:
+          ZEPHYR_BASE: ${{ github.workspace }}/zephyrproject/zephyr
+          ZEPHYR_SDK_INSTALL_DIR: ${{ github.workspace }}/zephyrproject/zephyr-sdk-0.16.8
+        run: |
+          cd zephyrproject
+          west build \
+            -b esp32c3_devkitm \
+            ${{ github.workspace }}/ibattery-sdk/tests/module_consumer \
+            -d build-module \
+            --pristine -- \
+            -DZEPHYR_EXTRA_MODULES=${{ github.workspace }}/ibattery-sdk \
+            -DEXTRA_DTC_OVERLAY_FILE=${{ github.workspace }}/ibattery-sdk/app/boards/esp32c3_devkitm.overlay
