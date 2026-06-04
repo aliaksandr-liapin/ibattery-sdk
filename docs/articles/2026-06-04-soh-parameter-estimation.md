@@ -1,10 +1,11 @@
 ---
 title: "I Made a Battery Admit It Was Only 73% Healthy — On-Device, End to End"
-published: false
+published: true
 description: "How a tiny embedded SDK learns a battery's real capacity on-device — integer-only, ~200 bytes of flash — and how I watched a learned 'State of Health' travel from firmware to a live Grafana dashboard."
 tags: embedded, iot, opensource, zephyr
 cover_image: ""
-# cover_image: drop the Grafana State-of-Health screenshot here (gauge at 73.1% + the 100→73 trend)
+# Published 2026-06-04: https://dev.to/aliaksandrliapin/i-made-a-battery-admit-it-was-only-73-healthy-on-device-end-to-end-1882
+# cover_image on dev.to: the Grafana State-of-Health dashboard (gauge 73.1% + the 100→73 trend)
 ---
 
 Voltage lies.
