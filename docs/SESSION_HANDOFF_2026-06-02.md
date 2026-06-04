@@ -3,6 +3,45 @@
 > Current handoff. Supersedes `SESSION_HANDOFF_2026-05-29.md` (and earlier).
 > For authoritative current status, this file + `CLAUDE.md` "Current State" win.
 
+## 2026-06-04 UPDATE — the "one remaining HW test" is DONE ✅
+
+The faded-SoH-over-BLE→Grafana end-to-end gap (see TL;DR / §"Next HW test") is
+now **closed and hardware-validated**, plus NVS persistence in the same run:
+
+- Rig: PPK2 (Source Meter) on the **cap-free 10 k/10 k** divider + INA219 + load,
+  per `docs/BENCH_PREP_SOH_BLE_E2E.md`. Build: `nucleo_l476rg_ble_extadc.conf`
+  with a **`CONFIG_BATTERY_CAPACITY_MAH=10`** override so the excursion finishes
+  in minutes (build dir `build-stm32-extadc-q10`).
+- Drove a full→empty excursion: PPK2 3300 mV armed the full anchor (firmware
+  reads ~9% low, so 3300→~2990 ≥ 2950), ~33 mA load drew it down, PPK2 swept to
+  2200 mV (→ read ≤2000) fired the **empty anchor → SoH learned 73.10%**.
+- **BLE → gateway → InfluxDB:** `soh_pct=73.1` **verified by direct InfluxDB
+  query** (bucket `telemetry`, device `iBattery`) — which transitively proves the
+  BLE path, since a fresh value in the DB arrived over BLE from the device.
+  Gateway run from **iTerm**.
+- **Grafana** "State of Health" gauge (73.1%) + trend (100→73 step) **observed on
+  the live dashboard** (operator screenshots; Grafana queries the same verified
+  InfluxDB).
+- **NVS persistence:** reset over SWD → board booted reading **SOH=73.10% from
+  flash** on the first telemetry line (not 100%) — verified in the serial capture.
+- Evidence: `docs/captures/2026-06-04-soh-fast-excursion.log` (the
+  `SOH CHANGED 100.00% -> 73.10%` event + post-reset restore are in it; this is
+  the serial stream I read directly).
+- Cross-checks: PPK2 vs INA219 current agreed <1% throughout.
+
+> Provenance: firmware-learn, NVS-restore, and the InfluxDB value were verified
+> by direct tooling (serial + `influx query`); the Grafana render was observed
+> via operator screenshots. The BLE link itself was not sniffed directly — it's
+> inferred from the fresh InfluxDB value (gateway's only data source is BLE).
+
+**Board left with the q10 (10 mAh-rated) extADC image + NVS holding learned
+73.10%.** To return to normal, reflash the standard app (VREFINT, 220 mAh) and
+clear NVS — same as the post-v0.13.0 restore.
+
+Remaining candidates now: external-ADC ~6–10% calibration trim, partial-excursion
+learning, promo blog post (the SoH parameter-estimation story now has a complete
+BLE→Grafana demo + screenshots).
+
 ## TL;DR
 
 iBattery SDK is at **v0.13.0**, on `main`, clean and in sync. The big arc since
