@@ -38,9 +38,14 @@ now **closed and hardware-validated**, plus NVS persistence in the same run:
 73.10%.** To return to normal, reflash the standard app (VREFINT, 220 mAh) and
 clear NVS — same as the post-v0.13.0 restore.
 
+Promo blog post **published** (dev.to): "I Made a Battery Admit It Was Only 73%
+Healthy — On-Device, End to End"
+(https://dev.to/aliaksandrliapin/i-made-a-battery-admit-it-was-only-73-healthy-on-device-end-to-end-1882;
+draft archived at `docs/articles/2026-06-04-soh-parameter-estimation.md`).
+
 Remaining candidates now: external-ADC ~6–10% calibration trim, partial-excursion
-learning, promo blog post (the SoH parameter-estimation story now has a complete
-BLE→Grafana demo + screenshots).
+learning, a real CR2032/LiPo discharge to validate the SoC LUT against a physical
+cell, nRF I2C remap experiment.
 
 ## TL;DR
 
