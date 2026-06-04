@@ -45,20 +45,25 @@
 | ☐ | X-NUCLEO-IDB05A1 BLE shield | — | mounted on Arduino headers |
 | ☐ | INA219 current sensor | — | I2C already wired (SDA=PB9/D14, SCL=PB8/D15) |
 | ☐ | **PPK2** (Nordic Power Profiler Kit II) | 0.8–5.0 V, ≤1 A | emulates the discharging cell |
-| ☐ | **2 × 100 kΩ** resistors | ±5% OK, ¼ W | the ÷2 voltage divider — **R1 must equal R2** |
+| ☐ | **2 × equal resistors** | **1 k–22 kΩ**, ±5% OK, ¼ W | the ÷2 voltage divider — **R1 must equal R2**. 10 k/10 k recommended |
 | ☐ | **1 × load resistor** | 47–100 Ω, **≥0.5 W** | sets discharge current; smaller Ω = faster |
-| ☐ | **1 × 100 nF** ceramic cap | — | A2→GND, required for stable high-Z ADC read |
 | ☐ | breadboard + jumper wires | — | — |
 | ☐ | multimeter | — | for the pre-power continuity/voltage checks |
 | ☐ | Mac running **iTerm** | — | for the BLE gateway (see §4) |
 
-> **⚠️ Locate the 2×100 kΩ, the load resistor, and the 100 nF first** — the lab
-> inventory lists exact resistor values as *unconfirmed*. Everything else is
-> known on-hand.
+> **No capacitor needed (cap-free divider).** The original spec used 100 k/100 k
+> + a 100 nF cap; the cap was only there to stabilize the ADC against the
+> divider's high 50 kΩ source impedance. A **lower-impedance divider removes the
+> need for it**: 10 k/10 k = 5 kΩ tap impedance, which the STM32 sample-and-hold
+> reads cleanly on its own. Any **equal pair** keeps the ÷2 ratio, so **no config
+> change** (`CONFIG_BATTERY_VOLTAGE_DIVIDER_RATIO=2` still holds). Avoid going
+> below ~1 kΩ (wastes PPK2 current for no benefit). The median voltage filter
+> (`CONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN=y`) is recommended belt-and-suspenders.
 
 **Power dissipation sanity (load resistor):** at 3 V across 100 Ω → 30 mA, 0.09 W
 (fine for ¼ W). Across 47 Ω → 64 mA, 0.19 W (still fine). A ¼ W part is adequate;
-≥0.5 W gives margin.
+≥0.5 W gives margin. **Divider current** at 10 k/10 k ≈ 150 µA @ 3 V — negligible,
+and tapped *before* the INA219 shunt so it never touches the current reading.
 
 ---
 
@@ -66,19 +71,19 @@
 
 Pin is **A2 / PA4 (ADC1_IN9)** — *not* A0/A1 (the BLE shield owns A0=IRQ, A1=SPI CS).
 
+**Cap-free divider** — 10 k/10 k (any equal pair 1 k–22 kΩ), no capacitor:
+
 ```
 PPK2 (Source Meter mode, VOUT = emulated cell +)
   │
   ├─ VOUT ─┬───────────────────────────► INA219 VIN+      (current path)
   │        │                              INA219 VIN- ─► [Load R 47–100Ω] ─┐
   │        │                                                               │
-  │        └─ [100kΩ R1] ──┬── A2 / PA4 (ADC1_IN9)  (voltage sense tap)    │
-  │                        │                                               │
-  │                      [100nF]                                           │
-  │                        │                                               │
-  │                     [100kΩ R2]                                         │
-  │                        │                                               │
-  └─ GND ──────────────────┴───────────────► NUCLEO GND ◄─────────────────┘
+  │        └─ [10kΩ R1] ──┬── A2 / PA4 (ADC1_IN9)  (voltage sense tap)     │
+  │                       │   (no cap — 5kΩ tap impedance reads clean)     │
+  │                    [10kΩ R2]                                           │
+  │                       │                                                │
+  └─ GND ─────────────────┴────────────────► NUCLEO GND ◄─────────────────┘
                                              INA219 GND  (COMMON GROUND!)
 
   INA219 VCC ◄── NUCLEO 3V3      SDA ◄──► PB9 / D14      SCL ◄──► PB8 / D15
@@ -87,22 +92,22 @@ PPK2 (Source Meter mode, VOUT = emulated cell +)
 
 ### Step-by-step
 1. **Power off** the PPK2 output before wiring.
-2. Build the **divider**: PPK2 VOUT → R1 (100 kΩ) → node **M** → R2 (100 kΩ) → GND.
-   Tap node **M** to **A2 / PA4**.
-3. Add the **100 nF cap** from node **M** to GND (right at the pin if you can).
-4. Build the **current path**: PPK2 VOUT → INA219 **VIN+**; INA219 **VIN-** →
+2. Build the **divider**: PPK2 VOUT → R1 (10 kΩ) → node **M** → R2 (10 kΩ) → GND.
+   Tap node **M** to **A2 / PA4**. (R1 = R2 = any equal pair 1 k–22 kΩ.)
+3. Build the **current path**: PPK2 VOUT → INA219 **VIN+**; INA219 **VIN-** →
    load resistor → GND.
-5. **Tie all grounds together**: PPK2 GND + INA219 GND + divider bottom (R2) +
+4. **Tie all grounds together**: PPK2 GND + INA219 GND + divider bottom (R2) +
    load-resistor return all to a **NUCLEO GND** pin (CN6). This common ground is
    **mandatory** — the ADC measures A2 relative to NUCLEO GND.
-6. Confirm INA219 VCC ← NUCLEO 3V3, and SDA/SCL on D14/D15 (already there).
+5. Confirm INA219 VCC ← NUCLEO 3V3, and SDA/SCL on D14/D15 (already there).
 
 ### Three things that bite if wrong
 - **Common ground missing** → garbage / floating ADC readings.
-- **No 100 nF cap** → noisy/unstable voltage (the 50 kΩ divider impedance is high
-  for the STM32 ADC).
 - **R1 ≠ R2** → wrong divider ratio; firmware assumes ÷2
   (`CONFIG_BATTERY_VOLTAGE_DIVIDER_RATIO=2`).
+- **Divider impedance too high** → noisy voltage. With no cap, keep R1 = R2 in the
+  **1 k–22 kΩ** range (≤11 kΩ tap impedance). If you only have ~100 kΩ parts, either
+  add a 10–100 nF cap A2→GND *or* enable the median filter and expect more jitter.
 
 ---
 
@@ -111,7 +116,7 @@ PPK2 (Source Meter mode, VOUT = emulated cell +)
 | ✓ | Check | Expected |
 |---|---|---|
 | ☐ | Continuity: PPK2 GND ↔ NUCLEO GND ↔ INA219 GND ↔ R2 bottom | all connected (beep) |
-| ☐ | R1 ≈ R2 | both ~100 kΩ; ratio within a few % |
+| ☐ | R1 ≈ R2 | equal within a few % (e.g. both ~10 kΩ) |
 | ☐ | No short VOUT ↔ GND | open (no beep) |
 | ☐ | Load resistor in series with INA219 VIN- (not across VOUT→GND directly) | correct path |
 
