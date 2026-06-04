@@ -123,6 +123,19 @@ config BATTERY_CURRENT_SENSE
       Required for coulomb counting SoC estimation.
       The INA219 must be defined in the board's devicetree overlay.
 
+config BATTERY_VOLTAGE_ADC
+    bool
+    default y
+    select ADC
+    help
+      The Zephyr voltage HAL (src/hal/battery_hal_adc_zephyr.c) is compiled
+      unconditionally and hard-depends on the ADC subsystem (DEVICE_DT_GET of
+      the ADC node + adc_raw_to_millivolts/adc_gain_invert).  Pull ADC in here
+      so the SDK declares its own dependency — mirroring how BATTERY_TEMP_DIE
+      selects SENSOR.  Without this, a module consumer that does not set
+      CONFIG_ADC itself fails to link (the sample app sets CONFIG_ADC=y in its
+      prj.conf, which masked this on the app-path build).  Hidden / always-on.
+
 config BATTERY_VOLTAGE_EXTERNAL_ADC
     bool "Read battery voltage from an external ADC pin + resistor divider"
     default n
