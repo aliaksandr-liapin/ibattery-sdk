@@ -90,6 +90,45 @@ PPK2 (Source Meter mode, VOUT = emulated cell +)
   (INA219 I2C already wired from the current-sense build)
 ```
 
+### Connection list (point-to-point)
+
+Set up three breadboard nodes first, then every part/wire just lands on them:
+
+- **[VOUT]** — PPK2 positive output rail
+- **[GND]** — common ground rail (everything grounded ties here)
+- **[SENSE]** — divider midpoint (one short row) that feeds A2
+
+**Resistors**
+
+| Part | One end → | Other end → |
+|---|---|---|
+| **R1** (10 kΩ) | **[VOUT]** | **[SENSE]** |
+| **R2** (10 kΩ) | **[SENSE]** | **[GND]** |
+| **RL** (load 47–100 Ω, ≥0.5 W) | **INA219 VIN−** | **[GND]** |
+
+**Wires**
+
+| Wire | One end → | Other end → |
+|---|---|---|
+| **W1** | PPK2 **VOUT** | **[VOUT]** |
+| **W2** | **[VOUT]** | INA219 **VIN+** |
+| **W3** | **[SENSE]** | NUCLEO **A2 / PA4** (CN8) |
+| **W4** | PPK2 **GND** | **[GND]** |
+| **W5** | NUCLEO **GND** (CN6) | **[GND]** |
+| **W6** | INA219 **GND** | **[GND]** |
+
+**INA219 logic** — already wired from the current-sense build; *verify, don't redo*:
+
+| Wire | One end → | Other end → |
+|---|---|---|
+| **W7** | INA219 **VCC** | NUCLEO **3V3** (CN6) |
+| **W8** | INA219 **SDA** | NUCLEO **D14 / PB9** |
+| **W9** | INA219 **SCL** | NUCLEO **D15 / PB8** |
+
+Current path: PPK2 **VOUT** → **VIN+** →(INA219 internal shunt)→ **VIN−** → **RL** →
+**GND**. The divider hangs off **[VOUT]** *before* the shunt, so its ~150 µA never
+touches the current reading.
+
 ### Step-by-step
 1. **Power off** the PPK2 output before wiring.
 2. Build the **divider**: PPK2 VOUT → R1 (10 kΩ) → node **M** → R2 (10 kΩ) → GND.
