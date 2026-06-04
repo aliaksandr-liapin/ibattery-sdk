@@ -1,13 +1,17 @@
-# Battery SDK
+# iBattery SDK
 
 [![CI](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/ci.yml)
 [![Firmware (ESP32-C3)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/firmware.yml/badge.svg)](https://github.com/aliaksandr-liapin/ibattery-sdk/actions/workflows/firmware.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/aliaksandr-liapin/ibattery-sdk)](https://github.com/aliaksandr-liapin/ibattery-sdk/releases)
 
-Embedded firmware library providing a **standardized battery intelligence layer** for battery-powered IoT devices. Measures voltage, estimates state-of-charge, monitors temperature and power state, and packages everything into structured telemetry packets.
+**On-device battery intelligence for embedded systems.** Measure voltage, estimate State-of-Charge, monitor temperature and power state — and *learn* each cell's true **State-of-Health** (capacity fade) on the device itself. Integer-only, no heap, ~120 bytes of static RAM, portable across MCU vendors, with a full telemetry pipeline to a live dashboard.
 
-Currently targets the **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS) with **CR2032** coin cell and **LiPo 500mAh** (via TP4056 USB-C charger). All three platforms hardware-validated with full BLE telemetry pipeline. Designed to scale to other MCUs and battery chemistries.
+> **Why it's different — intelligence, not just a reading.** Most options tell you *how full* a battery is. iBattery SDK also learns *how worn out* it is: it estimates real usable capacity on-device (parameter estimation), so a fleet of devices can tell you which batteries actually need replacing. → [How it compares](docs/POSITIONING.md)
+
+**See it work:** a real battery learning it's only **73% healthy**, live on Grafana — [the full end-to-end story](https://dev.to/aliaksandrliapin/i-made-a-battery-admit-it-was-only-73-healthy-on-device-end-to-end-1882).
+
+Hardware-validated on **nRF52840**, **STM32L476**, and **ESP32-C3** (Zephyr RTOS) with **CR2032** coin cells and **LiPo** (via TP4056 USB-C charger) — full BLE → gateway → InfluxDB → Grafana pipeline on all three. Apache-2.0. Designed to scale to more MCUs and chemistries.
 
 ---
 
@@ -255,6 +259,7 @@ ibattery-sdk/
 
 ## Documentation
 
+- [Positioning & Comparison](docs/POSITIONING.md) — when to use iBattery SDK, and how it relates to the alternatives
 - [SDK API Reference](docs/SDK_API.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Hardware Wiring Guide](docs/WIRING.md)
