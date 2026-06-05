@@ -288,7 +288,7 @@ if (fuel_gauge_get_prop(fg, BATTERY_FUEL_GAUGE_PROP_SOH, &val) == 0) {
 }
 ```
 
-> Status: the driver builds and is module-path CI-smoke-tested. Runtime accuracy over the fuel_gauge interface has not yet been hardware-validated.
+> Status: the driver builds, is module-path CI-smoke-tested, and is **read-back validated on NUCLEO-L476RG (2026-06-04)** — every property returns the correct value, unit, and sign versus the native telemetry (incl. the current sign-flip, `REMAINING_CAPACITY` tracking the coulomb counter, the SoH custom property, and `set_property` → `-ENOSYS`). Evidence: `docs/captures/2026-06-04-fuel-gauge-runtime-validation.log`.
 
 ---
 
