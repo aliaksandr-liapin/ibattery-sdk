@@ -32,6 +32,13 @@ void test_full_charge_uah_with_soh(void) {
 void test_cycles_to_centi(void) {
     TEST_ASSERT_EQUAL_UINT32(500, battery_fg_cycles_to_centi(5));
 }
+void test_decikelvin_clamps(void) {
+    TEST_ASSERT_EQUAL_UINT16(0, battery_fg_cdegc_to_decikelvin(-30000));   /* -300°C -> 0 */
+    TEST_ASSERT_EQUAL_UINT16(65535, battery_fg_cdegc_to_decikelvin(700000)); /* 7000°C -> UINT16_MAX */
+}
+void test_full_charge_uah_negative_rated(void) {
+    TEST_ASSERT_EQUAL_UINT32(0, battery_fg_full_charge_uah(-5, 7310)); /* negative rated -> 0 */
+}
 
 int main(void) {
     UNITY_BEGIN();
@@ -42,5 +49,7 @@ int main(void) {
     RUN_TEST(test_mah_to_uah_clamp);
     RUN_TEST(test_full_charge_uah_with_soh);
     RUN_TEST(test_cycles_to_centi);
+    RUN_TEST(test_decikelvin_clamps);
+    RUN_TEST(test_full_charge_uah_negative_rated);
     return UNITY_END();
 }

@@ -1,6 +1,18 @@
 #ifndef BATTERY_SDK_BATTERY_FUEL_GAUGE_CONVERT_H
 #define BATTERY_SDK_BATTERY_FUEL_GAUGE_CONVERT_H
+
+/*
+ * Unit conversions from iBattery's internal fixed-point representations to the
+ * units expected by the Zephyr fuel_gauge driver API. Pure stateless integer
+ * math: each helper rescales (and where needed sign-flips or clamps) one
+ * telemetry quantity so it can be reported through a fuel_gauge backend.
+ */
+
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Battery voltage mV -> Zephyr fuel_gauge µV. */
 int32_t battery_fg_mv_to_uv(int32_t mv);
@@ -24,5 +36,9 @@ uint32_t battery_fg_full_charge_uah(int32_t rated_mah, uint16_t soh_x100);
 
 /* Cycle count -> Zephyr "1/100ths" unit. */
 uint32_t battery_fg_cycles_to_centi(uint32_t cycles);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
