@@ -171,7 +171,7 @@ config BATTERY_CAPACITY_MAH
     int "Battery capacity in mAh"
     default 220 if BATTERY_CHEMISTRY_CR2032
     default 1000 if BATTERY_CHEMISTRY_LIPO
-    depends on BATTERY_SOC_COULOMB
+    depends on BATTERY_SOC_COULOMB || BATTERY_FUEL_GAUGE_API
     help
       Nominal battery capacity in milliamp-hours. Used by the
       coulomb counting estimator to convert accumulated charge

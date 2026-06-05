@@ -28,18 +28,6 @@
 #include "battery_sdk/battery_soh.h"
 #endif
 
-/* CONFIG_BATTERY_CAPACITY_MAH only exists when BATTERY_SOC_COULOMB is enabled
- * (it depends on it in Kconfig). The fuel_gauge API can be built standalone,
- * so fall back to the rated-capacity defaults used by Kconfig (CR2032 / LiPo)
- * when coulomb counting is not compiled in. */
-#if !defined(CONFIG_BATTERY_CAPACITY_MAH)
-#if defined(CONFIG_BATTERY_CHEMISTRY_LIPO)
-#define CONFIG_BATTERY_CAPACITY_MAH 1000
-#else
-#define CONFIG_BATTERY_CAPACITY_MAH 220
-#endif
-#endif
-
 static int ibattery_fg_get_prop(const struct device *dev, fuel_gauge_prop_t prop,
 				union fuel_gauge_prop_val *val)
 {
