@@ -9,6 +9,12 @@
 #include <battery_sdk/battery_transport.h>
 #endif
 
+#if IS_ENABLED(CONFIG_BATTERY_FUEL_GAUGE_SELFCHECK)
+#include <zephyr/device.h>
+#include <zephyr/drivers/fuel_gauge.h>
+#include <battery_sdk/battery_fuel_gauge.h>
+#endif
+
 #include <stdint.h>
 
 static void print_platform_info(void)
@@ -61,6 +67,59 @@ static void print_platform_info(void)
     printk("============================================\n\n");
 }
 
+#if IS_ENABLED(CONFIG_BATTERY_FUEL_GAUGE_SELFCHECK)
+/* Read each property back through the standard fuel_gauge API and print raw
+ * values + units, so they can be compared against the native telemetry line.
+ * Expected conversions: V uV = mV*1000; I uA = -(mA*1000) [neg=discharge];
+ * T 0.1K = degC*10 + 2731(.5); SOC % = round(native SOC); REM/FULL uAh;
+ * DESIGN mAh; CYC 1/100ths; SOH(flags) = native soh*100. set_prop = -ENOSYS. */
+static void fuel_gauge_selfcheck(void)
+{
+    const struct device *fg = DEVICE_DT_GET_ANY(aliaksandr_ibattery_fuel_gauge);
+    union fuel_gauge_prop_val v;
+
+    if (fg == NULL || !device_is_ready(fg)) {
+        printk("  [FG] device not ready\n");
+        return;
+    }
+
+    printk("  [FG]");
+    if (fuel_gauge_get_prop(fg, FUEL_GAUGE_VOLTAGE, &v) == 0) {
+        printk(" V=%duV", v.voltage);
+    }
+    if (fuel_gauge_get_prop(fg, FUEL_GAUGE_CURRENT, &v) == 0) {
+        printk(" I=%duA", v.current);
+    }
+    if (fuel_gauge_get_prop(fg, FUEL_GAUGE_AVG_CURRENT, &v) == 0) {
+        printk(" AVGI=%duA", v.avg_current);
+    }
+    if (fuel_gauge_get_prop(fg, FUEL_GAUGE_TEMPERATURE, &v) == 0) {
+        printk(" T=%u(0.1K)", v.temperature);
+    }
+    if (fuel_gauge_get_prop(fg, FUEL_GAUGE_RELATIVE_STATE_OF_CHARGE, &v) == 0) {
+        printk(" SOC=%u%%", v.relative_state_of_charge);
+    }
+    if (fuel_gauge_get_prop(fg, FUEL_GAUGE_REMAINING_CAPACITY, &v) == 0) {
+        printk(" REM=%uuAh", v.remaining_capacity);
+    }
+    if (fuel_gauge_get_prop(fg, FUEL_GAUGE_FULL_CHARGE_CAPACITY, &v) == 0) {
+        printk(" FULL=%uuAh", v.full_charge_capacity);
+    }
+    if (fuel_gauge_get_prop(fg, FUEL_GAUGE_DESIGN_CAPACITY, &v) == 0) {
+        printk(" DESIGN=%umAh", v.design_cap);
+    }
+    if (fuel_gauge_get_prop(fg, FUEL_GAUGE_CYCLE_COUNT, &v) == 0) {
+        printk(" CYC=%u(1/100)", v.cycle_count);
+    }
+    if (fuel_gauge_get_prop(fg, BATTERY_FUEL_GAUGE_PROP_SOH, &v) == 0) {
+        printk(" SOH(flags)=%u", v.flags);
+    }
+    /* read-only contract: set_property must report not-supported */
+    printk(" set_rc=%d", fuel_gauge_set_prop(fg, FUEL_GAUGE_VOLTAGE, v));
+    printk("\n");
+}
+#endif /* CONFIG_BATTERY_FUEL_GAUGE_SELFCHECK */
+
 int main(void)
 {
     struct battery_telemetry_packet pkt;
@@ -111,6 +170,10 @@ int main(void)
                    pkt.soh_pct_x100 % 100U);
 #endif
             printk("\n");
+
+#if IS_ENABLED(CONFIG_BATTERY_FUEL_GAUGE_SELFCHECK)
+            fuel_gauge_selfcheck();
+#endif
 
 #if IS_ENABLED(CONFIG_BATTERY_TRANSPORT)
             rc = battery_transport_send(&pkt);

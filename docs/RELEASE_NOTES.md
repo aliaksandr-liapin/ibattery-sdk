@@ -19,8 +19,12 @@
     (e.g. 7310 == 73.10%); available only when `CONFIG_BATTERY_SOC_SOH=y`.
   - **Read-only contract:** only `.get_property` is implemented; `set_property`
     and the other ops return `-ENOSYS`, unsupported properties return `-ENOTSUP`.
-  - Builds and is module-path CI-smoke-tested; runtime accuracy over the
-    fuel_gauge interface has not yet been hardware-validated.
+  - Builds, module-path CI-smoke-tested, **and read-back validated on
+    NUCLEO-L476RG (2026-06-04)**: every property returns the correct value, unit,
+    and sign versus the native telemetry — including the current sign-flip,
+    `REMAINING_CAPACITY` tracking the coulomb counter, the SoH custom property,
+    and `set_property` → `-ENOSYS` (read-only). Evidence:
+    `docs/captures/2026-06-04-fuel-gauge-runtime-validation.log`.
 
 ## v0.13.0 — External-ADC voltage sense + hardware-validated SoH excursion — 2026-06-01
 
