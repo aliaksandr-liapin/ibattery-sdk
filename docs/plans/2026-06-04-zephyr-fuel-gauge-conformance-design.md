@@ -21,7 +21,7 @@ it as a documented custom property *and* keep it in the native API.
 Kconfig, mapping iBattery's existing outputs to standard properties + one custom
 SoH property. No change to existing behavior when disabled.
 
-**Out (explicitly):** `set_property` (read-only → `-ENOTSUP`); SBS buffer/string
+**Out (explicitly):** `set_property` (read-only → `-ENOSYS`, since `.set_property` is left unset and the subsystem returns `-ENOSYS`); SBS buffer/string
 properties (manufacturer/device name/chemistry); `RUNTIME_TO_EMPTY/_TO_FULL`
 (deferred — needs a rate model); charge-control properties. A future iteration
 can add these.
@@ -103,7 +103,7 @@ rather than re-reading hardware in the fuel_gauge path.
 
 - Unsupported / out-of-range prop → `-ENOTSUP`.
 - SDK not initialized or no valid reading yet → `-EIO`.
-- `set_property` → `-ENOTSUP` (read-only). `get_buffer_property` → not provided.
+- `set_property` → `-ENOSYS` (read-only; `.set_property` left unset, so the subsystem returns `-ENOSYS`). `get_buffer_property` → not provided.
 - Getter never blocks and never does I/O — returns last-known state.
 
 ## Testing (TDD)
