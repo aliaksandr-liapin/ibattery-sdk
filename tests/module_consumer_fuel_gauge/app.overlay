@@ -1,0 +1,6 @@
+/ {
+	ibattery_fuel_gauge {
+		compatible = "aliaksandr,ibattery-fuel-gauge";
+		status = "okay";
+	};
+};
