@@ -79,6 +79,12 @@ zephyr_library_sources_ifdef(CONFIG_BATTERY_SOC_SOH
     src/intelligence/battery_soh.c
 )
 
+# Zephyr fuel_gauge driver API (read-only) + its conversion helpers
+zephyr_library_sources_ifdef(CONFIG_BATTERY_FUEL_GAUGE_API
+    src/fuel_gauge/battery_fuel_gauge_zephyr.c
+    src/core_modules/battery_fuel_gauge_convert.c
+)
+
 # Voltage filter: moving-average (default) or median
 if(CONFIG_BATTERY_VOLTAGE_FILTER_MEDIAN)
     zephyr_library_sources(src/core_modules/battery_voltage_filter_median.c)
