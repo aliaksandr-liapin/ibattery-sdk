@@ -306,6 +306,17 @@ config BATTERY_FUEL_GAUGE_API
       from a devicetree node with compatible "aliaksandr,ibattery-fuel-gauge".
       No effect when disabled.
 
+config BATTERY_FUEL_GAUGE_SELFCHECK
+    bool "Print fuel_gauge driver readings on serial (runtime validation aid)"
+    default n
+    depends on BATTERY_FUEL_GAUGE_API
+    help
+      Sample-app diagnostic: each telemetry cycle, read every property back
+      through the standard fuel_gauge_get_prop() API and print it on serial
+      next to the native telemetry line, so the driver's values and unit
+      conversions can be eyeballed against the SDK's own output on hardware.
+      Validation-only; leave off for normal builds.
+
 config BATTERY_CHARGER_TP4056
     bool "TP4056 charger IC GPIO status detection"
     default n
