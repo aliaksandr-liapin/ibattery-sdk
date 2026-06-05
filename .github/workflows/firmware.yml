@@ -96,3 +96,24 @@ jobs:
             --pristine -- \
             -DZEPHYR_EXTRA_MODULES=${{ github.workspace }}/ibattery-sdk \
             -DEXTRA_DTC_OVERLAY_FILE=${{ github.workspace }}/ibattery-sdk/app/boards/esp32c3_devkitm.overlay
+
+      # Verify the read-only Zephyr fuel_gauge driver
+      # (compatible "aliaksandr,ibattery-fuel-gauge",
+      # gated on CONFIG_BATTERY_FUEL_GAUGE_API) compiles + links when the SDK is
+      # consumed as a Zephyr MODULE. The consumer's app.overlay supplies the
+      # fuel_gauge DT node; the esp32c3 overlay is the platform overlay.
+      # Runs once (default config).
+      - name: Verify fuel_gauge driver via module path
+        if: matrix.config == 'default'
+        env:
+          ZEPHYR_BASE: ${{ github.workspace }}/zephyrproject/zephyr
+          ZEPHYR_SDK_INSTALL_DIR: ${{ github.workspace }}/zephyrproject/zephyr-sdk-0.16.8
+        run: |
+          cd zephyrproject
+          west build \
+            -b esp32c3_devkitm \
+            ${{ github.workspace }}/ibattery-sdk/tests/module_consumer_fuel_gauge \
+            -d build-module-fg \
+            --pristine -- \
+            -DZEPHYR_EXTRA_MODULES=${{ github.workspace }}/ibattery-sdk \
+            -DEXTRA_DTC_OVERLAY_FILE=${{ github.workspace }}/ibattery-sdk/app/boards/esp32c3_devkitm.overlay

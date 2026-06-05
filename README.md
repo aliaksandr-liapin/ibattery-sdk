@@ -160,6 +160,31 @@ manifest:
 
 Then `west update` and add `CONFIG_BATTERY_SDK=y` to your `prj.conf`.
 
+### Use as a standard Zephyr fuel gauge
+
+iBattery can be consumed through the standard Zephyr `fuel_gauge` driver API (read-only). Enable the Kconfig and add a devicetree node:
+
+```conf
+# prj.conf
+CONFIG_BATTERY_FUEL_GAUGE_API=y
+```
+
+```dts
+/* overlay — see app/boards/fuel_gauge.overlay */
+ibattery_fg: ibattery_fuel_gauge {
+    compatible = "aliaksandr,ibattery-fuel-gauge";
+    status = "okay";
+};
+```
+
+```c
+const struct device *fg = DEVICE_DT_GET_ANY(aliaksandr_ibattery_fuel_gauge);
+union fuel_gauge_prop_val val;
+fuel_gauge_get_prop(fg, FUEL_GAUGE_VOLTAGE, &val);  /* val.voltage in µV */
+```
+
+The standard API has no State-of-Health property, so iBattery exposes a custom `BATTERY_FUEL_GAUGE_PROP_SOH` (value in `val.flags`, centi-percent). See [docs/SDK_API.md](docs/SDK_API.md) for the full property→unit table.
+
 ### Install via PlatformIO
 
 ```ini

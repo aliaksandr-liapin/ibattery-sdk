@@ -1,0 +1,3 @@
+description: iBattery SDK virtual fuel gauge (software, read-only)
+compatible: "aliaksandr,ibattery-fuel-gauge"
+include: [base.yaml]
