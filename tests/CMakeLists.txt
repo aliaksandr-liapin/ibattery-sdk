@@ -472,6 +472,20 @@ target_compile_definitions(test_soc_slew_limit PRIVATE
 
 target_link_libraries(test_soc_slew_limit PRIVATE unity)
 
+# ── Fuel-gauge conversion helpers test (pure, host-only) ───────────────────
+add_executable(test_fuel_gauge_convert
+    test_fuel_gauge_convert.c
+    ${SDK_SRC}/core_modules/battery_fuel_gauge_convert.c
+)
+
+target_include_directories(test_fuel_gauge_convert PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}/core_modules
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_fuel_gauge_convert PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
@@ -497,3 +511,4 @@ add_test(NAME soc_soh COMMAND test_soc_soh)
 add_test(NAME soc_soh_estimator COMMAND test_soc_soh_estimator)
 add_test(NAME soh_persistence COMMAND test_soh_persistence)
 add_test(NAME adc_divider COMMAND test_adc_divider)
+add_test(NAME fuel_gauge_convert COMMAND test_fuel_gauge_convert)
