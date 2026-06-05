@@ -169,6 +169,7 @@ config BATTERY_SOC_COULOMB
 
 config BATTERY_CAPACITY_MAH
     int "Battery capacity in mAh"
+    range 1 65535
     default 220 if BATTERY_CHEMISTRY_CR2032
     default 1000 if BATTERY_CHEMISTRY_LIPO
     depends on BATTERY_SOC_COULOMB || BATTERY_FUEL_GAUGE_API
@@ -295,15 +296,15 @@ config BATTERY_SOC_SOH_REJECT_HI_PCT
 endif # BATTERY_SOC_SOH
 
 config BATTERY_FUEL_GAUGE_API
-	bool "Expose iBattery via the Zephyr fuel_gauge driver API (read-only)"
-	default n
-	select FUEL_GAUGE
-	help
-	  Build a read-only Zephyr fuel_gauge driver that maps iBattery's outputs
-	  (SoC, voltage, current, capacity, cycle count, temperature) to the standard
-	  fuel_gauge properties, plus a custom State-of-Health property. Instantiated
-	  from a devicetree node with compatible "aliaksandr,ibattery-fuel-gauge".
-	  No effect when disabled.
+    bool "Expose iBattery via the Zephyr fuel_gauge driver API (read-only)"
+    default n
+    select FUEL_GAUGE
+    help
+      Build a read-only Zephyr fuel_gauge driver that maps iBattery's outputs
+      (SoC, voltage, current, capacity, cycle count, temperature) to the standard
+      fuel_gauge properties, plus a custom State-of-Health property. Instantiated
+      from a devicetree node with compatible "aliaksandr,ibattery-fuel-gauge".
+      No effect when disabled.
 
 config BATTERY_CHARGER_TP4056
     bool "TP4056 charger IC GPIO status detection"

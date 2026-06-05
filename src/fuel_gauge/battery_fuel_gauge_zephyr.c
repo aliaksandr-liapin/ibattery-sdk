@@ -44,15 +44,19 @@ static int ibattery_fg_get_prop(const struct device *dev, fuel_gauge_prop_t prop
 		val->voltage = battery_fg_mv_to_uv(pkt.voltage_mv);
 		break;
 	case FUEL_GAUGE_CURRENT:
-	case FUEL_GAUGE_AVG_CURRENT:
 		val->current = battery_fg_ma_x100_to_ua(pkt.current_ma_x100);
+		break;
+	case FUEL_GAUGE_AVG_CURRENT:
+		val->avg_current = battery_fg_ma_x100_to_ua(pkt.current_ma_x100);
 		break;
 	case FUEL_GAUGE_TEMPERATURE:
 		val->temperature = battery_fg_cdegc_to_decikelvin(pkt.temperature_c_x100);
 		break;
 	case FUEL_GAUGE_RELATIVE_STATE_OF_CHARGE:
-	case FUEL_GAUGE_ABSOLUTE_STATE_OF_CHARGE:
 		val->relative_state_of_charge = battery_fg_socx100_to_pct(pkt.soc_pct_x100);
+		break;
+	case FUEL_GAUGE_ABSOLUTE_STATE_OF_CHARGE:
+		val->absolute_state_of_charge = battery_fg_socx100_to_pct(pkt.soc_pct_x100);
 		break;
 	case FUEL_GAUGE_REMAINING_CAPACITY:
 		val->remaining_capacity = battery_fg_mahx100_to_uah(pkt.coulomb_mah_x100);
