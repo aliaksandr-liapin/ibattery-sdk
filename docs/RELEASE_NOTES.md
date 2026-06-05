@@ -1,5 +1,27 @@
 # Release Notes
 
+## Unreleased
+
+- **Read-only Zephyr `fuel_gauge` driver** (opt-in `CONFIG_BATTERY_FUEL_GAUGE_API`,
+  default n; `select FUEL_GAUGE`). Lets any consumer written against the standard
+  Zephyr `fuel_gauge` API read iBattery without the iBattery-specific headers.
+  The driver is a software view over `battery_telemetry_collect()` (no backing
+  gauge IC) and is instantiated from a devicetree node with
+  `compatible = "aliaksandr,ibattery-fuel-gauge"` (example overlay:
+  `app/boards/fuel_gauge.overlay`).
+  - **Supported properties:** `VOLTAGE` (µV), `CURRENT`/`AVG_CURRENT` (µA,
+    negative = discharging), `TEMPERATURE` (0.1 K),
+    `RELATIVE_STATE_OF_CHARGE`/`ABSOLUTE_STATE_OF_CHARGE` (% 0–100),
+    `REMAINING_CAPACITY` (µAh), `FULL_CHARGE_CAPACITY` (µAh, reflects SoH-learned
+    capacity), `DESIGN_CAPACITY` (mAh), `CYCLE_COUNT` (1/100ths).
+  - **Custom State-of-Health property** `BATTERY_FUEL_GAUGE_PROP_SOH` (the standard
+    API has none): value delivered in `val->flags` as centi-percent
+    (e.g. 7310 == 73.10%); available only when `CONFIG_BATTERY_SOC_SOH=y`.
+  - **Read-only contract:** only `.get_property` is implemented; `set_property`
+    and the other ops return `-ENOSYS`, unsupported properties return `-ENOTSUP`.
+  - Builds and is module-path CI-smoke-tested; runtime accuracy over the
+    fuel_gauge interface has not yet been hardware-validated.
+
 ## v0.13.0 — External-ADC voltage sense + hardware-validated SoH excursion — 2026-06-01
 
 Adds an opt-in path to read battery voltage from an **external resistor divider

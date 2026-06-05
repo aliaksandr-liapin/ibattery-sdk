@@ -49,7 +49,7 @@ That last capability is the on-device primitive behind fleet questions like
 |---|---|---|
 | **Dedicated fuel-gauge ICs** (e.g. TI BQ27xxx, ADI/Maxim MAX17xxx families) | Hardware chips with on-chip estimation | Capable, but add a physical part + BOM cost and are vendor-specific. iBattery is pure software — no extra IC required. |
 | **Vendor estimation libraries** (e.g. Nordic `nrf_fuel_gauge`) | Model-based estimation tied to one vendor's platform | Polished for that ecosystem. iBattery is multi-vendor, open-source, and adds on-device SoH learning. |
-| **Zephyr `fuel_gauge` subsystem** | A standard *driver API* (with drivers for specific gauge ICs) | An interface, not an estimator for arbitrary hardware. iBattery is the algorithm side — **conforming to this API is on our roadmap**, so you could consume iBattery through the standard interface. |
+| **Zephyr `fuel_gauge` subsystem** | A standard *driver API* (with drivers for specific gauge ICs) | An interface, not an estimator for arbitrary hardware. iBattery is the algorithm side — and it now ships an opt-in **read-only** `fuel_gauge` driver (`CONFIG_BATTERY_FUEL_GAUGE_API`), so you can **consume iBattery through the standard interface today** (reads only; no `set_property`). |
 | **Roll-your-own voltage LUT** | A voltage→% table in your own firmware | Simplest path, but jittery and has no aging/health signal. iBattery includes a LUT *plus* coulomb counting, fusion, and SoH. |
 
 ## What makes iBattery SDK distinct (verifiable attributes)

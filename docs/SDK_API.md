@@ -216,6 +216,82 @@ Learning happens automatically inside the SoC estimator: it arms at the full-anc
 
 ---
 
+## Zephyr fuel_gauge API (read-only)
+
+Opt-in via `CONFIG_BATTERY_FUEL_GAUGE_API` (default n). When enabled, the SDK builds a **read-only** Zephyr `fuel_gauge` driver that maps iBattery's telemetry onto the standard `fuel_gauge_get_prop()` interface, so any consumer written against the generic Zephyr fuel gauge API can read iBattery without depending on the iBattery-specific headers.
+
+The driver is a software view over `battery_telemetry_collect()` — it has no backing gauge IC. Only `.get_property` is implemented; `set_property`, `get_buffer_property`, and `battery_cutoff` are unimplemented and return `-ENOSYS` (the read-only contract). Reading an unsupported property returns `-ENOTSUP`.
+
+### Enabling
+
+The Kconfig `select`s the upstream `FUEL_GAUGE` subsystem and instantiates the driver from a devicetree node with `compatible = "aliaksandr,ibattery-fuel-gauge"`.
+
+```conf
+# prj.conf
+CONFIG_BATTERY_FUEL_GAUGE_API=y
+```
+
+```dts
+/* overlay — see app/boards/fuel_gauge.overlay */
+/ {
+    ibattery_fg: ibattery_fuel_gauge {
+        compatible = "aliaksandr,ibattery-fuel-gauge";
+        status = "okay";
+    };
+};
+```
+
+### Supported properties and units
+
+Units follow upstream `zephyr/drivers/fuel_gauge.h` exactly.
+
+| Property | Unit | Source / notes |
+|----------|------|----------------|
+| `FUEL_GAUGE_VOLTAGE` | µV | Filtered battery voltage |
+| `FUEL_GAUGE_CURRENT` | µA (negative = discharging) | iBattery reports discharge as positive; sign is flipped to the Zephyr convention |
+| `FUEL_GAUGE_AVG_CURRENT` | µA (negative = discharging) | Same instantaneous value as `CURRENT` |
+| `FUEL_GAUGE_TEMPERATURE` | 0.1 K | Clamped ≥ 0 |
+| `FUEL_GAUGE_RELATIVE_STATE_OF_CHARGE` | % (0–100) | From the SoC estimator |
+| `FUEL_GAUGE_ABSOLUTE_STATE_OF_CHARGE` | % (0–100) | Same value as relative |
+| `FUEL_GAUGE_REMAINING_CAPACITY` | µAh | Coulomb-counter remaining charge (negatives clamp to 0) |
+| `FUEL_GAUGE_FULL_CHARGE_CAPACITY` | µAh | Rated capacity scaled by learned SoH; falls back to rated when SoH is unknown/disabled |
+| `FUEL_GAUGE_DESIGN_CAPACITY` | mAh | `CONFIG_BATTERY_CAPACITY_MAH` |
+| `FUEL_GAUGE_CYCLE_COUNT` | 1/100ths | Charge cycle count |
+
+Any property not listed above returns `-ENOTSUP`.
+
+### Custom State-of-Health property
+
+The standard `fuel_gauge` API has no State-of-Health property, so iBattery exposes one as a downstream-custom property defined in `battery_sdk/battery_fuel_gauge.h`:
+
+```c
+#define BATTERY_FUEL_GAUGE_PROP_SOH (FUEL_GAUGE_CUSTOM_BEGIN + 0)
+```
+
+The value is delivered in `val->flags` as SoH in **centi-percent** (e.g. `7310` == 73.10%). It is only available when `CONFIG_BATTERY_SOC_SOH=y`; otherwise reading it returns `-ENOTSUP`.
+
+### Usage
+
+```c
+#include <zephyr/drivers/fuel_gauge.h>
+#include <battery_sdk/battery_fuel_gauge.h>   /* for the custom SoH property */
+
+const struct device *fg = DEVICE_DT_GET_ANY(aliaksandr_ibattery_fuel_gauge);
+union fuel_gauge_prop_val val;
+
+if (fuel_gauge_get_prop(fg, FUEL_GAUGE_VOLTAGE, &val) == 0) {
+    /* val.voltage — battery voltage in µV */
+}
+
+if (fuel_gauge_get_prop(fg, BATTERY_FUEL_GAUGE_PROP_SOH, &val) == 0) {
+    /* val.flags — State of Health in centi-percent (7310 == 73.10%) */
+}
+```
+
+> Status: the driver builds and is module-path CI-smoke-tested. Runtime accuracy over the fuel_gauge interface has not yet been hardware-validated.
+
+---
+
 ## battery_power_manager.h — Power State
 
 ```c
