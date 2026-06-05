@@ -294,6 +294,17 @@ config BATTERY_SOC_SOH_REJECT_HI_PCT
 
 endif # BATTERY_SOC_SOH
 
+config BATTERY_FUEL_GAUGE_API
+	bool "Expose iBattery via the Zephyr fuel_gauge driver API (read-only)"
+	default n
+	select FUEL_GAUGE
+	help
+	  Build a read-only Zephyr fuel_gauge driver that maps iBattery's outputs
+	  (SoC, voltage, current, capacity, cycle count, temperature) to the standard
+	  fuel_gauge properties, plus a custom State-of-Health property. Instantiated
+	  from a devicetree node with compatible "aliaksandr,ibattery-fuel-gauge".
+	  No effect when disabled.
+
 config BATTERY_CHARGER_TP4056
     bool "TP4056 charger IC GPIO status detection"
     default n
