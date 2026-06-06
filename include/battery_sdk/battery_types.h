@@ -7,7 +7,9 @@
 extern "C" {
 #endif
 
-#if defined(CONFIG_BATTERY_SOC_SOH)
+#if defined(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
+#define BATTERY_TELEMETRY_VERSION 5U
+#elif defined(CONFIG_BATTERY_SOC_SOH)
 #define BATTERY_TELEMETRY_VERSION 4U
 #else
 #define BATTERY_TELEMETRY_VERSION 3U
@@ -44,6 +46,9 @@ struct battery_telemetry_packet {
 
     /* v4 field — zero when telemetry_version < 4 */
     uint16_t soh_pct_x100;
+
+    /* v5 field — zero when telemetry_version < 5 */
+    uint32_t runtime_to_empty_min;
 };
 
 /* Telemetry status_flags bit definitions.
