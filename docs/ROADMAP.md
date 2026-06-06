@@ -29,7 +29,7 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 - Python BLE gateway (bleak) → InfluxDB 2.x → Grafana dashboard (Docker Compose)
 - `ibattery-gateway` CLI: scan, stream, run, analytics (health, anomalies, rul, cycles)
 - Cloud analytics: battery health scoring, real-time + historical anomaly detection, RUL estimation, cycle analysis
-- 23 C test suites (Unity) + 113 Python tests (pytest), zero hardware required to run
+- 25 C test suites (Unity) + 122 Python tests (pytest), zero hardware required to run
 - Zephyr RTOS integration with clean layered architecture
 - Production-quality codebase: no layer violations, consistent conventions, full documentation
 

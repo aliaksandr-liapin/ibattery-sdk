@@ -1,7 +1,6 @@
 # Session Handoff — 2026-06-02
 
-> Current handoff. Supersedes `SESSION_HANDOFF_2026-05-29.md` (and earlier).
-> For authoritative current status, this file + `CLAUDE.md` "Current State" win.
+> ⚠️ **SUPERSEDED by [`SESSION_HANDOFF_2026-06-06.md`](SESSION_HANDOFF_2026-06-06.md)** — see that file for current status. Kept for history.
 
 ## 2026-06-04 UPDATE — the "one remaining HW test" is DONE ✅
 
