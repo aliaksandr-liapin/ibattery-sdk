@@ -185,7 +185,7 @@ on-device *correctness and usability* stays FREE (gating it would hurt adoption)
 
 | Candidate | Why (gap it closes) | Tier (proposed) |
 |---|---|---|
-| **Runtime-to-empty estimate** (days/hours) on-device | today there's no time-remaining; only cloud RUL in *cycles*. Standard fuel-gauge `RUNTIME_TO_EMPTY` = remaining charge ÷ current — the data already exists | **FREE** (basic gauge feature) |
+| ✅ **Runtime-to-empty estimate** (minutes) on-device — **done (unreleased)** | opt-in `CONFIG_BATTERY_RUNTIME_TO_EMPTY`; native API + Zephyr `fuel_gauge` `RUNTIME_TO_EMPTY` + wire v5 + gateway/Grafana. Host/gateway tested; hardware e2e pending | **FREE** (basic gauge feature) |
 | **Swap-aware SoH** — battery-swap detection + auto-reset | today a swap needs a manual `battery_soh_reset()`; no detection, and re-learn EMA-blends the old cell | **FREE** (correctness) |
 | **Power-source flag** — expose "on external/permanent power vs battery" | no auto USB-vs-battery detection today; only inferable from charge state | **FREE** (basic) |
 | **Configurable low/warning state on-device** (not just CRITICAL) | device has one low threshold (CRITICAL); a "LOW/warning" tier only exists in the gateway | **FREE** (basic) |

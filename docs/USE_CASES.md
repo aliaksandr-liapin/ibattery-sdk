@@ -97,12 +97,18 @@ the battery to travel from the full-voltage region to the empty threshold once.
 Until that happens it reports the last known / initial value (100% on a fresh
 init). No current sensor → no SoH.
 
-### 🔧 No built-in "time remaining" (days/hours)
-There is **no runtime-to-empty estimate** today. The cloud `analytics rul`
-command estimates **remaining charge *cycles*** (and only for rechargeable cells
-that actually cycle — it returns "insufficient data" for a coin cell). A
-days/hours figure (remaining charge ÷ current draw) is **derivable but not
-shipped** — see [Roadmap](ROADMAP.md).
+### 🔧 "Time remaining" (minutes-to-empty) is opt-in and needs the current sensor
+A runtime-to-empty estimate **now exists**: enable opt-in
+`CONFIG_BATTERY_RUNTIME_TO_EMPTY` (default off; requires
+`CONFIG_BATTERY_SOC_COULOMB`, i.e. the INA219 current sensor). It reports minutes
+to empty from the smoothed discharge current and the coulomb-counter remaining
+charge, via `battery_runtime_to_empty_min()`, the Zephyr `fuel_gauge`
+`RUNTIME_TO_EMPTY` property, and wire v5 (`runtime_to_empty_min`). It reports
+**"not available"** whenever the cell is idle or charging, since no draw means no
+meaningful estimate — so treat a missing value as expected, not an error.
+Separately, the cloud `analytics rul` command estimates **remaining charge
+*cycles*** (only for rechargeable cells that actually cycle — it returns
+"insufficient data" for a coin cell). See [Roadmap](ROADMAP.md).
 
 ### 🔧 No human-language notifications on-device
 The device emits a **power-state code** (ACTIVE / IDLE / SLEEP / **CRITICAL** /

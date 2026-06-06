@@ -216,6 +216,26 @@ Learning happens automatically inside the SoC estimator: it arms at the full-anc
 
 ---
 
+## battery_runtime.h — Runtime to Empty
+
+Opt-in via `CONFIG_BATTERY_RUNTIME_TO_EMPTY` (requires `CONFIG_BATTERY_SOC_COULOMB`). Estimates the minutes remaining until the cell reaches empty from an EMA-smoothed discharge current and the coulomb-counter remaining charge. When the feature is disabled the module is not compiled. Integer-only (int64 division); no heap, no FPU.
+
+```c
+void battery_runtime_reset(void);
+void battery_runtime_update(int32_t current_ma_x100);
+int  battery_runtime_to_empty_min(int32_t remaining_mah_x100, uint32_t *minutes_out);
+```
+
+- `battery_runtime_reset` — clear the EMA state. Called automatically from `battery_sdk_init`.
+- `battery_runtime_update` — feed a current sample in 0.01 mA units (positive = discharge) into the EMA. Called automatically from the telemetry collect path each cycle.
+- `battery_runtime_to_empty_min` — estimate minutes to empty as `remaining_mAh × 60 ÷ avg_mA`. Returns `BATTERY_STATUS_OK` and writes `*minutes_out` on success; returns `BATTERY_STATUS_NOT_AVAILABLE` when the cell is idle or charging (smoothed current ≤ idle threshold), in which case no estimate is meaningful.
+
+Tuning Kconfig: `BATTERY_RUNTIME_EMA_ALPHA_X1000` (EMA weight ×1000, default 300) and `BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100` (idle/charging cutoff in 0.01 mA, default 100 = 1.00 mA).
+
+> Status: built and host-tested (Unity) plus gateway-tested (pytest). Hardware end-to-end validation is pending.
+
+---
+
 ## Zephyr fuel_gauge API (read-only)
 
 Opt-in via `CONFIG_BATTERY_FUEL_GAUGE_API` (default n). When enabled, the SDK builds a **read-only** Zephyr `fuel_gauge` driver that maps iBattery's telemetry onto the standard `fuel_gauge_get_prop()` interface, so any consumer written against the generic Zephyr fuel gauge API can read iBattery without depending on the iBattery-specific headers.
@@ -257,6 +277,7 @@ Units follow upstream `zephyr/drivers/fuel_gauge.h` exactly.
 | `FUEL_GAUGE_FULL_CHARGE_CAPACITY` | µAh | Rated capacity scaled by learned SoH; falls back to rated when SoH is unknown/disabled |
 | `FUEL_GAUGE_DESIGN_CAPACITY` | mAh | `CONFIG_BATTERY_CAPACITY_MAH` |
 | `FUEL_GAUGE_CYCLE_COUNT` | 1/100ths | Charge cycle count |
+| `FUEL_GAUGE_RUNTIME_TO_EMPTY` | minutes | Estimated minutes to empty. Only when `CONFIG_BATTERY_RUNTIME_TO_EMPTY=y` and the estimate is available (cell discharging); returns `-ENOTSUP` when disabled, idle, or charging |
 
 Any property not listed above returns `-ENOTSUP`.
 
@@ -422,7 +443,7 @@ Initialize the transport subsystem. Calls the active backend's init function. Fo
 
 ### `battery_transport_send`
 
-Serialize and send a telemetry packet. Packs the packet into a wire buffer (v1: 20 bytes, v2: 24 bytes, v3: 32 bytes, v4: 34 bytes) and forwards it to the active backend.
+Serialize and send a telemetry packet. Packs the packet into a wire buffer (v1: 20 bytes, v2: 24 bytes, v3: 32 bytes, v4: 34 bytes, v5: 38 bytes) and forwards it to the active backend.
 
 | Parameter | Direction | Description |
 |-----------|-----------|-------------|
@@ -459,7 +480,13 @@ Serialize and send a telemetry packet. Packs the packet into a wire buffer (v1: 
 |--------|------|-------|----------|
 | 32 | 2 | soh_pct_x100 | uint16 LE |
 
-v3 is the default; v4 is emitted only when `CONFIG_BATTERY_SOC_SOH=y` (then `BATTERY_TELEMETRY_VERSION=4`, otherwise 3). The decoder accepts v1–v4 by length for backward compatibility.
+**Wire format v5 (38 bytes, extends v4):**
+
+| Offset | Size | Field | Encoding |
+|--------|------|-------|----------|
+| 34 | 4 | runtime_to_empty_min | uint32 LE (`UINT32_MAX` = not available) |
+
+v3 is the default; v4 is emitted only when `CONFIG_BATTERY_SOC_SOH=y` (then `BATTERY_TELEMETRY_VERSION=4`), and v5 only when `CONFIG_BATTERY_RUNTIME_TO_EMPTY=y` (then `BATTERY_TELEMETRY_VERSION=5`); otherwise the version is the highest enabled. When the runtime estimate is unavailable (idle/charging) the field carries the sentinel `UINT32_MAX` and the gateway decodes it to `None`. The decoder accepts v1–v5 by length for backward compatibility.
 
 **BLE behavior:** When no client is subscribed (CCCD not enabled), the send silently succeeds (drop policy). The wire buffer is always updated for the Read characteristic regardless of subscription state.
 
