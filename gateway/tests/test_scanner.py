@@ -51,20 +51,27 @@ def test_no_match_when_no_name_and_no_uuid():
 
 # ── Device-tag resolution ─────────────────────────────────────────────────────
 # The InfluxDB `device` tag (shown on the Grafana "Connected Device" tile) must
-# reflect the BOARD that is actually streaming — i.e. its advertised BLE name
-# (iBattery-STM32 / iBattery-nRF52840 / iBattery-ESP32C3) — not the gateway's
-# static filter/default. Falls back to the provided default when the peripheral
-# advertises no usable name (common on macOS CoreBluetooth).
+# reflect the BOARD that is actually streaming. The most reliable source is the
+# GATT Device Name characteristic (0x2A00, = firmware CONFIG_BT_DEVICE_NAME),
+# readable after connecting even on macOS — where the *advertised* GAP name is
+# usually empty (which is why the scanner matches by service UUID). Preference:
+# GATT name -> advertised name -> the gateway's configured default.
 from gateway.scanner import resolve_device_tag
 
 
-def test_resolve_device_tag_prefers_advertised_name():
-    assert resolve_device_tag("iBattery-nRF52840", "iBattery") == "iBattery-nRF52840"
+def test_resolve_device_tag_prefers_gatt_name():
+    assert resolve_device_tag("iBattery-nRF52840", "iBattery-STM32", "iBattery") == "iBattery-nRF52840"
 
 
-def test_resolve_device_tag_falls_back_when_name_missing():
-    assert resolve_device_tag(None, "iBattery") == "iBattery"
+def test_resolve_device_tag_uses_advertised_when_no_gatt():
+    # macOS: GATT read may be unavailable, but an advertised name was seen.
+    assert resolve_device_tag(None, "iBattery-STM32", "iBattery") == "iBattery-STM32"
 
 
-def test_resolve_device_tag_falls_back_on_empty_name():
-    assert resolve_device_tag("", "iBattery") == "iBattery"
+def test_resolve_device_tag_falls_back_to_default():
+    # Neither GATT nor advertised name available -> configured default.
+    assert resolve_device_tag(None, None, "iBattery") == "iBattery"
+
+
+def test_resolve_device_tag_skips_empty_strings():
+    assert resolve_device_tag("", "", "iBattery") == "iBattery"

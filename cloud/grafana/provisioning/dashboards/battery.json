@@ -39,7 +39,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "",
+          "fields": "/^Value$/",
           "values": false
         },
         "colorMode": "background",
@@ -880,5 +880,5 @@
   "timezone": "",
   "title": "iBattery Telemetry",
   "uid": "ibattery-telemetry",
-  "version": 4
+  "version": 5
 }

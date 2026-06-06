@@ -146,11 +146,15 @@ def run(
             click.echo(f"Device '{device_name}' not found. Is it advertising?", err=True)
             sys.exit(1)
 
-        tag_name = resolve_device_tag(device.name, device_name)
-        click.echo(f"\nStreaming from {tag_name} ({device.address}) -> InfluxDB")
-        click.echo("Press Ctrl+C to stop.\n")
+        adv_name = device.name  # usually None on macOS (matched by service UUID)
 
-        await connect_and_stream(device.address, on_packet)
+        def on_connect(gatt_name):
+            nonlocal tag_name
+            tag_name = resolve_device_tag(gatt_name, adv_name, device_name)
+            click.echo(f"\nStreaming from {tag_name} ({device.address}) -> InfluxDB")
+            click.echo("Press Ctrl+C to stop.\n")
+
+        await connect_and_stream(device.address, on_packet, on_connect=on_connect)
 
     try:
         asyncio.run(_run())
