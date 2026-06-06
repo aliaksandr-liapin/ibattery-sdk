@@ -19,7 +19,7 @@ The interesting part: while mapping it, I found the standard `fuel_gauge` API ha
 
 Integer-only C, ~120 bytes of RAM, runs on nRF52840 / STM32 / ESP32-C3. Free and open (Apache-2.0).
 
-Full write-up 👉 [dev.to article link]
+Full write-up 👉 https://dev.to/aliaksandrliapin/the-zephyr-fuelgauge-api-has-no-battery-health-property-so-my-driver-adds-one-dca
 Code 👉 https://github.com/aliaksandr-liapin/ibattery-sdk
 
 #embedded #IoT #ZephyrRTOS #opensource #firmware

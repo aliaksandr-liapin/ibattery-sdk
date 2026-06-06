@@ -1,6 +1,7 @@
 ---
 title: "The Zephyr fuel_gauge API Has No 'Battery Health' Property — So My Driver Adds One"
-published: false
+published: true
+# Published 2026-06-05: https://dev.to/aliaksandrliapin/the-zephyr-fuelgauge-api-has-no-battery-health-property-so-my-driver-adds-one-dca
 description: "Making an open-source battery SDK speak Zephyr's standard fuel-gauge interface — what mapped cleanly, the property the standard is missing, and how I validated every reading back on real hardware."
 tags: embedded, iot, opensource, zephyr
 cover_image: "https://raw.githubusercontent.com/aliaksandr-liapin/ibattery-sdk/main/docs/images/fuel-gauge-readback.png"
