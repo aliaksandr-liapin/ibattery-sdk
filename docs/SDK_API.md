@@ -210,7 +210,7 @@ int battery_soh_reset(void);
 
 - `battery_soh_get_pct_x100` — SoH in 0.01% units (0..10000), i.e. `learned_capacity / rated_capacity`. Returns `BATTERY_STATUS_NOT_INITIALIZED` if called before the estimator initializes SoH.
 - `battery_soh_get_learned_capacity_mah_x100` — learned usable capacity in 0.01 mAh units.
-- `battery_soh_reset` — restore learned capacity to the rated value.
+- `battery_soh_reset` — restore learned capacity to the rated value (and disarm). **⚠️ Call this on a battery swap:** the SDK does not detect swaps or fingerprint cells, so without a reset the old battery's learned health persists and the next excursion is EMA-*blended* into it. See [USE_CASES.md → Developer responsibilities](USE_CASES.md#developer-responsibilities-and-edge-cases).
 
 Learning happens automatically inside the SoC estimator: it arms at the full-anchor edge and, at the empty-anchor edge, computes `measured = rated − remaining_charge` and blends it into the learned capacity with an EMA (`BATTERY_SOC_SOH_ALPHA_X1000`). Implausible excursions (outside `REJECT_LO_PCT`..`REJECT_HI_PCT` of rated) are ignored. SoH converges only over deep discharge cycles. Learned capacity persists to flash (NVS) and is restored on boot behind a rated-capacity guard (v0.12.0+).
 

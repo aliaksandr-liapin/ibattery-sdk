@@ -184,6 +184,8 @@ docs/             ARCHITECTURE, SDK_API, TESTING, WIRING, BATTERY_PROFILES, ROAD
 | `README.md` | Project overview, hardware, features, quick start |
 | `docs/ARCHITECTURE.md` | Layer diagram, module responsibilities, data flow, memory budget |
 | `docs/SDK_API.md` | Full public API reference with function signatures |
+| `docs/USE_CASES.md` | How-Tos per use case (new/used coin cell, USB power, multi-board) + **developer responsibilities & edge cases** (battery-swap `battery_soh_reset()`, no time-remaining, signals-not-notifications, power-source not auto-sensed) |
+| `docs/POSITIONING.md` | When to use iBattery SDK; how it compares to alternatives |
 | `docs/TESTING.md` | Test procedures, suite descriptions, running instructions |
 | `docs/BATTERY_PROFILES.md` | CR2032 + LiPo discharge curves, LUT design rationale |
 | `docs/ROADMAP.md` | Business strategy, development priorities, monetization |

@@ -284,6 +284,7 @@ ibattery-sdk/
 
 ## Documentation
 
+- [Use Cases, How-Tos & Edge Cases](docs/USE_CASES.md) — per-board setup, common scenarios, and the things you must handle yourself (e.g. battery-swap reset)
 - [Positioning & Comparison](docs/POSITIONING.md) — when to use iBattery SDK, and how it relates to the alternatives
 - [SDK API Reference](docs/SDK_API.md)
 - [Architecture](docs/ARCHITECTURE.md)
