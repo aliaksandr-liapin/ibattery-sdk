@@ -23,6 +23,10 @@
 #include <battery_sdk/battery_soh.h>
 #endif
 
+#if defined(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
+#include <battery_sdk/battery_runtime.h>
+#endif
+
 #if defined(CONFIG_BATTERY_CURRENT_SENSE)
 static uint32_t g_prev_timestamp_ms;
 static bool g_prev_timestamp_valid;
@@ -119,6 +123,23 @@ int battery_telemetry_collect(struct battery_telemetry_packet *packet)
     /* State of Health — best-effort (v4) */
 #if defined(CONFIG_BATTERY_SOC_SOH)
     (void)battery_soh_get_pct_x100(&packet->soh_pct_x100);
+#endif
+
+    /* Runtime-to-empty — best-effort (v5).
+     * current_ma_x100/coulomb_mah_x100 are set by the CURRENT_SENSE block above
+     * (RUNTIME_TO_EMPTY depends on SOC_COULOMB, which requires CURRENT_SENSE). */
+#if defined(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
+    {
+        uint32_t rte;
+
+        battery_runtime_update(packet->current_ma_x100);
+        if (battery_runtime_to_empty_min(packet->coulomb_mah_x100, &rte) ==
+            BATTERY_STATUS_OK) {
+            packet->runtime_to_empty_min = rte;
+        } else {
+            packet->runtime_to_empty_min = UINT32_MAX; /* not available (idle/charging) */
+        }
+    }
 #endif
 
     /* Always succeeds — partial data is flagged, not fatal */

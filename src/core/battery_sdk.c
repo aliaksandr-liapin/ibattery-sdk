@@ -30,6 +30,10 @@
 #include <battery_sdk/battery_coulomb.h>
 #endif
 
+#if defined(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
+#include <battery_sdk/battery_runtime.h>
+#endif
+
 #include "../hal/battery_hal.h"
 
 static struct battery_sdk_runtime_state g_battery_sdk_state = {
@@ -95,6 +99,10 @@ int battery_sdk_init(void)
     if (rc != BATTERY_STATUS_OK) {
         printk("Warning: coulomb counter init failed (%d), continuing\n", rc);
     }
+#endif
+
+#if defined(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
+    battery_runtime_reset();
 #endif
 
     rc = battery_soc_estimator_init();
