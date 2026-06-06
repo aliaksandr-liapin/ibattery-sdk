@@ -56,6 +56,11 @@ if(CONFIG_BATTERY_SOC_SOH)
     target_sources(app PRIVATE ../src/intelligence/battery_soh.c)
 endif()
 
+# Swap-aware SoH auto-reset (power-off battery swap detection)
+if(CONFIG_BATTERY_SWAP_DETECT)
+    target_sources(app PRIVATE ../src/intelligence/battery_swap.c)
+endif()
+
 # Zephyr fuel_gauge driver API (read-only) + its conversion helpers
 if(CONFIG_BATTERY_FUEL_GAUGE_API)
     target_sources(app PRIVATE

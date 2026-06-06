@@ -84,6 +84,11 @@ zephyr_library_sources_ifdef(CONFIG_BATTERY_SOC_SOH
     src/intelligence/battery_soh.c
 )
 
+# Swap-aware SoH auto-reset (power-off battery swap detection)
+zephyr_library_sources_ifdef(CONFIG_BATTERY_SWAP_DETECT
+    src/intelligence/battery_swap.c
+)
+
 # Zephyr fuel_gauge driver API (read-only) + its conversion helpers
 zephyr_library_sources_ifdef(CONFIG_BATTERY_FUEL_GAUGE_API
     src/fuel_gauge/battery_fuel_gauge_zephyr.c
