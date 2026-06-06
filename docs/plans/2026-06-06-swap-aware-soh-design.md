@@ -1,7 +1,7 @@
 # Swap-aware SoH auto-reset — Design (Phase 1: primary cells, power-off swap)
 
 Date: 2026-06-06
-Status: approved (brainstorm), pending implementation plan
+Status: implemented (Phase 1) — host-tested + firmware-build-verified; hardware E2E pending
 Related: `docs/plans/2026-05-29-phase-8d-soh-design.md`,
          `docs/plans/2026-06-01-soh-nvs-persistence-design.md`,
          `docs/USE_CASES.md` ("Battery swap → you must call battery_soh_reset()")
