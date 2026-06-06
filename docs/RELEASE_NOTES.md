@@ -1,5 +1,25 @@
 # Release Notes
 
+## Unreleased
+
+### Runtime to empty (minutes-to-empty estimate) + wire v5
+
+- New opt-in `CONFIG_BATTERY_RUNTIME_TO_EMPTY` (default n; depends on
+  `CONFIG_BATTERY_SOC_COULOMB`) estimates the minutes until the cell reaches
+  empty from an EMA-smoothed discharge current and the coulomb-counter remaining
+  charge (`remaining_mAh × 60 ÷ avg_mA`, integer-only). Reports **not available**
+  when the cell is idle or charging.
+- Exposed three ways: native API `battery_runtime_to_empty_min()`, the standard
+  Zephyr `fuel_gauge` `RUNTIME_TO_EMPTY` property (previously `-ENOTSUP`), and a
+  new **wire v5 (38 bytes)** field `runtime_to_empty_min` (uint32 LE at offset 34;
+  `UINT32_MAX` = not available). `BATTERY_TELEMETRY_VERSION` becomes 5 when enabled.
+- BLE MTU/ACL buffers sized up for the 38-byte payload across all board confs.
+- Gateway decodes v5 to the InfluxDB field `runtime_to_empty_min` (`None` when
+  not available); serial prints `RTE=<n> min` / `RTE=n/a`.
+- New Grafana **"Time to Empty (min)"** panel on both dashboards.
+- Built and host-tested (Unity) plus gateway-tested (pytest). **Hardware
+  end-to-end validation is pending.** No breaking changes; off by default.
+
 ## v0.14.0 — Standard Zephyr fuel_gauge driver — 2026-06-05
 
 Headline: iBattery now **conforms to Zephyr's standard `fuel_gauge` API**, so any

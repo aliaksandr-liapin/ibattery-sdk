@@ -28,6 +28,11 @@
 #include "battery_sdk/battery_soh.h"
 #endif
 
+#if defined(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
+#include "battery_sdk/battery_runtime.h"
+#include "battery_sdk/battery_status.h"
+#endif
+
 static int ibattery_fg_get_prop(const struct device *dev, fuel_gauge_prop_t prop,
 				union fuel_gauge_prop_val *val)
 {
@@ -89,6 +94,18 @@ static int ibattery_fg_get_prop(const struct device *dev, fuel_gauge_prop_t prop
 		return -ENOTSUP;
 #endif
 	}
+#if defined(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
+	case FUEL_GAUGE_RUNTIME_TO_EMPTY: {
+		uint32_t rte;
+
+		if (battery_runtime_to_empty_min(pkt.coulomb_mah_x100, &rte) !=
+		    BATTERY_STATUS_OK) {
+			return -ENOTSUP; /* idle/charging -> not available */
+		}
+		val->runtime_to_empty = rte;
+		break;
+	}
+#endif
 	default:
 		return -ENOTSUP;
 	}

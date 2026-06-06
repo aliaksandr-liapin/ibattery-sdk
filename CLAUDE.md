@@ -18,6 +18,7 @@ Embedded C SDK providing battery intelligence for IoT devices. Targets nRF52840,
 - **SoH NVS persistence status**: ✅ Shipped in **v0.12.0** — learned capacity persists to flash (Zephyr NVS) and restores on boot behind a rated-capacity guard (stale value rejected if `CONFIG_BATTERY_CAPACITY_MAH` changed). Best-effort (RAM authoritative; NVS failure never changes a return code), 0 new static RAM. Real-flash write+restore validated on NUCLEO-L476RG (`docs/captures/2026-06-01-soh-nvs-persistence-e2e.log`). The voltage-driven excursion was later hardware-validated in v0.13.0 via the PPK2 external-ADC rig. **22 host** + 77 gateway suites pass.
 - **Done 2026-06-04**: (1) **faded-SoH BLE→Grafana E2E + NVS persistence** hardware-validated — drove a PPK2 voltage excursion, learned **73.10%**, confirmed `soh_pct=73.1` in InfluxDB + on the Grafana SoH gauge, and 73.10% restored from NVS after reset (`docs/captures/2026-06-04-soh-fast-excursion.log`). (2) **Promo blog post published** — dev.to "I Made a Battery Admit It Was Only 73% Healthy" (`docs/articles/2026-06-04-soh-parameter-estimation.md`). (3) **Fixed firmware.yml** (red on main since PR #9): the SDK now `select ADC` so the ESP32-C3 module-consumption build links (PR #12).
 - **Read-only Zephyr fuel_gauge driver** (merged to main via PR #19, unreleased): opt-in `CONFIG_BATTERY_FUEL_GAUGE_API` (default n; `select FUEL_GAUGE`) exposes iBattery via the standard Zephyr `fuel_gauge` API (read-only `.get_property` only), instantiated from a DT node `compatible = "aliaksandr,ibattery-fuel-gauge"`. Custom SoH property `BATTERY_FUEL_GAUGE_PROP_SOH` carries SoH in `val->flags` (centi-percent). Builds + module-path CI-smoke-tested **and read-back validated on NUCLEO-L476RG 2026-06-04** — all properties correct vs native telemetry (`docs/captures/2026-06-04-fuel-gauge-runtime-validation.log`); opt-in serial self-check via `CONFIG_BATTERY_FUEL_GAUGE_SELFCHECK`.
+- **Runtime-to-empty** (branch `feature/runtime-to-empty`, unreleased): opt-in `CONFIG_BATTERY_RUNTIME_TO_EMPTY` (default n; depends on `BATTERY_SOC_COULOMB`) estimates minutes-to-empty from EMA-smoothed discharge current; exposed via native `battery_runtime_to_empty_min()`, the Zephyr `fuel_gauge` `RUNTIME_TO_EMPTY` property, and **wire v5** (38 bytes, `runtime_to_empty_min` uint32 LE @34; `UINT32_MAX`/null when idle/charging). Gateway decodes to InfluxDB field `runtime_to_empty_min`; Grafana "Time to Empty (min)" panel. Built + host/gateway tested; hardware e2e pending.
 - **Next milestone**: open. Candidates: partial-excursion learning (faster SoH convergence), external-ADC reading calibration/trim (the divider reads ~6–10% low), a real CR2032/LiPo discharge to validate the SoC LUT against a physical cell, nRF I2C remap experiment.
 - **Distribution**: PlatformIO registry + Zephyr module + GitHub Pages docs
 
@@ -85,7 +86,7 @@ cd tests && mkdir -p build && cd build
 cmake .. && make && ctest --output-on-failure
 ```
 
-23 test suites, Unity framework (includes coulomb counter, SoC coulomb, SoH, SoH NVS persistence, fusion, current HAL stub, serialize v1–v4, ADC divider scaling).
+25 test suites, Unity framework (includes coulomb counter, SoC coulomb, SoH, SoH NVS persistence, fusion, current HAL stub, serialize v1–v5, fuel_gauge unit conversions, runtime-to-empty, ADC divider scaling).
 
 ### Python gateway tests
 
@@ -144,6 +145,7 @@ HAL (platform-specific)
 | `CONFIG_BATTERY_SOC_SOH` | `y/n` | `n` (Phase 8d State-of-Health / capacity-fade learning; needs SOC_COULOMB) |
 | `CONFIG_BATTERY_CAPACITY_MAH` | `int` | `220` (CR2032) / `1000` (LiPo) |
 | `CONFIG_BATTERY_FUEL_GAUGE_API` | `y/n` | `n` (read-only Zephyr fuel_gauge driver; `select FUEL_GAUGE`) |
+| `CONFIG_BATTERY_RUNTIME_TO_EMPTY` | `y/n` | `n` (minutes-to-empty estimate; depends on `BATTERY_SOC_COULOMB`; emits wire v5) |
 
 ## Wire Format
 
@@ -151,8 +153,9 @@ HAL (platform-specific)
 - **v2** (24 bytes): v1 + cycle_count (uint32 LE at offset 20)
 - **v3** (32 bytes): v2 + current_ma_x100 (int32 LE at offset 24) + coulomb_mah_x100 (int32 LE at offset 28)
 - **v4** (34 bytes): v3 + soh_pct_x100 (uint16 LE at offset 32). Emitted only when `CONFIG_BATTERY_SOC_SOH=y` (`BATTERY_TELEMETRY_VERSION` is 4 then, else 3).
+- **v5** (38 bytes): v4 + runtime_to_empty_min (uint32 LE at offset 34; `UINT32_MAX` = not available). Emitted only when `CONFIG_BATTERY_RUNTIME_TO_EMPTY=y` (`BATTERY_TELEMETRY_VERSION` is 5 then).
 
-All four formats accepted by gateway decoder (auto-detect by length).
+All five formats accepted by gateway decoder (auto-detect by length).
 
 ## Known Quirks
 

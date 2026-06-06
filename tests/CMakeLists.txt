@@ -486,6 +486,20 @@ target_include_directories(test_fuel_gauge_convert PRIVATE
 
 target_link_libraries(test_fuel_gauge_convert PRIVATE unity)
 
+# ── Runtime-to-empty estimator test (pure, host-only) ──────────────────────
+add_executable(test_runtime
+    test_runtime.c
+    ${SDK_SRC}/intelligence/battery_runtime.c
+)
+
+target_include_directories(test_runtime PRIVATE
+    ${SDK_INCLUDE}
+    ${SDK_SRC}/intelligence
+    ${unity_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_runtime PRIVATE unity)
+
 # ── CTest integration ────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME voltage_filter COMMAND test_voltage_filter)
@@ -512,3 +526,4 @@ add_test(NAME soc_soh_estimator COMMAND test_soc_soh_estimator)
 add_test(NAME soh_persistence COMMAND test_soh_persistence)
 add_test(NAME adc_divider COMMAND test_adc_divider)
 add_test(NAME fuel_gauge_convert COMMAND test_fuel_gauge_convert)
+add_test(NAME runtime COMMAND test_runtime)

@@ -105,7 +105,7 @@ See [Hardware Wiring Guide](docs/WIRING.md) for pin diagrams and circuit schemat
 - LiPo single-cell (3.7 V nominal) discharge curve LUT (11-point, extra density in knee region)
 - `CONFIG_BATTERY_CHEMISTRY` Kconfig: selects CR2032 or LiPo LUT + gates temp compensation on LiPo only
 - BLE telemetry transport with custom GATT service and notification characteristic
-- Wire format v1 (20 bytes), v2 (24 bytes with `cycle_count`), v3 (32 bytes with `current_ma` + `coulomb_mah`), and v4 (34 bytes with `soh_pct`) — backward compatible
+- Wire format v1 (20 bytes), v2 (24 bytes with `cycle_count`), v3 (32 bytes with `current_ma` + `coulomb_mah`), v4 (34 bytes with `soh_pct`), and v5 (38 bytes with `runtime_to_empty_min`) — backward compatible
 - Compile-time transport backend selection via Kconfig (BLE or mock)
 - Dual output: serial printk + BLE notifications (when `CONFIG_BATTERY_TRANSPORT=y`)
 - Coulomb counting SoC estimation via INA219 current sensor (voltage-anchored, NVS-persisted)
@@ -229,7 +229,7 @@ Battery SDK initialized OK
 
 | Offset | Field | Type | Description |
 |--------|-------|------|-------------|
-| 0 | `telemetry_version` | `uint8_t` | Protocol version (1–4); see wire format below |
+| 0 | `telemetry_version` | `uint8_t` | Protocol version (1–5); see wire format below |
 | 1 | `timestamp_ms` | `uint32_t` | Uptime in milliseconds |
 | 5 | `voltage_mv` | `int32_t` | Filtered battery voltage in mV |
 | 9 | `temperature_c_x100` | `int32_t` | Temperature in 0.01 C units |
@@ -256,7 +256,15 @@ Battery SDK initialized OK
 |--------|-------|------|-------------|
 | 32 | `soh_pct_x100` | `uint16_t` | State of Health in 0.01% units |
 
-Emitted only when `CONFIG_BATTERY_SOC_SOH=y` (then `BATTERY_TELEMETRY_VERSION=4`, otherwise 3). The decoder accepts v1–v4 by length for backward compatibility.
+Emitted only when `CONFIG_BATTERY_SOC_SOH=y` (then `BATTERY_TELEMETRY_VERSION=4`, otherwise 3).
+
+### v5 (38 bytes, extends v4)
+
+| Offset | Field | Type | Description |
+|--------|-------|------|-------------|
+| 34 | `runtime_to_empty_min` | `uint32_t` | Estimated minutes to empty (`UINT32_MAX` = not available) |
+
+Emitted only when `CONFIG_BATTERY_RUNTIME_TO_EMPTY=y` (then `BATTERY_TELEMETRY_VERSION=5`). When idle/charging the field carries `UINT32_MAX`, which the gateway decodes to `None`. The decoder accepts v1–v5 by length for backward compatibility.
 
 ---
 

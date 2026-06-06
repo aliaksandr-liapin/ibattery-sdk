@@ -1,6 +1,7 @@
 """Decode LE wire packets from the iBattery BLE telemetry characteristic.
 
-Supports v1 (20-byte), v2 (24-byte), v3 (32-byte), and v4 (34-byte) wire formats.
+Supports v1 (20-byte), v2 (24-byte), v3 (32-byte), v4 (34-byte), and v5
+(38-byte) wire formats.
 
 Wire format v1:
 
@@ -30,6 +31,12 @@ Wire format v4 (extends v3):
 
     32      2     soh_pct_x100        uint16 LE (/100 → State of Health %)
     Total: 34 bytes
+
+Wire format v5 (extends v4):
+
+    34      4     runtime_to_empty_min  uint32 LE (minutes; 0xFFFFFFFF =
+                                        not available, e.g. idle/charging)
+    Total: 38 bytes
 """
 
 import struct
@@ -39,16 +46,22 @@ WIRE_SIZE_V1 = 20
 WIRE_SIZE_V2 = 24
 WIRE_SIZE_V3 = 32
 WIRE_SIZE_V4 = 34
+WIRE_SIZE_V5 = 38
+
+# Sentinel for "runtime not available" (idle/charging) in the v5 wire format.
+RUNTIME_TO_EMPTY_NA = 0xFFFFFFFF
 
 # struct formats: < = little-endian
 _WIRE_FMT_V1 = "<BIiiHBI"
 _WIRE_FMT_V2 = "<BIiiHBII"  # adds cycle_count (uint32)
 _WIRE_FMT_V3 = "<BIiiHBIIii"  # adds current_ma_x100, coulomb_mah_x100 (int32)
 _WIRE_FMT_V4 = "<BIiiHBIIiiH"  # adds soh_pct_x100 (uint16)
+_WIRE_FMT_V5 = "<BIiiHBIIiiHI"  # adds runtime_to_empty_min (uint32)
 _WIRE_STRUCT_V1 = struct.Struct(_WIRE_FMT_V1)
 _WIRE_STRUCT_V2 = struct.Struct(_WIRE_FMT_V2)
 _WIRE_STRUCT_V3 = struct.Struct(_WIRE_FMT_V3)
 _WIRE_STRUCT_V4 = struct.Struct(_WIRE_FMT_V4)
+_WIRE_STRUCT_V5 = struct.Struct(_WIRE_FMT_V5)
 
 POWER_STATES = {
     0: "UNKNOWN",
@@ -63,18 +76,26 @@ POWER_STATES = {
 
 
 def decode_packet(data: bytes) -> dict:
-    """Unpack a v1/v2/v3/v4 wire buffer into a telemetry dict.
+    """Unpack a v1/v2/v3/v4/v5 wire buffer into a telemetry dict.
 
     Args:
-        data: 20, 24, 32, or 34 bytes from the BLE notification.
+        data: 20, 24, 32, 34, or 38 bytes from the BLE notification.
 
     Returns:
         Dictionary with human-readable telemetry values.
 
     Raises:
-        ValueError: If data length is not 20, 24, 32, or 34.
+        ValueError: If data length is not 20, 24, 32, 34, or 38.
     """
-    if len(data) == WIRE_SIZE_V4:
+    runtime_to_empty_min = None  # v5 field; None = not available / pre-v5
+    if len(data) == WIRE_SIZE_V5:
+        (version, ts_ms, mv, temp_x100, soc_x100, ps, flags,
+         cycles, current_x100, coulomb_x100, soh_x100,
+         runtime_raw) = _WIRE_STRUCT_V5.unpack(data)
+        runtime_to_empty_min = (
+            None if runtime_raw == RUNTIME_TO_EMPTY_NA else runtime_raw
+        )
+    elif len(data) == WIRE_SIZE_V4:
         (version, ts_ms, mv, temp_x100, soc_x100, ps, flags,
          cycles, current_x100, coulomb_x100, soh_x100) = _WIRE_STRUCT_V4.unpack(data)
     elif len(data) == WIRE_SIZE_V3:
@@ -94,8 +115,8 @@ def decode_packet(data: bytes) -> dict:
         soh_x100 = 0
     else:
         raise ValueError(
-            f"Expected {WIRE_SIZE_V1}, {WIRE_SIZE_V2}, or {WIRE_SIZE_V3} bytes "
-            f"(or {WIRE_SIZE_V4} for v4), got {len(data)}"
+            f"Expected {WIRE_SIZE_V1}, {WIRE_SIZE_V2}, {WIRE_SIZE_V3}, "
+            f"{WIRE_SIZE_V4}, or {WIRE_SIZE_V5} bytes, got {len(data)}"
         )
 
     return {
@@ -112,6 +133,9 @@ def decode_packet(data: bytes) -> dict:
         "current_ma": current_x100 / 100.0,
         "coulomb_mah": coulomb_x100 / 100.0,
         "soh_pct": soh_x100 / 100.0,
+        # v5: runtime-to-empty in minutes; None when not available
+        # (idle/charging sentinel, or any pre-v5 packet).
+        "runtime_to_empty_min": runtime_to_empty_min,
         "received_at": datetime.now(timezone.utc).isoformat(),
     }
 

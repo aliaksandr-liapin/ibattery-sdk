@@ -6,13 +6,51 @@ import pytest
 
 from gateway.decoder import (
     POWER_STATES,
+    RUNTIME_TO_EMPTY_NA,
     WIRE_SIZE_V1,
     WIRE_SIZE_V2,
     WIRE_SIZE_V3,
     WIRE_SIZE_V4,
+    WIRE_SIZE_V5,
     decode_packet,
     format_packet,
 )
+
+
+def _pack_v4(
+    version=4,
+    timestamp_ms=0,
+    voltage_mv=3700,
+    temperature_c_x100=2500,
+    soc_pct_x100=5000,
+    power_state=1,
+    status_flags=0,
+    cycle_count=0,
+    current_ma_x100=0,
+    coulomb_mah_x100=0,
+    soh_pct_x100=10000,
+) -> bytes:
+    """Build a 34-byte v4 wire packet."""
+    return struct.pack(
+        "<BIiiHBIIiiH",
+        version,
+        timestamp_ms,
+        voltage_mv,
+        temperature_c_x100,
+        soc_pct_x100,
+        power_state,
+        status_flags,
+        cycle_count,
+        current_ma_x100,
+        coulomb_mah_x100,
+        soh_pct_x100,
+    )
+
+
+def _pack_v5(runtime_to_empty_min=132000, **v4_kwargs) -> bytes:
+    """Build a 38-byte v5 wire packet: a v4 body + uint32 LE runtime."""
+    v4_kwargs.setdefault("version", 5)
+    return _pack_v4(**v4_kwargs) + struct.pack("<I", runtime_to_empty_min)
 
 
 def _pack_v1(
@@ -330,27 +368,68 @@ class TestDecodePacketV4:
         assert out["soh_pct"] == 0.0
 
 
+class TestDecodePacketV5:
+    """Tests for v5 (38-byte) packets — adds runtime_to_empty_min."""
+
+    def test_decode_v5_includes_runtime(self):
+        data = _pack_v5(runtime_to_empty_min=132000, version=5)
+        assert len(data) == WIRE_SIZE_V5 == 38
+        out = decode_packet(data)
+        assert out["version"] == 5
+        assert out["runtime_to_empty_min"] == 132000
+
+    def test_decode_v5_sentinel_maps_to_none(self):
+        """0xFFFFFFFF (idle/charging) decodes as None, not the raw sentinel."""
+        data = _pack_v5(runtime_to_empty_min=RUNTIME_TO_EMPTY_NA, version=5)
+        out = decode_packet(data)
+        assert out["runtime_to_empty_min"] is None
+
+    def test_decode_v5_preserves_v4_fields(self):
+        data = _pack_v5(
+            runtime_to_empty_min=4321,
+            version=5,
+            soh_pct_x100=8750,
+            coulomb_mah_x100=22000,
+        )
+        out = decode_packet(data)
+        assert out["soh_pct"] == pytest.approx(87.5)
+        assert out["coulomb_mah"] == pytest.approx(220.0)
+
+    def test_decode_v4_runtime_absent(self):
+        """v4 (34-byte) packets decode with runtime_to_empty_min = None."""
+        data = _pack_v4(version=4)
+        out = decode_packet(data)
+        assert out["runtime_to_empty_min"] is None
+
+    def test_v5_size_constant(self):
+        assert WIRE_SIZE_V5 == 38
+
+
 class TestDecodeErrors:
     """Invalid input handling."""
 
     def test_short_buffer_raises(self):
-        with pytest.raises(ValueError, match="Expected 20, 24, or 32"):
+        with pytest.raises(ValueError, match="Expected 20, 24, 32"):
             decode_packet(b"\x00" * 19)
 
     def test_21_bytes_raises(self):
-        with pytest.raises(ValueError, match="Expected 20, 24, or 32"):
+        with pytest.raises(ValueError, match="Expected 20, 24, 32"):
             decode_packet(b"\x00" * 21)
 
     def test_25_bytes_raises(self):
-        with pytest.raises(ValueError, match="Expected 20, 24, or 32"):
+        with pytest.raises(ValueError, match="Expected 20, 24, 32"):
             decode_packet(b"\x00" * 25)
 
     def test_33_bytes_raises(self):
-        with pytest.raises(ValueError, match="Expected 20, 24, or 32"):
+        with pytest.raises(ValueError, match="Expected 20, 24, 32"):
             decode_packet(b"\x00" * 33)
 
+    def test_39_bytes_raises(self):
+        with pytest.raises(ValueError, match="Expected 20, 24, 32"):
+            decode_packet(b"\x00" * 39)
+
     def test_empty_buffer_raises(self):
-        with pytest.raises(ValueError, match="Expected 20, 24, or 32"):
+        with pytest.raises(ValueError, match="Expected 20, 24, 32"):
             decode_packet(b"")
 
     def test_v1_size_constant(self):

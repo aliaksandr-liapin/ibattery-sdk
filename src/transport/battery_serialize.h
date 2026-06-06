@@ -32,6 +32,12 @@
  *  32      2    soh_pct_x100        (uint16 LE)
  *  ──     34    Total
  *
+ * Wire format v5 (38 bytes, little-endian):
+ *
+ *   0-33         Same as v4
+ *  34      4    runtime_to_empty_min (uint32 LE; UINT32_MAX = not available)
+ *  ──     38    Total
+ *
  * Versions are a superset ladder: a vN buffer contains all fields of
  * v1..vN. The gateway auto-detects the version by buffer length.
  */
@@ -50,13 +56,14 @@ extern "C" {
 #define BATTERY_SERIALIZE_V2_SIZE 24
 #define BATTERY_SERIALIZE_V3_SIZE 32
 #define BATTERY_SERIALIZE_V4_SIZE 34
-#define BATTERY_SERIALIZE_BUF_SIZE BATTERY_SERIALIZE_V4_SIZE
+#define BATTERY_SERIALIZE_V5_SIZE 38
+#define BATTERY_SERIALIZE_BUF_SIZE BATTERY_SERIALIZE_V5_SIZE
 
 /**
  * Pack a telemetry packet into a wire buffer.
  *
  * Writes the number of bytes for pkt->telemetry_version: 20 (v1), 24 (v2),
- * 32 (v3), or 34 (v4). See battery_serialize_wire_size().
+ * 32 (v3), 34 (v4), or 38 (v5). See battery_serialize_wire_size().
  *
  * @param pkt      Source packet (must not be NULL)
  * @param buf      Destination buffer (must not be NULL, >= BATTERY_SERIALIZE_BUF_SIZE)
@@ -69,8 +76,8 @@ int battery_serialize_pack(const struct battery_telemetry_packet *pkt,
 /**
  * Unpack a wire buffer into a telemetry packet.
  *
- * Accepts 20-byte (v1), 24-byte (v2), 32-byte (v3), and 34-byte (v4)
- * buffers. Fields beyond the buffer's length are set to 0.
+ * Accepts 20-byte (v1), 24-byte (v2), 32-byte (v3), 34-byte (v4), and
+ * 38-byte (v5) buffers. Fields beyond the buffer's length are set to 0.
  *
  * @param buf      Source buffer (must not be NULL, >= 20 bytes)
  * @param buf_len  Size of buf in bytes
@@ -83,11 +90,12 @@ int battery_serialize_unpack(const uint8_t *buf, uint8_t buf_len,
 /**
  * Get the wire size for the given packet version.
  *
- * @param version  Telemetry version (1..4; higher clamps to the latest).
- * @return Wire size in bytes: 20 (v1), 24 (v2), 32 (v3), 34 (v4+).
+ * @param version  Telemetry version (1..5; higher clamps to the latest).
+ * @return Wire size in bytes: 20 (v1), 24 (v2), 32 (v3), 34 (v4), 38 (v5+).
  */
 static inline uint8_t battery_serialize_wire_size(uint8_t version)
 {
+    if (version >= 5) return BATTERY_SERIALIZE_V5_SIZE;
     if (version >= 4) return BATTERY_SERIALIZE_V4_SIZE;
     if (version >= 3) return BATTERY_SERIALIZE_V3_SIZE;
     if (version >= 2) return BATTERY_SERIALIZE_V2_SIZE;
