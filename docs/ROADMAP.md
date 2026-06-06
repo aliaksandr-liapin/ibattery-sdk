@@ -107,6 +107,29 @@ Lower scale but immediate revenue with zero infrastructure cost.
 
 ## Development Roadmap
 
+### Surfaced from real-world usage gaps (2026-06-04)
+
+These came directly from walking through user scenarios (new/used coin cell,
+permanent USB, multi-board, battery swap) — see [USE_CASES.md](USE_CASES.md).
+**FREE/PAID tags below are proposals pending owner confirmation** (monetization
+is a business decision — keep a human in the loop). Guiding principle: basic
+on-device *correctness and usability* stays FREE (gating it would hurt adoption);
+*fleet-scale* intelligence and alerting is the COMMERCIAL tier.
+
+| Candidate | Why (gap it closes) | Tier (proposed) |
+|---|---|---|
+| **Runtime-to-empty estimate** (days/hours) on-device | today there's no time-remaining; only cloud RUL in *cycles*. Standard fuel-gauge `RUNTIME_TO_EMPTY` = remaining charge ÷ current — the data already exists | **FREE** (basic gauge feature) |
+| **Swap-aware SoH** — battery-swap detection + auto-reset | today a swap needs a manual `battery_soh_reset()`; no detection, and re-learn EMA-blends the old cell | **FREE** (correctness) |
+| **Power-source flag** — expose "on external/permanent power vs battery" | no auto USB-vs-battery detection today; only inferable from charge state | **FREE** (basic) |
+| **Configurable low/warning state on-device** (not just CRITICAL) | device has one low threshold (CRITICAL); a "LOW/warning" tier only exists in the gateway | **FREE** (basic) |
+| **Fleet alerting / notifications** ("plan a swap", thresholds → push/email) | device emits signals, not messages; turning them into alerts is the integrator's job | **COMMERCIAL** (SaaS/fleet) |
+| **Predictive maintenance / fleet RUL dashboards** | per-device cloud RUL exists; fleet-wide "which units to service" is the monetizable layer | **COMMERCIAL** (SaaS/fleet) |
+| **Advanced SoH** — partial-excursion learning, multi-cell/per-cell identity | faster/robust health without a full excursion; supports swappable + pack use | **COMMERCIAL** (advanced pack) or FREE-basic split — to decide |
+
+> Documentation already shipped for these gaps: `USE_CASES.md` (How-Tos +
+> "Developer responsibilities & edge cases", incl. the swap/`battery_soh_reset()`
+> rule). The roadmap items above are the *code* follow-ups.
+
 ### Near-term (1-3 months)
 
 | Priority | Task | Impact |

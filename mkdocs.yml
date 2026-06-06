@@ -36,9 +36,11 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Use Cases & How-Tos: USE_CASES.md
   - Getting Started:
       - Hardware Wiring: WIRING.md
       - Contributing: contributing.md
+  - Positioning: POSITIONING.md
   - Architecture: ARCHITECTURE.md
   - API Reference: SDK_API.md
   - Battery Profiles: BATTERY_PROFILES.md
