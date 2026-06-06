@@ -47,3 +47,24 @@ def test_no_match_for_unrelated_device():
 
 def test_no_match_when_no_name_and_no_uuid():
     assert not matches_ibattery(_dev(None), _adv(None))
+
+
+# ── Device-tag resolution ─────────────────────────────────────────────────────
+# The InfluxDB `device` tag (shown on the Grafana "Connected Device" tile) must
+# reflect the BOARD that is actually streaming — i.e. its advertised BLE name
+# (iBattery-STM32 / iBattery-nRF52840 / iBattery-ESP32C3) — not the gateway's
+# static filter/default. Falls back to the provided default when the peripheral
+# advertises no usable name (common on macOS CoreBluetooth).
+from gateway.scanner import resolve_device_tag
+
+
+def test_resolve_device_tag_prefers_advertised_name():
+    assert resolve_device_tag("iBattery-nRF52840", "iBattery") == "iBattery-nRF52840"
+
+
+def test_resolve_device_tag_falls_back_when_name_missing():
+    assert resolve_device_tag(None, "iBattery") == "iBattery"
+
+
+def test_resolve_device_tag_falls_back_on_empty_name():
+    assert resolve_device_tag("", "iBattery") == "iBattery"

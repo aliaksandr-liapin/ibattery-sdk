@@ -32,6 +32,17 @@ class DiscoveredDevice:
         return self.device.address
 
 
+def resolve_device_tag(advertised_name: Optional[str], fallback: str) -> str:
+    """Pick the InfluxDB `device` tag for a connected peripheral.
+
+    Prefer the board's advertised BLE name (iBattery-STM32 / iBattery-nRF52840 /
+    iBattery-ESP32C3) so the Grafana "Connected Device" tile distinguishes
+    boards. Falls back to the gateway's configured default when the peripheral
+    advertises no usable name (common on macOS CoreBluetooth).
+    """
+    return advertised_name or fallback
+
+
 def matches_ibattery(
     device: BLEDevice,
     adv_data,
