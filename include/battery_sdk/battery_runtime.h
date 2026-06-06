@@ -7,7 +7,7 @@
  *
  * Pure and host-testable: integer-only math, no heap, no Zephyr headers.
  *
- * Design doc: docs/plans/2026-06-04-runtime-to-empty-design.md
+ * Design doc: docs/plans/2026-06-05-runtime-to-empty-design.md
  */
 
 #ifndef BATTERY_SDK_BATTERY_RUNTIME_H

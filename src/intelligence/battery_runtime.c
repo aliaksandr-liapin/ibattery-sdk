@@ -9,11 +9,11 @@
  * Stateful (one smoothed sample + a prime flag), integer-only, no heap.
  * The final division uses int64 to keep low-drain estimates from overflowing.
  *
- * Design doc: docs/plans/2026-06-04-runtime-to-empty-design.md
+ * Design doc: docs/plans/2026-06-05-runtime-to-empty-design.md
  */
 
-#include "battery_sdk/battery_runtime.h"
-#include "battery_sdk/battery_status.h"
+#include <battery_sdk/battery_runtime.h>
+#include <battery_sdk/battery_status.h>
 
 #include <stddef.h>
 #include <stdint.h>
@@ -78,7 +78,9 @@ int battery_runtime_to_empty_min(int32_t remaining_mah_x100,
     /* minutes = (remaining_mah / current_ma) * 60
      *         = (remaining_mah_x100 * 60) / current_ma_x100
      * (the x100 scales cancel). int64 keeps low-drain cases from overflowing
-     * before the divide; clamp to fit uint32_t. */
+     * before the divide; clamp to fit uint32_t. UINT32_MAX is reserved as the
+     * wire-v5 NOT_AVAILABLE sentinel, so a real estimate must never produce it;
+     * clamp to UINT32_MAX - 1 to keep the sentinel distinct. */
     int64_t minutes = ((int64_t)remaining_mah_x100 * 60) / g_ema_x100;
     if (minutes > (int64_t)(UINT32_MAX - 1)) {
         minutes = UINT32_MAX - 1;
