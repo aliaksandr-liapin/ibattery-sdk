@@ -230,7 +230,7 @@ int  battery_runtime_to_empty_min(int32_t remaining_mah_x100, uint32_t *minutes_
 - `battery_runtime_update` — feed a current sample in 0.01 mA units (positive = discharge) into the EMA. Called automatically from the telemetry collect path each cycle.
 - `battery_runtime_to_empty_min` — estimate minutes to empty as `remaining_mAh × 60 ÷ avg_mA`. Returns `BATTERY_STATUS_OK` and writes `*minutes_out` on success; returns `BATTERY_STATUS_NOT_AVAILABLE` when the cell is idle or charging (smoothed current ≤ idle threshold), in which case no estimate is meaningful.
 
-Tuning Kconfig: `BATTERY_RUNTIME_EMA_ALPHA_X1000` (EMA weight ×1000, default 300) and `BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100` (idle/charging cutoff in 0.01 mA, default 100 = 1.00 mA).
+Tuning Kconfig: `BATTERY_RUNTIME_EMA_ALPHA_X1000` (EMA weight ×1000, default 300) and `BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100` (idle/charging cutoff in 0.01 mA, **default 0** — i.e. any positive smoothed current yields an estimate, and only a non-discharging cell (current ≤ 0 → idle/charging) reports `NOT_AVAILABLE`). Raise it to set a noise-floor deadband (e.g. 5 = 0.05 mA) so tiny sub-milliamp draws near rest are also treated as idle.
 
 > Status: built and host-tested (Unity) plus gateway-tested (pytest). Hardware end-to-end validation is pending.
 

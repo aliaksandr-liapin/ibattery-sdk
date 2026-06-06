@@ -28,8 +28,11 @@ behavior when disabled.
   Q-as-remaining). Current from the telemetry/current HAL (positive = discharge).
 
 ### Edge cases → "not available"
-- Smoothed current **below an idle threshold** (`CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100`,
-  default ~100 = 1.00 mA) → not meaningfully discharging.
+- Smoothed current **at or below an idle threshold** (`CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100`,
+  **default 0** — i.e. only current ≤ 0 (idle/charging) is "not discharging"; a
+  positive default like 1.00 mA was rejected because it would mark a normal
+  ~0.1 mA coin-cell draw as idle. Raise it to add a sub-mA noise-floor deadband.)
+  → not meaningfully discharging.
 - **Charging** (current ≤ 0 in iBattery's positive-discharge convention).
 - No current sensor / coulomb path (the Kconfig dependency prevents this build).
 - Remaining ≤ 0 → 0 minutes.
