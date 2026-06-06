@@ -51,3 +51,19 @@ and matches the predicted bound Q/floor = 199.37 mAh / 0.5 mA * 60 = 23924 min.
 25 C host suites pass (test_runtime: below_floor/at_floor -> n/a, just_above_floor
 reports, estimate never collides with the v5 sentinel). 122 gateway tests pass.
 Build/config drift guard in sync.
+
+## Full BLE -> InfluxDB -> Grafana E2E (gateway run from iTerm, 2026-06-06)
+
+Gateway streamed v5 over BLE from iBattery-STM32 into InfluxDB (bucket telemetry).
+While idle (SLEEP, -0.10 mA) the runtime_to_empty_min field was correctly OMITTED
+(gateway writes it only when not None) -> Grafana "Time to Empty" trend = No data.
+After the load was reconnected (~29.6 mA discharge), the field appeared and the
+EMA converged to ground truth:
+
+  _time                      current_ma  coulomb_mah  runtime_to_empty_min
+  2026-06-06T21:24:38.86Z    29.6        199.29       457
+  2026-06-06T21:24:44.846Z   29.6        199.24       420
+  2026-06-06T21:24:52.854Z   29.6        199.17       407   (199.17/29.6*60 = 404)
+
+E2E PASS: firmware (idle-floor fix) -> wire v5 -> BLE -> gateway -> InfluxDB ->
+Grafana, plus the idle -> NOT_AVAILABLE -> field-omitted path. No multi-year spike.
