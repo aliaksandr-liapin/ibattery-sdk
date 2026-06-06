@@ -6,6 +6,7 @@
 void     mock_nvs_reset(void);
 void     mock_nvs_set_stored_value_key(uint16_t key, uint32_t v);
 bool     mock_nvs_get_value_key(uint16_t key, uint32_t *out);
+void     mock_nvs_set_write_rc(int rc);
 
 #define KEY_LAST_SOC 5
 
@@ -55,6 +56,27 @@ void test_persist_throttled_on_drop(void){
     mock_nvs_get_value_key(KEY_LAST_SOC,&v);
     TEST_ASSERT_EQUAL_UINT32(9400, v);
 }
+/* The swap flag is per-session: a fresh init (next power cycle) clears it. */
+void test_swap_flag_clears_on_reinit(void){
+    mock_nvs_set_stored_value_key(KEY_LAST_SOC, 500);
+    battery_swap_init();
+    battery_swap_update(10000);              /* swap detected */
+    TEST_ASSERT_TRUE(battery_swap_detected());
+    battery_swap_init();                     /* new power session */
+    TEST_ASSERT_FALSE(battery_swap_detected());
+}
+
+/* NVS write is best-effort: a forced write failure must not crash, must not
+ * flip the swap flag, and RAM stays authoritative (detection still works). */
+void test_persist_write_failure_is_best_effort(void){
+    mock_nvs_set_write_rc(BATTERY_STATUS_ERROR);   /* every write fails */
+    battery_swap_init();                            /* no stored baseline */
+    battery_swap_update(10000);                     /* boot stamp; write fails silently */
+    TEST_ASSERT_FALSE(battery_swap_detected());     /* no spurious swap, no crash */
+    battery_swap_update(9400);                      /* >=5% drop; write fails again, no crash */
+    TEST_ASSERT_FALSE(battery_swap_detected());
+    mock_nvs_set_write_rc(BATTERY_STATUS_OK);       /* restore so later tests aren't affected */
+}
 int main(void){
     UNITY_BEGIN();
     RUN_TEST(test_first_boot_no_swap_stamps_baseline);
@@ -62,5 +84,7 @@ int main(void){
     RUN_TEST(test_boot_small_rise_no_swap);
     RUN_TEST(test_boot_lower_soc_no_swap);
     RUN_TEST(test_persist_throttled_on_drop);
+    RUN_TEST(test_swap_flag_clears_on_reinit);
+    RUN_TEST(test_persist_write_failure_is_best_effort);
     return UNITY_END();
 }

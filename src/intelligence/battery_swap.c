@@ -21,6 +21,9 @@ static void persist(int32_t soc_x100)
 {
     g_baseline_x100 = soc_x100;
     g_have_baseline = true;
+    /* RAM is authoritative: the baseline advances even if the NVS write fails.
+     * The next boot then reloads the older flash value, which only makes swap
+     * detection marginally more conservative — acceptable, never wrong. */
     (void)battery_hal_nvs_write_u32(BATTERY_NVS_KEY_LAST_SOC, (uint32_t)soc_x100);
 }
 
