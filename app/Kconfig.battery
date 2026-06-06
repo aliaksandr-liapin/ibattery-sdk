@@ -295,6 +295,30 @@ config BATTERY_SOC_SOH_REJECT_HI_PCT
 
 endif # BATTERY_SOC_SOH
 
+config BATTERY_SWAP_DETECT
+    bool "Auto-detect a power-off battery swap and reset learned SoH"
+    depends on BATTERY_SOC_SOH
+    default y if BATTERY_CHEMISTRY_CR2032
+    default n
+    help
+      On boot, if SoC jumped up vs the last persisted value, treat it as a
+      swapped cell: reset learned SoH to rated and set the BATTERY_SWAPPED
+      status flag. Primary-cell only — a rechargeable charged while powered
+      off would look identical, so leave this OFF for LiPo until charge-vs-swap
+      disambiguation (Phase 2) lands.
+
+config BATTERY_SWAP_SOC_THRESHOLD_PCT_X100
+    int "Swap detection: upward SoC jump that counts as a swap (0.01%)"
+    default 2500
+    range 100 10000
+    depends on BATTERY_SWAP_DETECT
+
+config BATTERY_SWAP_PERSIST_DELTA_PCT_X100
+    int "Swap detection: SoC drop that triggers a baseline persist (0.01%)"
+    default 500
+    range 100 10000
+    depends on BATTERY_SWAP_DETECT
+
 config BATTERY_RUNTIME_TO_EMPTY
     bool "Estimate runtime-to-empty (minutes) from charge + smoothed current"
     default n
