@@ -1,9 +1,26 @@
 # Release Notes
 
-## Unreleased
+## v0.14.0 — Standard Zephyr fuel_gauge driver — 2026-06-05
 
-- **Read-only Zephyr `fuel_gauge` driver** (opt-in `CONFIG_BATTERY_FUEL_GAUGE_API`,
-  default n; `select FUEL_GAUGE`). Lets any consumer written against the standard
+Headline: iBattery now **conforms to Zephyr's standard `fuel_gauge` API**, so any
+Zephyr app can read it through the interface it already uses — and it adds the
+**State-of-Health** property the standard API lacks. Also folds in the post-v0.13.0
+CI fix and a substantial documentation pass. No breaking changes; the new driver
+is opt-in and off by default.
+
+**Also since v0.13.0:**
+- **Fixed `firmware.yml`** (red on `main` since the module-path CI was added): the
+  SDK now `select ADC`, so an ESP32-C3 module consumer links without the app
+  setting `CONFIG_ADC` itself.
+- **Docs:** new `docs/USE_CASES.md` (per-board how-tos + "developer
+  responsibilities and edge cases" — battery-swap `battery_soh_reset()`, no
+  built-in time-remaining, signals-not-notifications, power-source not auto-sensed);
+  `docs/POSITIONING.md`; a phased product-vision section in `docs/ROADMAP.md`
+  (FREE/PAID tiers proposed, pending owner confirmation).
+
+### Read-only Zephyr `fuel_gauge` driver
+
+- Opt-in `CONFIG_BATTERY_FUEL_GAUGE_API` (default n; `select FUEL_GAUGE`). Lets any consumer written against the standard
   Zephyr `fuel_gauge` API read iBattery without the iBattery-specific headers.
   The driver is a software view over `battery_telemetry_collect()` (no backing
   gauge IC) and is instantiated from a devicetree node with
