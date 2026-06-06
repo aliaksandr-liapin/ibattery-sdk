@@ -259,6 +259,28 @@
           "refId": "A"
         }
       ]
+    },
+    {
+      "title": "Time to Empty (min)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "m",
+          "decimals": 0,
+          "min": 0,
+          "noValue": "—",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15, "spanNulls": false }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb" },
+          "query": "from(bucket: \"ibattery\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"runtime_to_empty_min\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)",
+          "refId": "A"
+        }
+      ]
     }
   ],
   "refresh": "10s",
