@@ -23,6 +23,10 @@
 #include <battery_sdk/battery_soh.h>
 #endif
 
+#if defined(CONFIG_BATTERY_SWAP_DETECT)
+#include <battery_sdk/battery_swap.h>
+#endif
+
 #if defined(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
 #include <battery_sdk/battery_runtime.h>
 #endif
@@ -123,6 +127,13 @@ int battery_telemetry_collect(struct battery_telemetry_packet *packet)
     /* State of Health — best-effort (v4) */
 #if defined(CONFIG_BATTERY_SOC_SOH)
     (void)battery_soh_get_pct_x100(&packet->soh_pct_x100);
+#endif
+
+    /* Swap-aware SoH: flag the session if a power-off swap was detected. */
+#if defined(CONFIG_BATTERY_SWAP_DETECT)
+    if (battery_swap_detected()) {
+        packet->status_flags |= BATTERY_TELEMETRY_FLAG_BATTERY_SWAPPED;
+    }
 #endif
 
     /* Runtime-to-empty — best-effort (v5).
