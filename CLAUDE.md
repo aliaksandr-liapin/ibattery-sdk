@@ -86,7 +86,7 @@ cd tests && mkdir -p build && cd build
 cmake .. && make && ctest --output-on-failure
 ```
 
-23 test suites, Unity framework (includes coulomb counter, SoC coulomb, SoH, SoH NVS persistence, fusion, current HAL stub, serialize v1–v4, ADC divider scaling).
+25 test suites, Unity framework (includes coulomb counter, SoC coulomb, SoH, SoH NVS persistence, fusion, current HAL stub, serialize v1–v5, fuel_gauge unit conversions, runtime-to-empty, ADC divider scaling).
 
 ### Python gateway tests
 
