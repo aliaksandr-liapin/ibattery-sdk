@@ -104,10 +104,14 @@ def run(
     """Connect to iBattery, decode telemetry, and write to InfluxDB."""
     from .analytics.realtime import check_realtime
     from .influxdb_writer import TelemetryWriter
-    from .scanner import connect_and_stream, scan_for_device
+    from .scanner import connect_and_stream, resolve_device_tag, scan_for_device
 
     packet_count = 0
     anomaly_count = 0
+    # Overwritten with the connected board's advertised BLE name once found, so
+    # the InfluxDB `device` tag (Grafana "Connected Device" tile) reflects the
+    # actual board rather than the static --device-name filter.
+    tag_name = device_name
     writer = TelemetryWriter(
         url=influxdb_url,
         token=influxdb_token,
@@ -120,7 +124,7 @@ def run(
         try:
             decoded = decode_packet(data)
             packet_count += 1
-            writer.write(decoded, device_name=device_name)
+            writer.write(decoded, device_name=tag_name)
             click.echo(f"[{packet_count:>5}] {format_packet(decoded)}")
 
             # Real-time anomaly checks
@@ -136,15 +140,21 @@ def run(
             click.echo(f"[ERROR] {e}", err=True)
 
     async def _run() -> None:
+        nonlocal tag_name
         device = await scan_for_device(name=device_name, timeout=timeout)
         if device is None:
             click.echo(f"Device '{device_name}' not found. Is it advertising?", err=True)
             sys.exit(1)
 
-        click.echo(f"\nStreaming from {device.name} ({device.address}) -> InfluxDB")
-        click.echo("Press Ctrl+C to stop.\n")
+        adv_name = device.name  # usually None on macOS (matched by service UUID)
 
-        await connect_and_stream(device.address, on_packet)
+        def on_connect(gatt_name):
+            nonlocal tag_name
+            tag_name = resolve_device_tag(gatt_name, adv_name, device_name)
+            click.echo(f"\nStreaming from {tag_name} ({device.address}) -> InfluxDB")
+            click.echo("Press Ctrl+C to stop.\n")
+
+        await connect_and_stream(device.address, on_packet, on_connect=on_connect)
 
     try:
         asyncio.run(_run())

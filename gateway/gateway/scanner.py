@@ -32,6 +32,23 @@ class DiscoveredDevice:
         return self.device.address
 
 
+def resolve_device_tag(
+    gatt_name: Optional[str],
+    advertised_name: Optional[str],
+    fallback: str,
+) -> str:
+    """Pick the InfluxDB `device` tag for a connected peripheral.
+
+    So the Grafana "Connected Device" tile distinguishes boards (iBattery-STM32 /
+    iBattery-nRF52840 / iBattery-ESP32C3), prefer the GATT Device Name
+    characteristic (0x2A00, = firmware CONFIG_BT_DEVICE_NAME) read after
+    connecting — it is reliable on macOS, where the *advertised* GAP name is
+    usually empty (the reason the scanner matches by service UUID). Then fall
+    back to any advertised name, and finally to the gateway's configured default.
+    """
+    return gatt_name or advertised_name or fallback
+
+
 def matches_ibattery(
     device: BLEDevice,
     adv_data,
@@ -111,10 +128,27 @@ async def list_nearby_devices(
     return sorted(results, key=lambda d: d.rssi or -999, reverse=True)
 
 
+# Standard GATT Device Name characteristic (GAP service); carries the
+# firmware's CONFIG_BT_DEVICE_NAME and is readable after connecting even when
+# the advertisement omits the GAP name (common on macOS CoreBluetooth).
+_GATT_DEVICE_NAME_UUID = "00002a00-0000-1000-8000-00805f9b34fb"
+
+
+async def _read_gatt_device_name(client: BleakClient) -> Optional[str]:
+    """Best-effort read of the GATT Device Name (0x2A00). None on any failure."""
+    try:
+        raw = await client.read_gatt_char(_GATT_DEVICE_NAME_UUID)
+        return raw.decode("utf-8", errors="replace").strip() or None
+    except Exception:
+        logger.debug("Could not read GATT device name (0x2A00)", exc_info=True)
+        return None
+
+
 async def connect_and_stream(
     address: str,
     on_packet: Callable[[bytes], None],
     char_uuid: str = config.CHAR_UUID,
+    on_connect: Optional[Callable[[Optional[str]], None]] = None,
 ) -> None:
     """Connect to a BLE device and stream notification packets.
 
@@ -124,6 +158,8 @@ async def connect_and_stream(
         address: BLE device address.
         on_packet: Callback receiving raw 20-byte notification data.
         char_uuid: Characteristic UUID to subscribe to.
+        on_connect: Optional callback invoked once per (re)connection with the
+            peripheral's GATT Device Name (0x2A00), or None if it can't be read.
     """
     delay = config.RECONNECT_DELAY_INITIAL
     stop_event = asyncio.Event()
@@ -138,6 +174,9 @@ async def connect_and_stream(
             async with BleakClient(address, disconnected_callback=on_disconnect) as client:
                 logger.info("Connected to %s", address)
                 delay = config.RECONNECT_DELAY_INITIAL  # Reset backoff
+
+                if on_connect is not None:
+                    on_connect(await _read_gatt_device_name(client))
 
                 def notification_handler(sender, data: bytearray) -> None:
                     on_packet(bytes(data))

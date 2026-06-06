@@ -94,7 +94,7 @@ cmake .. && make && ctest --output-on-failure
 cd gateway && pip install -e . && pytest
 ```
 
-122 tests (includes v4/v5 packet decoding, SoH, runtime-to-empty, scanner service-UUID matching, AnomalyDetector + CLI coverage).
+126 tests (includes v4/v5 packet decoding, SoH, runtime-to-empty, scanner service-UUID matching + device-tag resolution (GATT 0x2A00), AnomalyDetector + CLI coverage).
 
 ### Gateway CLI
 

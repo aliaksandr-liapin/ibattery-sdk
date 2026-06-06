@@ -10,13 +10,61 @@
   "description": "iBattery telemetry \u2014 at-a-glance status tiles, health gauges, and trends.",
   "panels": [
     {
+      "title": "Connected Device",
+      "description": "BLE device tag of the board currently streaming (e.g. iBattery-STM32 / iBattery-nRF52840 / iBattery-ESP32C3).",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": ""
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "mappings": [],
+          "noValue": "(no device)"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Value$/",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": ""
+          },
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"voltage_v\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: r.device }))\n  |> keep(columns: [\"_time\", \"_value\"])\n  |> yield(name: \"device\")",
+          "refId": "A"
+        }
+      ]
+    },
+    {
       "title": "Voltage",
       "description": "Battery terminal voltage (latest sample).",
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 5,
-        "x": 0,
+        "w": 4,
+        "x": 4,
         "y": 0
       },
       "datasource": {
@@ -80,8 +128,8 @@
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 5,
-        "x": 5,
+        "w": 4,
+        "x": 8,
         "y": 0
       },
       "datasource": {
@@ -149,8 +197,8 @@
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 5,
-        "x": 10,
+        "w": 4,
+        "x": 12,
         "y": 0
       },
       "datasource": {
@@ -214,8 +262,8 @@
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 5,
-        "x": 15,
+        "w": 4,
+        "x": 16,
         "y": 0
       },
       "datasource": {
@@ -697,7 +745,7 @@
     },
     {
       "title": "Time to Empty (min)",
-      "description": "Estimated minutes until the cell reaches empty, from EMA-smoothed discharge current. Shows — (no data) when idle or charging. Requires the current sensor and CONFIG_BATTERY_RUNTIME_TO_EMPTY.",
+      "description": "Estimated minutes until the cell reaches empty, from EMA-smoothed discharge current. Shows \u2014 (no data) when idle or charging. Requires the current sensor and CONFIG_BATTERY_RUNTIME_TO_EMPTY.",
       "type": "stat",
       "gridPos": {
         "h": 8,
@@ -713,7 +761,7 @@
         "defaults": {
           "unit": "m",
           "decimals": 0,
-          "noValue": "—",
+          "noValue": "\u2014",
           "color": {
             "mode": "thresholds"
           },
@@ -762,7 +810,7 @@
       ]
     },
     {
-      "title": "Time to Empty (min) — trend",
+      "title": "Time to Empty (min) \u2014 trend",
       "description": "Estimated minutes-to-empty over time. Gaps appear when the cell is idle or charging (estimate not available).",
       "type": "timeseries",
       "gridPos": {
@@ -832,5 +880,5 @@
   "timezone": "",
   "title": "iBattery Telemetry",
   "uid": "ibattery-telemetry",
-  "version": 3
+  "version": 5
 }
