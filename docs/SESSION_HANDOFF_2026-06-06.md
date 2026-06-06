@@ -5,9 +5,11 @@
 
 ## TL;DR
 
-iBattery SDK is **released at v0.14.0** (tag + GitHub release [Latest] + PlatformIO),
-on `main`, clean and in sync. Since the last handoff the project completed a big
-**"become a standard" arc** plus the first **FREE-tier lifecycle feature**:
+iBattery SDK is **released at v0.15.0** (tag + GitHub release [Latest] + PlatformIO accepted),
+on `main`, clean and in sync. v0.15.0 ships **runtime-to-empty** (time remaining) +
+an **idle-current-floor fix**, both **hardware-validated end-to-end** (see "Done 2026-06-06"
+below). The prior arc (v0.14.0) was a **"become a standard"** push plus the first
+**FREE-tier lifecycle feature**:
 
 1. **Faded-SoH BLE→Grafana E2E** hardware-validated (learned 73.10%, persisted across reset).
 2. **Standard Zephyr `fuel_gauge` driver** (read-only) + a **custom SoH property** the
@@ -15,21 +17,36 @@ on `main`, clean and in sync. Since the last handoff the project completed a big
 3. **Positioning + usage docs**: `POSITIONING.md`, `USE_CASES.md` (how-tos + edge cases),
    a phased product vision in `ROADMAP.md`.
 4. **Promo**: two articles published (dev.to + LinkedIn) — SoH story and the fuel_gauge story.
-5. **Runtime-to-empty** ("time remaining") — built end-to-end (estimator → wire v5 →
-   `fuel_gauge` `RUNTIME_TO_EMPTY` → gateway → Grafana). **Merged to `main` (PR #25), UNRELEASED.**
+5. **Runtime-to-empty** ("time remaining") — estimator → wire v5 → `fuel_gauge`
+   `RUNTIME_TO_EMPTY` → gateway → Grafana. **Released in v0.15.0 (PRs #25, #27, #28).**
 
-**No urgent work.** The one thing pending is the **hardware e2e for runtime-to-empty**,
-then a **v0.15.0 release**.
+## Done 2026-06-06 (this handoff's session)
+
+- **Runtime-to-empty hardware e2e — DONE.** Validated firmware → wire v5 → BLE → gateway
+  → InfluxDB → Grafana on NUCLEO-L476RG (extADC+BLE+INA219 rig): RTE converged to ~407 min
+  under a ~30 mA load (ground truth 404), idle → `n/a`/field-omitted with no spike.
+  Capture: `docs/captures/2026-06-06-runtime-to-empty-idle-floor.log`.
+- **Idle-current-floor fix (PR #27, TDD).** The bench idle-check exposed RTE briefly emitting
+  multi-year values (261564 → 1307820 min) as the EMA decayed toward zero after the load was
+  removed. Root cause: the idle gate only tripped at current ≤ 0, and low-drain reporting was
+  *intended/tested* behavior — so it was a design decision, surfaced to the owner, not silently
+  patched. Fix: `CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100` default 0 → 50 (0.5 mA), which
+  bounds the estimate to `Q/floor` (spike dropped 83× to 23004 min, then `n/a`). Tunable; 0 = legacy.
+- **v0.15.0 released (PR #28):** `library.json` → 0.15.0, RELEASE_NOTES + CLAUDE.md updated,
+  tag `v0.15.0`, GitHub release [Latest], `pio pkg publish` accepted (54 KB).
+
+**No urgent work.** Both pending items from this handoff (RTE hardware e2e, v0.15.0 release)
+are now complete. The remaining open decision is **FREE/PAID tiers** (owner call, see below).
 
 ## Repo / release state
 
 - Branch `main`, **in sync with origin**, clean tree, no stale local branches, 0 open PRs.
-- **v0.14.0**: `library.json` = 0.14.0; tag `v0.14.0`; **GitHub release created + marked Latest**
-  (also backfilled the previously-missing v0.13.0 release page); **PlatformIO published (accepted)**.
-- **On `main`, unreleased (1 squash commit past the v0.14.0 tag):** runtime-to-empty (PR #25).
-- Recent PRs this arc: #11–#17 (faded-SoH e2e, CI `select ADC` fix, doc sync), #18 (README/positioning),
-  #19 (fuel_gauge driver), #20 (fuel_gauge HW read-back validation), #21 (usage/edge-case docs),
-  #22 (phased roadmap vision), #23 (dev.to+LinkedIn drafts), #24 (v0.14.0 release), #25 (runtime-to-empty).
+- **v0.15.0**: `library.json` = 0.15.0; tag `v0.15.0`; **GitHub release created + marked Latest**;
+  **PlatformIO published (accepted, 54 KB)**. Nothing unreleased on `main`.
+- Recent PRs: #19 (fuel_gauge driver), #20 (fuel_gauge HW read-back), #21 (usage/edge-case docs),
+  #22 (phased roadmap vision), #23 (dev.to+LinkedIn drafts), #24 (v0.14.0 release),
+  #25 (runtime-to-empty), #26 (prior handoff sync), #27 (RTE idle-current-floor fix, HW-validated),
+  #28 (v0.15.0 release).
 
 ## Tests / coverage (all green)
 
@@ -47,19 +64,16 @@ then a **v0.15.0 release**.
   `docs/captures/2026-06-04-fuel-gauge-runtime-validation.log`. Opt-in self-check:
   `CONFIG_BATTERY_FUEL_GAUGE_SELFCHECK`.
 
-## Next HW test worth doing (the only real gap)
+## Next HW test worth doing
 
-**Runtime-to-empty e2e on the rig.** Build `nucleo_l476rg_ble_extadc.conf` +
-`-DCONFIG_BATTERY_RUNTIME_TO_EMPTY=y` (the option needs `BATTERY_SOC_COULOMB`, which the extadc
-conf provides). Drive the PPK2/INA219 rig (see `docs/BENCH_PREP_SOH_BLE_E2E.md` — cap-free
-10k/10k divider): confirm serial `RTE=<min>` under load, `RTE=n/a` when idle/charging, then
-`runtime_to_empty_min` over BLE → InfluxDB → the Grafana "Time to Empty" panel. Run the gateway
-from **iTerm** (BLE). Then cut **v0.15.0**.
+**None pending.** The runtime-to-empty e2e (the prior "only real gap") is DONE — see
+"Done 2026-06-06" above. Remaining HW candidates are all low-priority (see Open follow-ups):
+external-ADC ~6–10% trim, partial-excursion SoH learning, real-cell LUT validation, nRF I2C remap.
 
 ## Open follow-ups (low priority unless noted)
 
-1. **v0.15.0 release** — bundle runtime-to-empty (bump `library.json` → 0.15.0, tag, GitHub
-   release, `pio pkg publish`). Do after the e2e.
+1. ~~**v0.15.0 release**~~ — DONE 2026-06-06 (bundled runtime-to-empty + idle-floor fix; tag +
+   GitHub release [Latest] + PlatformIO accepted).
 2. **OWNER DECISION pending:** confirm/re-tag the **FREE/PAID tiers** in `ROADMAP.md`
    ("Surfaced from usage gaps" table + the phased-vision section — all marked "proposals pending
    owner confirmation"). Monetization is a human call.
