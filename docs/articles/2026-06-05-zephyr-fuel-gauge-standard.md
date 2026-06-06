@@ -3,8 +3,8 @@ title: "The Zephyr fuel_gauge API Has No 'Battery Health' Property — So My Dri
 published: false
 description: "Making an open-source battery SDK speak Zephyr's standard fuel-gauge interface — what mapped cleanly, the property the standard is missing, and how I validated every reading back on real hardware."
 tags: embedded, iot, opensource, zephyr
-cover_image: ""
-# cover_image: a serial-log screenshot of the [FG] read-back lines next to the native telemetry works well here
+cover_image: "https://raw.githubusercontent.com/aliaksandr-liapin/ibattery-sdk/main/docs/images/fuel-gauge-readback.png"
+# Cover generated from the real validation capture (docs/captures/2026-06-04-fuel-gauge-runtime-validation.log) → docs/images/fuel-gauge-readback.png
 ---
 
 There's a moment in every open-source project where you stop asking "is my thing good?" and start asking "is my thing *the obvious choice*?" The difference is usually **interoperability**: does it plug into what people already use, or does adopting it mean betting on your bespoke API?
