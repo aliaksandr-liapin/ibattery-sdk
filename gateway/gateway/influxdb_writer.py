@@ -57,6 +57,14 @@ class TelemetryWriter:
             .time(datetime.now(timezone.utc), WritePrecision.MS)
         )
 
+        # v5 telemetry (runtime-to-empty). Written only when available: the
+        # firmware reports None while idle/charging (sentinel) and for any
+        # pre-v5 packet. Skipping the field leaves gaps in the time series
+        # rather than spiking to a sentinel value.
+        runtime = decoded.get("runtime_to_empty_min")
+        if runtime is not None:
+            point.field("runtime_to_empty_min", runtime)
+
         try:
             self._write_api.write(bucket=self.bucket, org=self.org, record=point)
         except Exception:

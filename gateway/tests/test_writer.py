@@ -153,6 +153,76 @@ class TestTelemetryWriter:
 
         assert "soh_pct=87.5" in line
 
+    def test_write_v5_runtime_field(self, mock_influx):
+        """v5 packets persist runtime_to_empty_min when it is available."""
+        from gateway.influxdb_writer import TelemetryWriter
+
+        v5_decoded = {
+            "version": 5,
+            "timestamp_ms": 240000,
+            "voltage_mv": 3322,
+            "voltage_v": 3.322,
+            "temperature_c": 23.56,
+            "soc_pct": 99.88,
+            "power_state": "DISCHARGING",
+            "power_state_raw": 6,
+            "status_flags": 0,
+            "cycle_count": 0,
+            "current_ma": 80.0,
+            "coulomb_mah": 219.75,
+            "soh_pct": 87.5,
+            "runtime_to_empty_min": 132000,
+            "received_at": "2026-06-06T18:55:00+00:00",
+        }
+
+        writer = TelemetryWriter()
+        writer.write(v5_decoded)
+
+        point = mock_influx["write_api"].write.call_args.kwargs["record"]
+        line = point.to_line_protocol()
+        assert "runtime_to_empty_min=132000" in line
+
+    def test_write_v5_runtime_none_is_omitted(self, mock_influx):
+        """When runtime is None (idle/charging), the field is omitted entirely
+        so the time series has a gap rather than a sentinel spike."""
+        from gateway.influxdb_writer import TelemetryWriter
+
+        decoded = {
+            "version": 5,
+            "timestamp_ms": 240000,
+            "voltage_mv": 4100,
+            "voltage_v": 4.1,
+            "temperature_c": 23.56,
+            "soc_pct": 100.0,
+            "power_state": "CHARGING",
+            "power_state_raw": 5,
+            "status_flags": 0,
+            "cycle_count": 0,
+            "current_ma": -50.0,
+            "coulomb_mah": 219.75,
+            "soh_pct": 87.5,
+            "runtime_to_empty_min": None,
+            "received_at": "2026-06-06T18:55:00+00:00",
+        }
+
+        writer = TelemetryWriter()
+        writer.write(decoded)
+
+        point = mock_influx["write_api"].write.call_args.kwargs["record"]
+        line = point.to_line_protocol()
+        assert "runtime_to_empty_min" not in line
+
+    def test_write_v1_packets_omit_runtime(self, mock_influx, sample_decoded):
+        """Pre-v5 packets (no runtime key) omit the field — back-compat."""
+        from gateway.influxdb_writer import TelemetryWriter
+
+        writer = TelemetryWriter()
+        writer.write(sample_decoded)
+
+        point = mock_influx["write_api"].write.call_args.kwargs["record"]
+        line = point.to_line_protocol()
+        assert "runtime_to_empty_min" not in line
+
     def test_write_v1_packets_default_soh_to_zero(self, mock_influx, sample_decoded):
         """v1-v3 packets omit soh_pct — writer defaults to 0.0 for back-compat."""
         from gateway.influxdb_writer import TelemetryWriter
