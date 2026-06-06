@@ -105,6 +105,73 @@ Lower scale but immediate revenue with zero infrastructure cost.
 
 ---
 
+## Phased Product Vision (lifecycle-driven)
+
+> Articulated 2026-06-04 from the battery lifecycle. **FREE/PAID labels are
+> proposals pending owner confirmation** — monetization is a business decision.
+> Open-core principle: the on-device lifecycle *core* is FREE to drive adoption
+> ("become the standard"); *fleet-scale* intelligence, multi-battery profiling,
+> and saved-history analytics are the COMMERCIAL layer; developer-experience
+> tooling stays FREE because it lowers adoption friction.
+>
+> **Sequence intentionally:** ship the FREE core (Iterations 1–2) first to grow
+> the user base, *then* build the COMMERCIAL layer (Iteration 3) once there's
+> adoption to monetize — consistent with the Monetization timing below.
+
+### Iteration 1 — Primary (one-time) cell lifecycle — *proposed FREE*
+
+The unifying loop: **capture state → track discharge → warn low → estimate
+"replace soon" → reset on swap.**
+- Today: SoC from voltage ✅, CRITICAL low state ✅.
+- Add: softer **LOW/warning** tier (before CRITICAL); **runtime / time-to-empty**
+  estimate ("replace soon"); **swap-aware `battery_soh_reset()`** (today manual).
+- Note: a primary cell has no charge cycles — "tracking" here is monotonic
+  discharge (precise charge counting needs the INA219 current sensor).
+
+### Iteration 2 — Rechargeable cell lifecycle — *proposed FREE*
+
+Iteration 1 **+** charge-cycle count + capacity-fade (SoH) + "capacity too low"
+warning.
+- Today: cycle counter ✅, SoH learning + NVS persistence ✅.
+- Add: **SoH-threshold ("capacity too low") warning**.
+- **"Is the battery rechargeable?" is not electrically detectable.** Resolve by
+  (a) **configuration** — chemistry is set at build time (recommended); or
+  (b) **inference** — a primary cell never charges, so the first observed charge
+  event (charger present) marks it rechargeable. Exposed via the **power-source
+  flag** item below. Never pure sensing.
+
+### Iteration 3 — Advanced, all battery kinds — *mostly proposed COMMERCIAL*
+
+- **Per-battery profiles / profile store** (capacity, health, stats per installed
+  battery) — *proposed COMMERCIAL (advanced pack + cloud)*. ⚠️ Per-physical-cell
+  identity is impossible without an **external ID** (NFC/serial) or a user
+  "battery #N" input — design for "profile the currently-installed battery +
+  snapshot on swap," not "auto-recognize a re-inserted cell."
+- **Extended environmental warnings** (temp too high/low + effect on the battery)
+  — *split*: basic on-device thresholds + derating = **FREE**; fleet-wide alerting
+  = **COMMERCIAL**. (Gateway temp thresholds + LiPo temp-compensated SoC already
+  exist.)
+- **Saved battery-history analytics** (e.g. how a specific device/board drains a
+  cell over time) — *proposed COMMERCIAL (SaaS/analytics)*. Raw telemetry is
+  already stored (InfluxDB/Grafana); the analysis & reporting is the product.
+- **SDK install wizard / guided fine-tune** (incl. user-provided inputs) —
+  *proposed FREE* (developer experience lowers adoption friction → serves the
+  "become the standard" goal).
+
+### Two hard technical truths (set expectations)
+
+1. **Rechargeability / power-source is configured or inferred, never sensed** from
+   the cell alone.
+2. **Per-physical-cell identity requires an external ID** — the SDK can profile
+   "the battery currently installed," not fingerprint a specific re-inserted cell.
+
+### Parked
+
+- **Advanced SoH** (partial-excursion learning, multi-cell/per-cell identity) —
+  **postponed 2026-06-04**; revisit when fleet/pack demand appears.
+
+---
+
 ## Development Roadmap
 
 ### Surfaced from real-world usage gaps (2026-06-04)
@@ -124,7 +191,7 @@ on-device *correctness and usability* stays FREE (gating it would hurt adoption)
 | **Configurable low/warning state on-device** (not just CRITICAL) | device has one low threshold (CRITICAL); a "LOW/warning" tier only exists in the gateway | **FREE** (basic) |
 | **Fleet alerting / notifications** ("plan a swap", thresholds → push/email) | device emits signals, not messages; turning them into alerts is the integrator's job | **COMMERCIAL** (SaaS/fleet) |
 | **Predictive maintenance / fleet RUL dashboards** | per-device cloud RUL exists; fleet-wide "which units to service" is the monetizable layer | **COMMERCIAL** (SaaS/fleet) |
-| **Advanced SoH** — partial-excursion learning, multi-cell/per-cell identity | faster/robust health without a full excursion; supports swappable + pack use | **COMMERCIAL** (advanced pack) or FREE-basic split — to decide |
+| **Advanced SoH** — partial-excursion learning, multi-cell/per-cell identity | faster/robust health without a full excursion; supports swappable + pack use | **POSTPONED** (parked 2026-06-04) — revisit when fleet/pack demand appears |
 
 > Documentation already shipped for these gaps: `USE_CASES.md` (How-Tos +
 > "Developer responsibilities & edge cases", incl. the swap/`battery_soh_reset()`
