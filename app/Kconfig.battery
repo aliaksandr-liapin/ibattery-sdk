@@ -295,6 +295,27 @@ config BATTERY_SOC_SOH_REJECT_HI_PCT
 
 endif # BATTERY_SOC_SOH
 
+config BATTERY_RUNTIME_TO_EMPTY
+    bool "Estimate runtime-to-empty (minutes) from charge + smoothed current"
+    default n
+    depends on BATTERY_SOC_COULOMB
+    help
+      Estimate minutes until the battery is empty (remaining charge / smoothed
+      discharge current). Adds wire format v5 and the Zephyr fuel_gauge
+      RUNTIME_TO_EMPTY property. No effect when disabled.
+
+config BATTERY_RUNTIME_EMA_ALPHA_X1000
+    int "Runtime current EMA factor (x1000)"
+    default 300
+    range 1 1000
+    depends on BATTERY_RUNTIME_TO_EMPTY
+
+config BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100
+    int "Idle current threshold (0.01 mA); at/below this -> not discharging"
+    default 0
+    range 0 100000
+    depends on BATTERY_RUNTIME_TO_EMPTY
+
 config BATTERY_FUEL_GAUGE_API
     bool "Expose iBattery via the Zephyr fuel_gauge driver API (read-only)"
     default n

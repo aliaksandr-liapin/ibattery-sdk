@@ -74,6 +74,11 @@ zephyr_library_sources_ifdef(CONFIG_BATTERY_SOC_FUSION
     src/intelligence/battery_soc_fusion.c
 )
 
+# Runtime-to-empty estimator (time remaining)
+zephyr_library_sources_ifdef(CONFIG_BATTERY_RUNTIME_TO_EMPTY
+    src/intelligence/battery_runtime.c
+)
+
 # State of Health (capacity-fade learning)
 zephyr_library_sources_ifdef(CONFIG_BATTERY_SOC_SOH
     src/intelligence/battery_soh.c

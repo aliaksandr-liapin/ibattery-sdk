@@ -46,6 +46,11 @@ if(CONFIG_BATTERY_SOC_FUSION)
     target_sources(app PRIVATE ../src/intelligence/battery_soc_fusion.c)
 endif()
 
+# Runtime-to-empty estimator (time remaining)
+if(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
+    target_sources(app PRIVATE ../src/intelligence/battery_runtime.c)
+endif()
+
 # State of Health (capacity-fade learning)
 if(CONFIG_BATTERY_SOC_SOH)
     target_sources(app PRIVATE ../src/intelligence/battery_soh.c)
