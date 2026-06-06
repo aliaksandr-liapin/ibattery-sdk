@@ -1,8 +1,13 @@
 # Release Notes
 
-## Unreleased
+## v0.15.0 — Runtime to empty (minutes-to-empty estimate) + wire v5 — 2026-06-06
 
-### Runtime to empty (minutes-to-empty estimate) + wire v5
+Headline: iBattery now estimates **time remaining** — minutes until the cell is
+empty — and ships it through the native API, the standard Zephyr `fuel_gauge`
+`RUNTIME_TO_EMPTY` property, and a new wire format. Hardware-validated end-to-end
+on NUCLEO-L476RG. No breaking changes; the feature is opt-in and off by default.
+
+### Runtime to empty
 
 - New opt-in `CONFIG_BATTERY_RUNTIME_TO_EMPTY` (default n; depends on
   `CONFIG_BATTERY_SOC_COULOMB`) estimates the minutes until the cell reaches
@@ -17,8 +22,26 @@
 - Gateway decodes v5 to the InfluxDB field `runtime_to_empty_min` (`None` when
   not available); serial prints `RTE=<n> min` / `RTE=n/a`.
 - New Grafana **"Time to Empty (min)"** panel on both dashboards.
-- Built and host-tested (Unity) plus gateway-tested (pytest). **Hardware
-  end-to-end validation is pending.** No breaking changes; off by default.
+
+### Idle-current floor (estimate no longer spikes on load removal)
+
+- `CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100` now defaults to **50 (0.50 mA)**
+  instead of 0. A smoothed current at or below the floor reports **not available**.
+  The floor sits above typical current-sense noise and bounds the largest
+  emittable estimate to `remaining_charge ÷ floor`, so when a load is removed the
+  EMA decaying toward zero can no longer briefly emit multi-year values before
+  settling to `n/a`. Still tunable (set to 0 for the legacy any-positive-drain
+  behavior).
+
+### Validation
+
+- **Hardware-validated end-to-end** on NUCLEO-L476RG (extADC + BLE + INA219 rig):
+  `runtime_to_empty_min` traveled firmware → wire v5 → BLE → gateway → InfluxDB →
+  Grafana, converging to ground truth (~407 min under a ~30 mA load), and the
+  idle path correctly reported `n/a` / omitted the field with no spike
+  (`docs/captures/2026-06-06-runtime-to-empty-idle-floor.log`).
+- 25 C host suites (Unity) + 122 gateway tests (pytest) + build/config drift
+  guard all green.
 
 ## v0.14.0 — Standard Zephyr fuel_gauge driver — 2026-06-05
 
