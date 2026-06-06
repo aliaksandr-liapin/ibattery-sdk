@@ -169,6 +169,13 @@ int main(void)
                    pkt.soh_pct_x100 / 100U,
                    pkt.soh_pct_x100 % 100U);
 #endif
+#if IS_ENABLED(CONFIG_BATTERY_RUNTIME_TO_EMPTY)
+            if (pkt.runtime_to_empty_min == UINT32_MAX) {
+                printk(" RTE=n/a");
+            } else {
+                printk(" RTE=%u min", pkt.runtime_to_empty_min);
+            }
+#endif
             printk("\n");
 
 #if IS_ENABLED(CONFIG_BATTERY_FUEL_GAUGE_SELFCHECK)
