@@ -15,7 +15,7 @@
  * BATTERY_TRANSPORT_WIRE_SIZE; it must hold the largest serialized packet,
  * or the biggest wire format is silently rejected (v4 was, with INVALID_ARG,
  * until this was enforced). Fails the build if a new V*_SIZE outgrows it. */
-_Static_assert(BATTERY_TRANSPORT_WIRE_SIZE >= BATTERY_SERIALIZE_V4_SIZE,
+_Static_assert(BATTERY_TRANSPORT_WIRE_SIZE >= BATTERY_SERIALIZE_V5_SIZE,
                "transport buffer smaller than largest serialized wire format");
 
 /* ── Backend selection (compile-time vtable) ──────────────────────── */
