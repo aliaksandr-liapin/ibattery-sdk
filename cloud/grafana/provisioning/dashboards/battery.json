@@ -634,7 +634,7 @@
             "type": "influxdb",
             "uid": ""
           },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r.device == \"${device}\")\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"voltage_v\")\n  |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)\n  |> yield(name: \"voltage_v\")",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r.device == \"${device}\")\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"voltage_v\")\n  |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)\n  |> drop(columns: [\"device\", \"_measurement\"])\n  |> yield(name: \"voltage_v\")",
           "refId": "A"
         }
       ]
@@ -685,7 +685,7 @@
             "type": "influxdb",
             "uid": ""
           },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r.device == \"${device}\")\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"coulomb_mah\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"coulomb_mah\")",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r.device == \"${device}\")\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"coulomb_mah\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> drop(columns: [\"device\", \"_measurement\"])\n  |> yield(name: \"coulomb_mah\")",
           "refId": "A"
         }
       ]
@@ -738,7 +738,7 @@
             "type": "influxdb",
             "uid": ""
           },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r.device == \"${device}\")\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"soh_pct\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"soh_pct\")",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r.device == \"${device}\")\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"soh_pct\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> drop(columns: [\"device\", \"_measurement\"])\n  |> yield(name: \"soh_pct\")",
           "refId": "A"
         }
       ]
@@ -856,7 +856,7 @@
             "type": "influxdb",
             "uid": ""
           },
-          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r.device == \"${device}\")\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"runtime_to_empty_min\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> yield(name: \"runtime_to_empty_min\")",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: -30m)\n  |> filter(fn: (r) => r.device == \"${device}\")\n  |> filter(fn: (r) => r._measurement == \"battery_telemetry\")\n  |> filter(fn: (r) => r._field == \"runtime_to_empty_min\")\n  |> aggregateWindow(every: 5s, fn: last, createEmpty: false)\n  |> drop(columns: [\"device\", \"_measurement\"])\n  |> yield(name: \"runtime_to_empty_min\")",
           "refId": "A"
         }
       ]
@@ -909,5 +909,5 @@
   "timezone": "",
   "title": "iBattery Telemetry",
   "uid": "ibattery-telemetry",
-  "version": 6
+  "version": 7
 }
