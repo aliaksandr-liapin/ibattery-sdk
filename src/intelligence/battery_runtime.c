@@ -23,11 +23,16 @@
 #define CONFIG_BATTERY_RUNTIME_EMA_ALPHA_X1000 300
 #endif
 
-/* At or below this smoothed current (0.01 mA), treat as idle/charging.
- * Zero means "any positive drain counts"; negative (charging) and exactly
- * zero (idle) are reported NOT_AVAILABLE. */
+/* At or below this smoothed current (0.01 mA), treat as idle/charging and
+ * report NOT_AVAILABLE. Defaults to 0.50 mA: a smoothed current under that is
+ * at/below the current sensor's noise floor, so projecting time-to-empty from
+ * it is meaningless. It also bounds the largest emittable estimate to
+ * Q/floor, which keeps the load-removal transient (EMA decaying toward zero)
+ * from briefly emitting multi-year values before settling to NOT_AVAILABLE.
+ * Deployments with a low-noise sensor and genuine sub-mA drains can lower it
+ * via CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100 (0 = any positive drain). */
 #ifndef CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100
-#define CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100 0
+#define CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100 50
 #endif
 
 static int32_t g_ema_x100;

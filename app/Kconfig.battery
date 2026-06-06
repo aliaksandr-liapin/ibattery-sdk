@@ -312,9 +312,16 @@ config BATTERY_RUNTIME_EMA_ALPHA_X1000
 
 config BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100
     int "Idle current threshold (0.01 mA); at/below this -> not discharging"
-    default 0
+    default 50
     range 0 100000
     depends on BATTERY_RUNTIME_TO_EMPTY
+    help
+      A smoothed discharge current at or below this is treated as idle and
+      runtime-to-empty reports "not available". The 0.50 mA default sits above
+      typical current-sense noise, so it both suppresses meaningless estimates
+      from noise and bounds the largest estimate to (remaining charge / floor),
+      preventing a multi-year spike while the EMA settles to zero after a load
+      is removed. Set to 0 to report for any positive drain (legacy behavior).
 
 config BATTERY_FUEL_GAUGE_API
     bool "Expose iBattery via the Zephyr fuel_gauge driver API (read-only)"

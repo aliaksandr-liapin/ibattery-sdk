@@ -230,9 +230,9 @@ int  battery_runtime_to_empty_min(int32_t remaining_mah_x100, uint32_t *minutes_
 - `battery_runtime_update` — feed a current sample in 0.01 mA units (positive = discharge) into the EMA. Called automatically from the telemetry collect path each cycle.
 - `battery_runtime_to_empty_min` — estimate minutes to empty as `remaining_mAh × 60 ÷ avg_mA`. Returns `BATTERY_STATUS_OK` and writes `*minutes_out` on success; returns `BATTERY_STATUS_NOT_AVAILABLE` when the cell is idle or charging (smoothed current ≤ idle threshold), in which case no estimate is meaningful.
 
-Tuning Kconfig: `BATTERY_RUNTIME_EMA_ALPHA_X1000` (EMA weight ×1000, default 300) and `BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100` (idle/charging cutoff in 0.01 mA, **default 0** — i.e. any positive smoothed current yields an estimate, and only a non-discharging cell (current ≤ 0 → idle/charging) reports `NOT_AVAILABLE`). Raise it to set a noise-floor deadband (e.g. 5 = 0.05 mA) so tiny sub-milliamp draws near rest are also treated as idle.
+Tuning Kconfig: `BATTERY_RUNTIME_EMA_ALPHA_X1000` (EMA weight ×1000, default 300) and `BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100` (idle/charging cutoff in 0.01 mA, **default 50 = 0.50 mA**). A smoothed current at or below the threshold reports `NOT_AVAILABLE`. The 0.50 mA default sits above typical current-sense noise and bounds the largest emittable estimate to `remaining_charge ÷ threshold`, which prevents a multi-year spike while the EMA settles toward zero after a load is removed. Set it to `0` for the legacy behavior (any positive smoothed current yields an estimate; only current ≤ 0 → idle/charging).
 
-> Status: built and host-tested (Unity) plus gateway-tested (pytest). Hardware end-to-end validation is pending.
+> Status: built, host-tested (Unity), gateway-tested (pytest), and hardware-validated on NUCLEO-L476RG (extADC+BLE+INA219 rig). The idle-floor behavior is captured in `docs/captures/2026-06-06-runtime-to-empty-idle-floor.log`. Full BLE→Grafana end-to-end is the remaining step.
 
 ---
 
