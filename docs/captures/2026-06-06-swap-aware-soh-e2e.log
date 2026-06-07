@@ -1,0 +1,46 @@
+# Swap-aware SoH (Phase 1) — hardware E2E (NUCLEO-L476RG, extADC+INA219 rig)
+
+Date: 2026-06-06
+Board: NUCLEO-L476RG  ·  Build: build-swap (boards/nucleo_l476rg_ble_extadc.conf, CR2032)
+Config: CONFIG_BATTERY_SWAP_DETECT=y, SWAP_SOC_THRESHOLD=2500 (25%)
+Wire: v4 (SoH on, no RTE)  ·  Serial: /dev/cu.usbmodem1203 @115200
+Rig: PPK2 Source-Meter drives the 10k/10k divider on A2 (sensed "cell" voltage);
+     INA219 + ~30 mA load on the current path so the coulomb SoC path is live.
+Method: a NUCLEO RESET = "power-off -> power-on"; changing the PPK2 setpoint
+        between resets = "the cell was swapped". (No real cell needed to exercise
+        the boot detection logic.)
+
+## Pre-test hygiene
+Full chip MASS-ERASE before flashing (west flash --runner openocd --erase) to wipe
+NVS so no stale SoH/baseline/coulomb keys from prior tests could confound results.
+Clean first boot: SOH=100.00%, flags=0x00000000.
+
+## Key on-hardware finding (de-risked the design)
+On reset the coulomb SoC RE-ANCHORS from the sensed voltage (it does NOT restore a
+stale Q from flash here), so boot SoC genuinely reflects the inserted cell —
+exactly the signal the swap check needs. Verified: reset at 2205 mV produced
+SOC=5.08% (Q re-anchored to 11 mAh), not the previous 86%.
+
+## Results (all three steps pass)
+
+Step 1 — seed depleted baseline (PPK2 2.3 V, RESET):
+  [v4 t=8041] V=2205 mV SOC=5.08%  flags=0x00000000 Q=11.17 mAh SOH=100.00%
+  -> downward (86%->5%), correctly NO swap; low baseline (~5%) stamped to NVS.
+
+Step 2 — fresh-cell insertion (PPK2 3.0 V, RESET):
+  [v4 t=8041] V=2885 mV SOC=86.77% flags=0x00000080 Q=190.89 mAh SOH=100.00%
+  -> boot SoC jumped 5.08% -> 86.77% (+81% >= 25%): SWAP DETECTED.
+     flags bit 7 (0x80 = BATTERY_TELEMETRY_FLAG_BATTERY_SWAPPED) set, sticky for
+     the session; battery_soh_reset() fired (SOH=100%).
+
+Step 3 — false-positive control (PPK2 stays 3.0 V, RESET):
+  [v4 t=8041] V=2884 mV SOC=86.77% flags=0x00000000 SOH=100.00%
+  -> baseline now ~86%, no upward jump: NO swap, SoH preserved.
+     A normal same-cell power-cycle does not wrongly wipe SoH.
+
+## Verdict
+PASS. Swap detection fires on a real boot SoC jump and the flag rides status_flags
+to telemetry; the same-cell power-cycle control confirms no false positive (the
+destructive-reset risk the merge was held for). SOH stayed 100% throughout (never
+faded), so Step 2's reset was 100->100 — the flag is the proof the reset path ran
+on the swap and not on the control.
