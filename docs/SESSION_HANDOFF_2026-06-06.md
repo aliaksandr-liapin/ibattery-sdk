@@ -5,11 +5,15 @@
 
 ## TL;DR
 
-iBattery SDK is **released at v0.15.0** (tag + GitHub release [Latest] + PlatformIO accepted),
-on `main`, clean and in sync. v0.15.0 ships **runtime-to-empty** (time remaining) +
-an **idle-current-floor fix**, both **hardware-validated end-to-end** (see "Done 2026-06-06"
-below). The prior arc (v0.14.0) was a **"become a standard"** push plus the first
-**FREE-tier lifecycle feature**:
+iBattery SDK is **released at v0.16.0** (tag + GitHub release [Latest] + PlatformIO accepted),
+on `main`, clean and in sync. **v0.16.0 = swap-aware SoH Phase 1** — auto-reset learned
+health on a power-off battery swap (boot SoC-jump vs NVS baseline → `battery_soh_reset()`
++ `BATTERY_SWAPPED` flag; opt-in, CR2032-only; PR #32), hardware-validated E2E incl. the
+same-cell-power-cycle false-positive control; it also bundles the Grafana **"Connected
+Device" tile + `$device` selector** (PRs #30/#31). The prior **v0.15.0** shipped
+**runtime-to-empty** + an **idle-current-floor fix**, both hardware-validated. The
+**v0.14.0** arc was a **"become a standard"** push plus the first **FREE-tier lifecycle
+feature**:
 
 1. **Faded-SoH BLE→Grafana E2E** hardware-validated (learned 73.10%, persisted across reset).
 2. **Standard Zephyr `fuel_gauge` driver** (read-only) + a **custom SoH property** the
@@ -32,21 +36,36 @@ below). The prior arc (v0.14.0) was a **"become a standard"** push plus the firs
   *intended/tested* behavior — so it was a design decision, surfaced to the owner, not silently
   patched. Fix: `CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100` default 0 → 50 (0.5 mA), which
   bounds the estimate to `Q/floor` (spike dropped 83× to 23004 min, then `n/a`). Tunable; 0 = legacy.
-- **v0.15.0 released (PR #28):** `library.json` → 0.15.0, RELEASE_NOTES + CLAUDE.md updated,
-  tag `v0.15.0`, GitHub release [Latest], `pio pkg publish` accepted (54 KB).
+- **v0.15.0 released (PR #28):** runtime-to-empty + idle-floor; tag + GitHub release + PlatformIO.
+- **Connected-Device Grafana tile + `$device` selector (PRs #30/#31).** Tag telemetry by the
+  board's real BLE name (read via GATT 0x2A00 — macOS leaves the advertised name empty); fixed
+  the Grafana string-render; nRF given a distinct name. **First full BLE→Grafana run on the
+  nRF52840-DK.** `$device` selector shows one board at a time (no cross-device duplication).
+- **Swap-aware SoH Phase 1 (PR #32) — built + hardware-validated + MERGED.** Full superpowers
+  workflow (brainstorm→design→plan→subagent-driven TDD w/ spec+quality reviews→finish). On boot,
+  an upward SoC jump vs a persisted NVS baseline ⇒ `battery_soh_reset()` + `BATTERY_SWAPPED`
+  flag (opt-in, CR2032-only, no wire bump). Bench E2E on the PPK2 rig passed incl. the
+  **same-cell-power-cycle false-positive control** (`docs/captures/2026-06-06-swap-aware-soh-e2e.log`).
+  Merge was held until that control passed (it auto-resets health). **Validation note:** detection
+  logic is HW-proven; the cell was PPK2-emulated — a real-cell + all-boards pass is logged as
+  deferred QA in `ROADMAP.md` (not blocking).
+- **v0.16.0 released:** `library.json` → 0.16.0, RELEASE_NOTES + ROADMAP + CLAUDE.md updated,
+  tag `v0.16.0`, GitHub release [Latest], PlatformIO published.
 
-**No urgent work.** Both pending items from this handoff (RTE hardware e2e, v0.15.0 release)
-are now complete. The remaining open decision is **FREE/PAID tiers** (owner call, see below).
+**No urgent work.** All this session's pending items are complete. Open: **FREE/PAID tiers**
+(owner call), **swap-aware Phase 2** (LiPo charge-vs-swap), and the **deferred HW-validation
+matrix** (all boards × real batteries).
 
 ## Repo / release state
 
 - Branch `main`, **in sync with origin**, clean tree, no stale local branches, 0 open PRs.
-- **v0.15.0**: `library.json` = 0.15.0; tag `v0.15.0`; **GitHub release created + marked Latest**;
-  **PlatformIO published (accepted, 54 KB)**. Nothing unreleased on `main`.
-- Recent PRs: #19 (fuel_gauge driver), #20 (fuel_gauge HW read-back), #21 (usage/edge-case docs),
-  #22 (phased roadmap vision), #23 (dev.to+LinkedIn drafts), #24 (v0.14.0 release),
-  #25 (runtime-to-empty), #26 (prior handoff sync), #27 (RTE idle-current-floor fix, HW-validated),
-  #28 (v0.15.0 release).
+- **v0.16.0** (current): `library.json` = 0.16.0; tag `v0.16.0`; **GitHub release [Latest]** +
+  **PlatformIO published**. Nothing unreleased on `main`.
+- **v0.15.0**: runtime-to-empty + idle-floor; tag + GitHub release + PlatformIO.
+- Recent PRs: #24 (v0.14.0 release), #25 (runtime-to-empty), #26 (handoff sync),
+  #27 (RTE idle-floor fix, HW-validated), #28 (v0.15.0 release), #29 (handoff sync),
+  #30 (connected-device tile + GATT name), #31 (`$device` selector), #32 (swap-aware SoH, HW-validated),
+  v0.16.0 release.
 
 ## Tests / coverage (all green)
 

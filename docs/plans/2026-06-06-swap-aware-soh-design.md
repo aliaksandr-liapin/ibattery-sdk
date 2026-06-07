@@ -1,7 +1,7 @@
 # Swap-aware SoH auto-reset — Design (Phase 1: primary cells, power-off swap)
 
 Date: 2026-06-06
-Status: implemented (Phase 1) — host-tested + firmware-build-verified; hardware E2E pending
+Status: SHIPPED in v0.16.0 (Phase 1) — host-tested, firmware-build-verified, and hardware E2E PASSED on NUCLEO-L476RG (PPK2 rig, incl. the same-cell false-positive control — `docs/captures/2026-06-06-swap-aware-soh-e2e.log`). Real-cell + all-boards validation logged as deferred QA.
 Related: `docs/plans/2026-05-29-phase-8d-soh-design.md`,
          `docs/plans/2026-06-01-soh-nvs-persistence-design.md`,
          `docs/USE_CASES.md` ("Battery swap → you must call battery_soh_reset()")
