@@ -1,5 +1,46 @@
 # Release Notes
 
+## v0.16.0 — Swap-aware SoH (auto-reset on a battery swap) — 2026-06-06
+
+Headline: when a depleted cell is swapped for a fresh one while the device is powered
+off, iBattery now **auto-detects it on boot and resets learned State-of-Health to
+rated** — so it no longer blends the old cell's health into the new one — and raises a
+status flag. Opt-in, **primary-cell (CR2032) only this phase**, no wire-format change.
+Also folds in the Grafana "Connected Device" tile + `$device` selector from the
+gateway/dashboard work since v0.15.0.
+
+### Swap-aware SoH
+- New opt-in `CONFIG_BATTERY_SWAP_DETECT` (depends on `CONFIG_BATTERY_SOC_SOH`;
+  **default y for CR2032 only**). On boot, if SoC jumped up vs a value persisted
+  before power-off by ≥ `CONFIG_BATTERY_SWAP_SOC_THRESHOLD_PCT_X100` (default 25%), it
+  concludes a swap, calls `battery_soh_reset()`, and sets
+  `BATTERY_TELEMETRY_FLAG_BATTERY_SWAPPED` (`status_flags` bit 7). Mirrors a fuel-gauge
+  IC's reset-indicator-on-insertion.
+- New `battery_swap` module; the SoC baseline is persisted to NVS throttled (only on
+  ≥5% drops → negligible flash wear). NVS best-effort; RAM authoritative.
+- **Primary-cell only this phase:** a rechargeable charged while powered off would look
+  identical under the SoC-jump rule, so `SWAP_DETECT` defaults **off** for LiPo;
+  charge-vs-swap disambiguation is deferred to Phase 2.
+- **Hardware-validated E2E** on NUCLEO-L476RG (PPK2 rig): seed depleted → no swap;
+  fresh → `BATTERY_SWAPPED` flag + SoH reset; **same-cell power-cycle → no false
+  positive** (`docs/captures/2026-06-06-swap-aware-soh-e2e.log`).
+
+### Dashboard / gateway (also since v0.15.0)
+- Grafana **"Connected Device"** tile + **`$device`** selector: telemetry is tagged by
+  the board's real advertised BLE name (read via the GATT Device Name characteristic
+  0x2A00), and the dashboard shows one board at a time (no cross-device duplication).
+- nRF52840-DK given a distinct BLE name (`iBattery-nRF52840`); first full
+  BLE→gateway→InfluxDB→Grafana run on the flagship nRF board.
+
+### Tests
+- **26 C host suites** (incl. `battery_swap`, 7 cases) + **126 gateway tests** +
+  build/config drift guard — all green. No breaking changes; swap-detect is opt-in.
+
+### Validation note
+The swap **detection logic** is hardware-validated; the cell itself was PPK2-emulated
+(the firmware only sees a voltage, which the PPK2 reproduces faithfully). A real-cell +
+all-boards validation pass is logged as deferred QA — it does not block this release.
+
 ## v0.15.0 — Runtime to empty (minutes-to-empty estimate) + wire v5 — 2026-06-06
 
 Headline: iBattery now estimates **time remaining** — minutes until the cell is

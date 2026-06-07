@@ -185,8 +185,8 @@ on-device *correctness and usability* stays FREE (gating it would hurt adoption)
 
 | Candidate | Why (gap it closes) | Tier (proposed) |
 |---|---|---|
-| ✅ **Runtime-to-empty estimate** (minutes) on-device — **done (unreleased)** | opt-in `CONFIG_BATTERY_RUNTIME_TO_EMPTY`; native API + Zephyr `fuel_gauge` `RUNTIME_TO_EMPTY` + wire v5 + gateway/Grafana. Host/gateway tested; hardware e2e pending | **FREE** (basic gauge feature) |
-| **Swap-aware SoH** — battery-swap detection + auto-reset | today a swap needs a manual `battery_soh_reset()`; no detection, and re-learn EMA-blends the old cell | **FREE** (correctness) |
+| ✅ **Runtime-to-empty estimate** (minutes) on-device — **done, released v0.15.0** | opt-in `CONFIG_BATTERY_RUNTIME_TO_EMPTY`; native API + Zephyr `fuel_gauge` `RUNTIME_TO_EMPTY` + wire v5 + gateway/Grafana. Host/gateway tested **and hardware-validated E2E** (idle-current floor added so the estimate never spikes on load removal) | **FREE** (basic gauge feature) |
+| ✅ **Swap-aware SoH** — battery-swap detection + auto-reset — **done, released v0.16.0 (Phase 1)** | opt-in `CONFIG_BATTERY_SWAP_DETECT` (default y for CR2032 only): on boot, an upward SoC jump vs a persisted baseline ⇒ `battery_soh_reset()` + `BATTERY_SWAPPED` flag. Hardware-validated incl. the same-cell-power-cycle false-positive control. **LiPo (charge-vs-swap disambiguation) = Phase 2.** | **FREE** (correctness) |
 | **Power-source flag** — expose "on external/permanent power vs battery" | no auto USB-vs-battery detection today; only inferable from charge state | **FREE** (basic) |
 | **Configurable low/warning state on-device** (not just CRITICAL) | device has one low threshold (CRITICAL); a "LOW/warning" tier only exists in the gateway | **FREE** (basic) |
 | **Fleet alerting / notifications** ("plan a swap", thresholds → push/email) | device emits signals, not messages; turning them into alerts is the integrator's job | **COMMERCIAL** (SaaS/fleet) |
@@ -196,6 +196,15 @@ on-device *correctness and usability* stays FREE (gating it would hurt adoption)
 > Documentation already shipped for these gaps: `USE_CASES.md` (How-Tos +
 > "Developer responsibilities & edge cases", incl. the swap/`battery_soh_reset()`
 > rule). The roadmap items above are the *code* follow-ups.
+
+> **Deferred QA — full hardware validation matrix.** Much of the feature
+> validation to date is PPK2-emulated or host-only (the firmware sees a voltage,
+> which the PPK2 reproduces faithfully — valid for the *logic*). A future pass
+> should exercise every feature against **real batteries across all three boards**:
+> swap-detect with a real CR2032 swap (IR sag/relaxation, the physical pull-and-
+> insert); the SoC LUT against a real discharge curve; an ESP32-C3 BLE→Grafana E2E
+> (never done); and nRF current/SoH/RTE once the DK's P0.26/P0.27 I2C defect is
+> worked around. Not blocking any release — analog/physical-layer confidence.
 
 ### Near-term (1-3 months)
 
