@@ -433,6 +433,25 @@ target_compile_definitions(test_soc_soh_estimator PRIVATE
 )
 target_link_libraries(test_soc_soh_estimator PRIVATE unity)
 
+# ── Battery swap detection test ────────────────────────────────────────────
+add_executable(test_battery_swap
+    test_battery_swap.c
+    ${SDK_SRC}/intelligence/battery_swap.c
+    ${SDK_SRC}/intelligence/battery_soh.c
+    mocks/mock_nvs.c
+)
+target_include_directories(test_battery_swap PRIVATE
+    ${SDK_INCLUDE} ${SDK_SRC} ${SDK_SRC}/intelligence ${SDK_SRC}/hal
+    ${unity_SOURCE_DIR}/src
+)
+target_compile_definitions(test_battery_swap PRIVATE
+    CONFIG_BATTERY_SOC_SOH_ALPHA_X1000=500
+    CONFIG_BATTERY_SOC_SOH_REJECT_LO_PCT=30
+    CONFIG_BATTERY_SOC_SOH_REJECT_HI_PCT=120
+    CONFIG_BATTERY_CAPACITY_MAH=220
+)
+target_link_libraries(test_battery_swap PRIVATE unity)
+
 # ── Median voltage filter test ─────────────────────────────────────────────
 add_executable(test_voltage_filter_median
     test_voltage_filter_median.c
@@ -527,3 +546,4 @@ add_test(NAME soh_persistence COMMAND test_soh_persistence)
 add_test(NAME adc_divider COMMAND test_adc_divider)
 add_test(NAME fuel_gauge_convert COMMAND test_fuel_gauge_convert)
 add_test(NAME runtime COMMAND test_runtime)
+add_test(NAME battery_swap COMMAND test_battery_swap)

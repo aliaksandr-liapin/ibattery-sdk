@@ -86,7 +86,7 @@ cd tests && mkdir -p build && cd build
 cmake .. && make && ctest --output-on-failure
 ```
 
-25 test suites, Unity framework (includes coulomb counter, SoC coulomb, SoH, SoH NVS persistence, fusion, current HAL stub, serialize v1–v5, fuel_gauge unit conversions, runtime-to-empty, ADC divider scaling).
+26 test suites, Unity framework (includes coulomb counter, SoC coulomb, SoH, SoH NVS persistence, swap detection, fusion, current HAL stub, serialize v1–v5, fuel_gauge unit conversions, runtime-to-empty, ADC divider scaling).
 
 ### Python gateway tests
 
@@ -146,6 +146,7 @@ HAL (platform-specific)
 | `CONFIG_BATTERY_CAPACITY_MAH` | `int` | `220` (CR2032) / `1000` (LiPo) |
 | `CONFIG_BATTERY_FUEL_GAUGE_API` | `y/n` | `n` (read-only Zephyr fuel_gauge driver; `select FUEL_GAUGE`) |
 | `CONFIG_BATTERY_RUNTIME_TO_EMPTY` | `y/n` | `n` (minutes-to-empty estimate; depends on `BATTERY_SOC_COULOMB`; emits wire v5) |
+| `CONFIG_BATTERY_SWAP_DETECT` | `y/n` | `y` if `CR2032` else `n` (auto-reset SoH on a power-off swap; depends on `BATTERY_SOC_SOH`; sets `BATTERY_TELEMETRY_FLAG_BATTERY_SWAPPED`; primary-only — LiPo deferred to Phase 2) |
 
 ## Wire Format
 

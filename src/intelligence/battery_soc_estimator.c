@@ -23,6 +23,10 @@
 #include <battery_sdk/battery_soh.h>
 #endif
 
+#if defined(CONFIG_BATTERY_SWAP_DETECT)
+#include <battery_sdk/battery_swap.h>
+#endif
+
 #ifndef CONFIG_BATTERY_CAPACITY_MAH
 #define CONFIG_BATTERY_CAPACITY_MAH 1000
 #endif
@@ -139,6 +143,9 @@ int battery_soc_estimator_init(void)
     g_empty_anchor_active = false;
 #if defined(CONFIG_BATTERY_SOC_SOH)
     battery_soh_init((int32_t)CONFIG_BATTERY_CAPACITY_MAH * 100);
+#endif
+#if defined(CONFIG_BATTERY_SWAP_DETECT)
+    battery_swap_init();
 #endif
 #endif
 #if defined(CONFIG_BATTERY_SOC_SLEW_LIMIT)
@@ -302,6 +309,12 @@ int battery_soc_estimator_get_pct_x100(uint16_t *soc_pct_x100)
         g_coulomb_soc_x100 = apply_slew_limit(g_coulomb_soc_x100);
 #endif
         *soc_pct_x100 = g_coulomb_soc_x100;
+#if defined(CONFIG_BATTERY_SWAP_DETECT)
+        /* Boot swap-check runs on the first *successful* coulomb SoC; the LUT/fallback
+         * early-returns above skip it, deferring the one-shot check rather than
+         * deciding a swap from a degraded reading. */
+        battery_swap_update((uint16_t)g_coulomb_soc_x100);
+#endif
         return BATTERY_STATUS_OK;
     }
 #else

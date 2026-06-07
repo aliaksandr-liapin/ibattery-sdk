@@ -52,7 +52,8 @@ struct battery_telemetry_packet {
 };
 
 /* Telemetry status_flags bit definitions.
- * A set bit indicates the corresponding reading failed during collection. */
+ * A set error bit indicates the corresponding reading failed during
+ * collection; event bits (>= bit 7) flag notable events. */
 #define BATTERY_TELEMETRY_FLAG_VOLTAGE_ERR     (1U << 0)
 #define BATTERY_TELEMETRY_FLAG_TEMP_ERR        (1U << 1)
 #define BATTERY_TELEMETRY_FLAG_SOC_ERR         (1U << 2)
@@ -60,6 +61,10 @@ struct battery_telemetry_packet {
 #define BATTERY_TELEMETRY_FLAG_TIMESTAMP_ERR   (1U << 4)
 #define BATTERY_TELEMETRY_FLAG_CURRENT_ERR     (1U << 5)
 #define BATTERY_TELEMETRY_FLAG_COULOMB_ERR     (1U << 6)
+
+/* Event flag (not an error): set for the session when a battery swap was
+ * detected on boot and the learned SoH was auto-reset. */
+#define BATTERY_TELEMETRY_FLAG_BATTERY_SWAPPED (1U << 7)
 
 #ifdef __cplusplus
 }

@@ -80,16 +80,30 @@ CONFIG_BATTERY_CAPACITY_MAH=<rated mAh of your cell>
 These are the "you must handle this" items. **None of them is a bug** — they're
 deliberate boundaries of an on-device, integer-only library.
 
-### 🔧 Battery swap → you must call `battery_soh_reset()`
-The SDK has **no battery-swap detection** and **no per-cell identity.** Learned
-health persists in flash and is **smoothed (moving-average)** into the next
-measurement. So after you physically swap a cell:
-- it keeps reporting the **old** battery's health until a new full→empty cycle, and
-- the next learned value gets **blended** with the old one (wrong for a fresh cell).
+### 🔧 Battery swap → auto-detected for primary cells; manual otherwise
+Learned health persists in flash and is **smoothed (moving-average)** into the
+next measurement, and the SDK has **no per-cell identity.** If a swap goes
+unnoticed it keeps reporting the **old** cell's health and **blends** the next
+learned value with it (wrong for a fresh cell).
 
-**Your job:** call `battery_soh_reset()` (resets learned capacity to rated,
-disarms) whenever you know a swap happened — e.g. a user "I changed the battery"
-action. The SDK provides the API; it won't trigger it for you.
+**Auto-detection (`CONFIG_BATTERY_SWAP_DETECT`, default on for CR2032).** On boot
+the SDK compares SoC against a value it persisted before power-off; a large
+upward jump (default ≥25%) means a fresh cell was inserted while powered off, so
+it **auto-resets** learned SoH to rated and raises the
+`BATTERY_TELEMETRY_FLAG_BATTERY_SWAPPED` status flag (mirrors a fuel-gauge IC's
+reset-indicator on insertion). Tunable via
+`CONFIG_BATTERY_SWAP_SOC_THRESHOLD_PCT_X100`.
+
+**Still call `battery_soh_reset()` yourself when** auto-detection can't see it:
+- **Rechargeable (LiPo):** `SWAP_DETECT` is **off by default** — a cell charged
+  while powered off looks identical to a swap under the SoC-jump rule, so
+  charge-vs-swap disambiguation is deferred (Phase 2). Reset on a known swap.
+- **Hot-swap** (swapped while powered) — not detected this phase.
+- **Similarly-depleted replacement** — a used cell with no upward SoC jump won't trip detection.
+
+`battery_soh_reset()` (resets learned capacity to rated, disarms) remains the
+explicit escape hatch; the SDK provides the API and, for primary cells, now also
+triggers it automatically.
 
 ### 🔧 SoH only learns from a full→empty excursion (with a current sensor)
 Health is *measured*, not guessed: it needs `CONFIG_BATTERY_CURRENT_SENSE` **and**
