@@ -1,0 +1,56 @@
+# Connected-Device tile + nRF52840-DK BLE→Grafana E2E (Tier-1)
+
+Date: 2026-06-06
+Board: nRF52840-DK (PCA10056, SN 1050258557) — native BLE, USB/J-Link
+Build: build-nrf-dietemp  (plain app + -DCONFIG_BATTERY_TEMP_NTC=n -DCONFIG_BATTERY_TEMP_DIE=y)
+Wire: v3 (no current sense on this board => base format; current/coulomb/SoH/RTE absent)
+Gateway: run from iTerm, branch feat/grafana-connected-device
+
+## Goals
+1. First-ever full BLE -> gateway -> InfluxDB -> Grafana pipeline on the flagship nRF52840-DK
+   (only NUCLEO had been E2E'd before).
+2. Validate the new "Connected Device" Grafana tile (PR #30).
+
+## Two bugs the live run exposed (invisible to unit tests + an isolated InfluxDB query)
+
+1. Board name not distinguished. On macOS CoreBluetooth the advertised GAP name is
+   often empty (the scanner matches by service UUID for this reason), so device.name
+   was None and the InfluxDB `device` tag fell back to the static default "iBattery"
+   for every board. FIX: read the GATT Device Name characteristic (0x2A00 =
+   firmware CONFIG_BT_DEVICE_NAME) after connecting; prefer GATT name -> advertised
+   name -> default (gateway resolve_device_tag, TDD).
+2. Grafana tile showed "(no device)". The stat panel reduces NUMERIC fields by
+   default, so the string `device` tag (field "Value") was ignored. Verified via
+   Grafana /api/ds/query that the query DOES return the string. FIX: panel
+   reduceOptions.fields = "/^Value$/" so the string is selected and rendered.
+
+Also: the bare nRF defaulted to CONFIG_BATTERY_TEMP_NTC=y (external NTC on AIN1);
+with no thermistor wired the floating ADC read ~107 C. Rebuilt with the on-die
+sensor (TEMP_DIE) for a sane reading — no external hardware.
+
+## BEFORE
+  device tag = "iBattery" (same for every board); Temperature ~107 C (floating NTC);
+  Connected Device tile = "(no device)".
+
+## AFTER (serial)
+  [v3 t=2019] V=3002 mV T=26.00 C SOC=100.00% PWR=1 ...
+  [v3 t=8063] V=3000 mV T=25.75 C SOC=100.00% PWR=1 ...
+
+## AFTER (gateway, iTerm)
+  gateway.scanner: Found iBattery at C179F5A2-... (name='iBattery-nRF52840')
+  Streaming from iBattery-nRF52840 (C179F5A2-...) -> InfluxDB
+
+## AFTER (InfluxDB)
+  schema.tagValues(device, -30m) => iBattery (stale), iBattery-nRF52840 (live)
+  last voltage_v (-20s) => 3.005, device=iBattery-nRF52840
+  last temperature_c    => 26.25, device=iBattery-nRF52840
+
+## AFTER (Grafana)
+  Connected Device tile = "iBattery-nRF52840"; Temperature = 26.3 C.
+  (Gauges/trends briefly show BOTH device tags — the stale "iBattery" series ages
+   out of the time window; this is the per-device breakout the `device` tag enables.)
+
+## PASS
+Full BLE pipeline proven on nRF52840-DK; Connected Device tile shows the real board
+name; temperature realistic. Gateway tests 122 -> 126. RTE/SoH/current require the
+INA219 (Tier-2), blocked on this DK's P0.26/P0.27 defect — not attempted.

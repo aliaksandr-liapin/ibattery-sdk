@@ -1,0 +1,1401 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Embedded C SDK providing battery intelligence for IoT devices">
+      
+      
+      
+        <link rel="canonical" href="https://aliaksandr-liapin.github.io/ibattery-sdk/USE_CASES/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../WIRING/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Use Cases & How-Tos - iBattery SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#use-cases-how-tos-edge-cases" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="iBattery SDK" class="md-header__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iBattery SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Use Cases & How-Tos
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="iBattery SDK" class="md-nav__button md-logo" aria-label="iBattery SDK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    iBattery SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliaksandr-liapin/ibattery-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliaksandr-liapin/ibattery-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use Cases & How-Tos
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use Cases & How-Tos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mental-model-two-different-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mental model: two different questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-bring-it-up-on-your-board" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How-To: bring it up on your board
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use cases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Use cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-fresh-primary-coin-cell-cr2032" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. Fresh primary coin cell (CR2032)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-used-partly-spent-coin-cell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Used / partly-spent coin cell
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-permanent-usb-power" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. Permanent USB power
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-rechargeable-cell-lipo-where-soh-shines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D. Rechargeable cell (LiPo) — where SoH shines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enabling-current-sensing-soh-for-bd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling current sensing + SoH (for B/D)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#developer-responsibilities-and-edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Developer responsibilities and edge cases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Developer responsibilities and edge cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#battery-swap-auto-detected-for-primary-cells-manual-otherwise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Battery swap → auto-detected for primary cells; manual otherwise
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soh-only-learns-from-a-fullempty-excursion-with-a-current-sensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 SoH only learns from a full→empty excursion (with a current sensor)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-remaining-minutes-to-empty-is-opt-in-and-needs-the-current-sensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 "Time remaining" (minutes-to-empty) is opt-in and needs the current sensor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-human-language-notifications-on-device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 No human-language notifications on-device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-source-type-is-configured-not-sensed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Power-source type is configured, not sensed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soc-from-voltage-alone-is-approximate-esp-coin-cells" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 SoC from voltage alone is approximate (esp. coin cells)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#per-board-physical-quirks-recap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Per-board physical quirks (recap)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WIRING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware Wiring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POSITIONING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Positioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SDK_API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BATTERY_PROFILES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Battery Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RELEASE_NOTES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mental-model-two-different-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mental model: two different questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-bring-it-up-on-your-board" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How-To: bring it up on your board
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use cases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Use cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-fresh-primary-coin-cell-cr2032" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. Fresh primary coin cell (CR2032)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-used-partly-spent-coin-cell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Used / partly-spent coin cell
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-permanent-usb-power" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. Permanent USB power
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-rechargeable-cell-lipo-where-soh-shines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D. Rechargeable cell (LiPo) — where SoH shines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enabling-current-sensing-soh-for-bd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling current sensing + SoH (for B/D)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#developer-responsibilities-and-edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Developer responsibilities and edge cases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Developer responsibilities and edge cases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#battery-swap-auto-detected-for-primary-cells-manual-otherwise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Battery swap → auto-detected for primary cells; manual otherwise
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soh-only-learns-from-a-fullempty-excursion-with-a-current-sensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 SoH only learns from a full→empty excursion (with a current sensor)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-remaining-minutes-to-empty-is-opt-in-and-needs-the-current-sensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 "Time remaining" (minutes-to-empty) is opt-in and needs the current sensor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-human-language-notifications-on-device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 No human-language notifications on-device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-source-type-is-configured-not-sensed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Power-source type is configured, not sensed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#soc-from-voltage-alone-is-approximate-esp-coin-cells" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 SoC from voltage alone is approximate (esp. coin cells)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#per-board-physical-quirks-recap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Per-board physical quirks (recap)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="use-cases-how-tos-edge-cases">Use Cases, How-Tos &amp; Edge Cases<a class="headerlink" href="#use-cases-how-tos-edge-cases" title="Permanent link">&para;</a></h1>
+<p>A practical guide to <em>what iBattery does for you automatically</em>, <em>what you (the
+integrator) must do yourself</em>, and <em>what it deliberately doesn't do (yet)</em>.</p>
+<p>If you read only one section, read <strong><a href="#developer-responsibilities-and-edge-cases">Developer responsibilities and edge
+cases</a></strong> — it lists the things that
+will surprise you if you don't know them.</p>
+<hr />
+<h2 id="mental-model-two-different-questions">Mental model: two different questions<a class="headerlink" href="#mental-model-two-different-questions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Name</th>
+<th>How it's answered</th>
+<th>Needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"How full is the battery <em>right now</em>?"</td>
+<td><strong>State of Charge (SoC)</strong></td>
+<td>voltage → lookup curve, optionally refined by current integration</td>
+<td>voltage (always); current sensor (optional, more accurate)</td>
+</tr>
+<tr>
+<td>"How <em>worn out</em> is the battery?"</td>
+<td><strong>State of Health (SoH)</strong></td>
+<td>learns real usable capacity from one full→empty discharge</td>
+<td>current sensor <strong>+</strong> a full→empty cycle</td>
+</tr>
+</tbody>
+</table>
+<p>SoC is like a fuel needle. SoH is like noticing the fuel <em>tank itself</em> has
+shrunk with age. They are independent.</p>
+<hr />
+<h2 id="how-to-bring-it-up-on-your-board">How-To: bring it up on your board<a class="headerlink" href="#how-to-bring-it-up-on-your-board" title="Permanent link">&para;</a></h2>
+<p>The <strong>SDK logic and your app code are identical on every board.</strong> You select the
+board at build time and provide its small config; only the <em>physical</em> setup
+differs.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>nRF52840</th>
+<th>STM32L4</th>
+<th>ESP32-C3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Battery-voltage sensing</td>
+<td>built-in (reads supply directly)</td>
+<td>built-in (internal reference)</td>
+<td><strong>external resistor divider required</strong> on a GPIO</td>
+</tr>
+<tr>
+<td>Wireless (BLE)</td>
+<td>built-in</td>
+<td>needs an <strong>add-on BLE shield</strong></td>
+<td>built-in</td>
+</tr>
+<tr>
+<td>Build toolchain</td>
+<td>Nordic NCS</td>
+<td>Nordic NCS</td>
+<td>vanilla Zephyr workspace</td>
+</tr>
+<tr>
+<td>Per-board config</td>
+<td>board overlay</td>
+<td>board overlay</td>
+<td>board overlay</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Steps (any board):</strong>
+1. Add iBattery as a Zephyr module (see the project <a href="https://github.com/aliaksandr-liapin/ibattery-sdk#use-as-a-zephyr-module-in-your-own-project">README</a> "Use as a Zephyr module" section) and set <code>CONFIG_BATTERY_SDK=y</code>.
+2. Pick your chemistry: <code>CONFIG_BATTERY_CHEMISTRY_CR2032</code> (default) or <code>CONFIG_BATTERY_CHEMISTRY_LIPO</code>.
+3. Handle the board's one physical quirk (ESP32-C3: wire the divider; STM32: add the BLE shield if you want wireless). See <a href="../WIRING/">WIRING.md</a>.
+4. Call <code>battery_sdk_init()</code> once, then <code>battery_telemetry_collect()</code> on your cadence. That's the whole core API.
+5. <em>(Optional)</em> enable current sensing + SoH (below) if you want capacity/health, not just charge level.</p>
+<hr />
+<h2 id="use-cases">Use cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
+<h3 id="a-fresh-primary-coin-cell-cr2032">A. Fresh primary coin cell (CR2032)<a class="headerlink" href="#a-fresh-primary-coin-cell-cr2032" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Automatic:</strong> reports SoC (~100% when fresh) from voltage; raises the <strong>CRITICAL</strong> power state as voltage nears the ~2 V cutoff.</li>
+<li><strong>What you get:</strong> a fuel gauge + a low-battery signal so you can swap before the device dies.</li>
+<li><strong>Note:</strong> a coin cell is single-use — no charging to manage. SoH starts at 100% (assumed new) and won't produce a <em>measured</em> number until a full→empty discharge (which for a primary cell is end-of-life), so for coin cells the value is the fuel gauge + early warning, not health learning.</li>
+</ul>
+<h3 id="b-used-partly-spent-coin-cell">B. Used / partly-spent coin cell<a class="headerlink" href="#b-used-partly-spent-coin-cell" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Automatic:</strong> because voltage is already lower, SoC reads <strong>below 100%</strong> immediately and you hit the CRITICAL warning sooner.</li>
+<li><strong>⚠️ You must know:</strong> iBattery <strong>cannot</strong> tell a used cell's true remaining capacity the moment you insert it, and a health value learned from a <em>previous</em> cell does <strong>not</strong> apply to this one. <strong>If SoH is enabled, call <code>battery_soh_reset()</code> on a battery swap</strong> (see edge cases) — otherwise it keeps reporting the old battery's health and blends the next measurement into it.</li>
+</ul>
+<h3 id="c-permanent-usb-power">C. Permanent USB power<a class="headerlink" href="#c-permanent-usb-power" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Automatic:</strong> voltage reads the supply rail (~3.3 V), so SoC sits at ~100% and the state is steady. Nothing breaks; it just reports "full."</li>
+<li><strong>When it's useful:</strong> with a <strong>backup/rechargeable battery + charger</strong>, it detects CHARGING → CHARGED, counts cycles, and tracks the backup's health for when power drops. SoH learning correctly never fires while the pack is kept topped up (no full→empty cycle).</li>
+<li><strong>Pure USB, no battery:</strong> iBattery isn't really needed — it'll just report full.</li>
+<li><strong>⚠️ Note:</strong> the SDK does <strong>not auto-detect</strong> "I'm on USB." Power-source type is configured, not sensed (see edge cases).</li>
+</ul>
+<h3 id="d-rechargeable-cell-lipo-where-soh-shines">D. Rechargeable cell (LiPo) — where SoH shines<a class="headerlink" href="#d-rechargeable-cell-lipo-where-soh-shines" title="Permanent link">&para;</a></h3>
+<ul>
+<li>This is the intended home for health learning: a battery that <strong>lives in the device and ages in place over many cycles.</strong></li>
+<li>Enable <code>CONFIG_BATTERY_CHEMISTRY_LIPO</code>, current sensing, and SoH (below). Over real full→empty excursions it learns the cell's fading capacity and persists it across reboots.</li>
+<li>With a TP4056 charger wired, it also tracks charge/discharge state and cycle count.</li>
+</ul>
+<h3 id="enabling-current-sensing-soh-for-bd">Enabling current sensing + SoH (for B/D)<a class="headerlink" href="#enabling-current-sensing-soh-for-bd" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>CONFIG_BATTERY_CURRENT_SENSE=y     # INA219 current sensor (see WIRING.md)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>CONFIG_BATTERY_SOC_COULOMB=y       # charge counting
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>CONFIG_BATTERY_SOC_SOH=y           # State-of-Health learning
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>CONFIG_BATTERY_CAPACITY_MAH=&lt;rated mAh of your cell&gt;
+</code></pre></div>
+<hr />
+<h2 id="developer-responsibilities-and-edge-cases">Developer responsibilities and edge cases<a class="headerlink" href="#developer-responsibilities-and-edge-cases" title="Permanent link">&para;</a></h2>
+<p>These are the "you must handle this" items. <strong>None of them is a bug</strong> — they're
+deliberate boundaries of an on-device, integer-only library.</p>
+<h3 id="battery-swap-auto-detected-for-primary-cells-manual-otherwise">🔧 Battery swap → auto-detected for primary cells; manual otherwise<a class="headerlink" href="#battery-swap-auto-detected-for-primary-cells-manual-otherwise" title="Permanent link">&para;</a></h3>
+<p>Learned health persists in flash and is <strong>smoothed (moving-average)</strong> into the
+next measurement, and the SDK has <strong>no per-cell identity.</strong> If a swap goes
+unnoticed it keeps reporting the <strong>old</strong> cell's health and <strong>blends</strong> the next
+learned value with it (wrong for a fresh cell).</p>
+<p><strong>Auto-detection (<code>CONFIG_BATTERY_SWAP_DETECT</code>, default on for CR2032).</strong> On boot
+the SDK compares SoC against a value it persisted before power-off; a large
+upward jump (default ≥25%) means a fresh cell was inserted while powered off, so
+it <strong>auto-resets</strong> learned SoH to rated and raises the
+<code>BATTERY_TELEMETRY_FLAG_BATTERY_SWAPPED</code> status flag (mirrors a fuel-gauge IC's
+reset-indicator on insertion). Tunable via
+<code>CONFIG_BATTERY_SWAP_SOC_THRESHOLD_PCT_X100</code>.</p>
+<p><strong>Still call <code>battery_soh_reset()</code> yourself when</strong> auto-detection can't see it:
+- <strong>Rechargeable (LiPo):</strong> <code>SWAP_DETECT</code> is <strong>off by default</strong> — a cell charged
+  while powered off looks identical to a swap under the SoC-jump rule, so
+  charge-vs-swap disambiguation is deferred (Phase 2). Reset on a known swap.
+- <strong>Hot-swap</strong> (swapped while powered) — not detected this phase.
+- <strong>Similarly-depleted replacement</strong> — a used cell with no upward SoC jump won't trip detection.</p>
+<p><code>battery_soh_reset()</code> (resets learned capacity to rated, disarms) remains the
+explicit escape hatch; the SDK provides the API and, for primary cells, now also
+triggers it automatically.</p>
+<h3 id="soh-only-learns-from-a-fullempty-excursion-with-a-current-sensor">🔧 SoH only learns from a full→empty excursion (with a current sensor)<a class="headerlink" href="#soh-only-learns-from-a-fullempty-excursion-with-a-current-sensor" title="Permanent link">&para;</a></h3>
+<p>Health is <em>measured</em>, not guessed: it needs <code>CONFIG_BATTERY_CURRENT_SENSE</code> <strong>and</strong>
+the battery to travel from the full-voltage region to the empty threshold once.
+Until that happens it reports the last known / initial value (100% on a fresh
+init). No current sensor → no SoH.</p>
+<h3 id="time-remaining-minutes-to-empty-is-opt-in-and-needs-the-current-sensor">🔧 "Time remaining" (minutes-to-empty) is opt-in and needs the current sensor<a class="headerlink" href="#time-remaining-minutes-to-empty-is-opt-in-and-needs-the-current-sensor" title="Permanent link">&para;</a></h3>
+<p>A runtime-to-empty estimate <strong>now exists</strong>: enable opt-in
+<code>CONFIG_BATTERY_RUNTIME_TO_EMPTY</code> (default off; requires
+<code>CONFIG_BATTERY_SOC_COULOMB</code>, i.e. the INA219 current sensor). It reports minutes
+to empty from the smoothed discharge current and the coulomb-counter remaining
+charge, via <code>battery_runtime_to_empty_min()</code>, the Zephyr <code>fuel_gauge</code>
+<code>RUNTIME_TO_EMPTY</code> property, and wire v5 (<code>runtime_to_empty_min</code>). It reports
+<strong>"not available"</strong> whenever the cell is idle or charging, since no draw means no
+meaningful estimate — so treat a missing value as expected, not an error.
+Separately, the cloud <code>analytics rul</code> command estimates <strong>remaining charge
+<em>cycles</em></strong> (only for rechargeable cells that actually cycle — it returns
+"insufficient data" for a coin cell). See <a href="../ROADMAP/">Roadmap</a>.</p>
+<h3 id="no-human-language-notifications-on-device">🔧 No human-language notifications on-device<a class="headerlink" href="#no-human-language-notifications-on-device" title="Permanent link">&para;</a></h3>
+<p>The device emits a <strong>power-state code</strong> (ACTIVE / IDLE / SLEEP / <strong>CRITICAL</strong> /
+CHARGING / DISCHARGING / CHARGED) and status flags — <em>signals</em>, not messages like
+"plan a battery swap." Turning them into a user notification is your app's job
+(or use the gateway's anomaly/health analytics).
+- On-device, the only low-battery state is <strong>CRITICAL</strong> (one threshold).
+- The separate <strong>LOW (2.8 V)</strong> vs <strong>CRITICAL (2.5 V)</strong> warnings live in the
+  <strong>gateway</strong> anomaly detector, not on the device.</p>
+<h3 id="power-source-type-is-configured-not-sensed">🔧 Power-source type is configured, not sensed<a class="headerlink" href="#power-source-type-is-configured-not-sensed" title="Permanent link">&para;</a></h3>
+<p>There's no automatic "USB vs battery" or "rechargeable vs primary" detection.
+Chemistry is a build-time choice. You can <em>infer</em> a charger setup from CHARGING→
+CHARGED transitions (only if a TP4056's status pins are wired), but the SDK won't
+conclude "I'm on permanent power" for you.</p>
+<h3 id="soc-from-voltage-alone-is-approximate-esp-coin-cells">🔧 SoC from voltage alone is approximate (esp. coin cells)<a class="headerlink" href="#soc-from-voltage-alone-is-approximate-esp-coin-cells" title="Permanent link">&para;</a></h3>
+<p>A coin cell's voltage curve is fairly flat, so voltage-only SoC is a rough guide.
+Add a current sensor (coulomb counting + fusion) for materially better accuracy.</p>
+<h3 id="per-board-physical-quirks-recap">🔧 Per-board physical quirks (recap)<a class="headerlink" href="#per-board-physical-quirks-recap" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>ESP32-C3:</strong> must wire an external resistor divider for battery voltage.</li>
+<li><strong>STM32:</strong> needs an add-on BLE shield for wireless.</li>
+<li><strong>nRF52840:</strong> most plug-and-play.</li>
+</ul>
+<hr />
+<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../SDK_API/">SDK API Reference</a> — function signatures incl. <code>battery_soh_reset()</code> and the Zephyr <code>fuel_gauge</code> driver</li>
+<li><a href="../WIRING/">Hardware Wiring Guide</a> — per-board wiring incl. the INA219 current sensor and the divider</li>
+<li><a href="../ROADMAP/">Roadmap</a> — planned improvements to the gaps called out above (time-remaining, swap handling, power-source detection)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

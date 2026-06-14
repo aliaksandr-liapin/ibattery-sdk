@@ -1,0 +1,69 @@
+# Runtime-to-empty idle-current floor — hardware validation (NUCLEO-L476RG, extADC+BLE+INA219 rig)
+
+Board: NUCLEO-L476RG  ·  Build: build-stm32-extadc-rte
+Config: nucleo_l476rg_ble_extadc.conf + -DCONFIG_BATTERY_RUNTIME_TO_EMPTY=y
+Wire: v5 (38 B)  ·  Serial console: /dev/cu.usbmodem1203 @ 115200
+Date: 2026-06-06
+
+## Problem
+
+When a steady discharge load is removed, the EMA-smoothed current decays toward
+zero through arbitrarily small positive values. With the original idle gate
+(CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100 = 0, i.e. only current <= 0 is
+"idle"), remaining_charge / tiny_current briefly produced multi-year RTE values
+before the EMA crossed zero and the estimate became n/a. On the Grafana
+"Time to Empty" panel this is a momentary spike to ~1.3M minutes.
+
+## BEFORE (floor = 0) — load lifted, RL off INA219 VIN-
+
+[v5 t=268302] ... I=0.10 mA Q=217.97 mAh RTE=261564 min     <- ema ~= 0.05 mA
+[v5 t=270304] ... I=0.10 mA Q=217.97 mAh RTE=1307820 min    <- ema ~= 0.01 mA (~2.5 years)
+[v5 t=272306] ... I=0.10 mA Q=217.97 mAh RTE=n/a            <- ema <= 0, settled
+
+## FIX
+
+Default CONFIG_BATTERY_RUNTIME_IDLE_THRESHOLD_MA_X100 0 -> 50 (0.50 mA), in both
+the Kconfig (app/Kconfig.battery) and the C #ifndef fallback (battery_runtime.c).
+A smoothed current at/below 0.50 mA is treated as idle -> NOT_AVAILABLE. This sits
+above the current sensor's ~0.1 mA noise floor and bounds the largest emittable
+estimate to remaining_charge / floor. Still Kconfig-tunable (0 = legacy behavior).
+
+## AFTER (floor = 0.50 mA) — load lifted, RL off INA219 VIN-
+
+[v5 t=58090] ... I=0.10 mA Q=199.37 mAh RTE=3528 min
+[v5 t=60092] ... I=0.10 mA Q=199.37 mAh RTE=5112 min
+[v5 t=62095] ... I=0.00 mA Q=199.37 mAh RTE=7294 min
+[v5 t=64097] ... I=0.00 mA Q=199.37 mAh RTE=10401 min
+[v5 t=66099] ... I=0.10 mA Q=199.37 mAh RTE=15336 min
+[v5 t=68101] ... I=0.10 mA Q=199.37 mAh RTE=23004 min       <- peak, at the Q/floor bound
+[v5 t=70103] ... I=0.10 mA Q=199.37 mAh RTE=n/a             <- settled
+[v5 t=72105] ... I=0.10 mA Q=199.37 mAh RTE=n/a
+
+Peak transient 23004 min (~16 days) vs old 1307820 min (~2.5 years): 83x smaller,
+and matches the predicted bound Q/floor = 199.37 mAh / 0.5 mA * 60 = 23924 min.
+
+## Steady-state under load (~30 mA) still correct after the fix
+
+[v5 t=12044] ... I=29.60 mA Q=199.66 mAh RTE=404 min   (199.66/29.6*60 = 404.7)
+
+## Tests
+
+25 C host suites pass (test_runtime: below_floor/at_floor -> n/a, just_above_floor
+reports, estimate never collides with the v5 sentinel). 122 gateway tests pass.
+Build/config drift guard in sync.
+
+## Full BLE -> InfluxDB -> Grafana E2E (gateway run from iTerm, 2026-06-06)
+
+Gateway streamed v5 over BLE from iBattery-STM32 into InfluxDB (bucket telemetry).
+While idle (SLEEP, -0.10 mA) the runtime_to_empty_min field was correctly OMITTED
+(gateway writes it only when not None) -> Grafana "Time to Empty" trend = No data.
+After the load was reconnected (~29.6 mA discharge), the field appeared and the
+EMA converged to ground truth:
+
+  _time                      current_ma  coulomb_mah  runtime_to_empty_min
+  2026-06-06T21:24:38.86Z    29.6        199.29       457
+  2026-06-06T21:24:44.846Z   29.6        199.24       420
+  2026-06-06T21:24:52.854Z   29.6        199.17       407   (199.17/29.6*60 = 404)
+
+E2E PASS: firmware (idle-floor fix) -> wire v5 -> BLE -> gateway -> InfluxDB ->
+Grafana, plus the idle -> NOT_AVAILABLE -> field-omitted path. No multi-year spike.

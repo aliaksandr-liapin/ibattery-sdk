@@ -1,0 +1,61 @@
+# SoH Voltage-Driven Excursion — On-Device E2E (NUCLEO-L476RG + PPK2)
+
+Date:    2026-06-01
+Board:   NUCLEO-L476RG + X-NUCLEO-IDB05A1 (BLE) + INA219 (current)
+Build:   build-stm32-extadc — CONFIG_BATTERY_VOLTAGE_EXTERNAL_ADC=y,
+         CONFIG_BATTERY_SOC_SOH=y, CR2032 profile,
+         CONFIG_BATTERY_CAPACITY_MAH=10 (bench override for a fast excursion)
+Branch:  feat/external-adc-voltage-sense
+Rig:     Nordic PPK2 (Source Meter) emulates the cell on A2/PA4 via a 10k/10k
+         divider; PPK2 VOUT also sources real current through the INA219 + a
+         100 Ohm load.  See docs/WIRING.md "External ADC voltage sense".
+
+## What this proves (FIRST on real hardware)
+
+The SoH *learning* chain end-to-end with a genuine voltage-driven full->empty
+excursion and real coulomb integration — producing a sub-100% value — AND its
+persistence across a reset (v0.12.0).  Prior captures only showed SoH=100% on
+hardware, or a force-injected excursion; this is the real thing.
+
+## Phase 1 — full anchor (PPK2 3200 mV -> firmware reads ~2977 >= 2950)
+
+    [v4 t=2035] V=2971 mV ... SOC=100.00% ... I=31.70 mA Q=9.98 mAh SOH=100.00%
+
+Full anchor fired: coulomb reset to the 10 mAh rated (Q~=10), SoH armed at 100%.
+
+## Phase 2 — real discharge (~31.7 mA through the INA219 shunt)
+
+    [v4 t=704740] V=2978 mV ... SOC=43.84% ... I=31.70 mA Q=3.79 mAh SOH=100.00%
+
+Q counts down as ~6.7 mAh of real charge is delivered between the anchors.
+
+## Phase 3 — empty anchor (PPK2 2000 mV -> firmware reads ~1782 <= 2000): SoH LEARNS
+
+    [v4 t=760796] V=1980 mV ... I=19.70 mA Q=0.01 mAh SOH=83.30%
+
+Empty anchor fired.  measured = charge delivered ~= 6.7 mAh = 67% of the 10 mAh
+rated; integer EMA (alpha 0.5) lands learned at 8.33 mAh => SOH 83.30%.  Written
+to NVS.  (Load current dropped to ~19.7 mA because VOUT is now ~2 V across 100R.)
+
+## Phase 4 — RESET (RAM cleared): SoH RESTORED from flash
+
+    [v4 t=10043] V=1782 mV ... SOC=0.00% I=19.70 mA Q=0.05 mAh SOH=83.30%
+
+First telemetry line after the reset reads SOH=83.30% — restored from NVS, NOT
+the fresh-device 100% default.
+
+## Result: PASS
+
+- Voltage-driven full anchor + real-current discharge + voltage-driven empty
+  anchor -> SoH learned 83.30% on real hardware (first time, genuine excursion).
+- That learned value survived a reset (restored from STM32 NVS) -> v0.12.0
+  persistence confirmed on a real excursion.
+
+## Notes
+
+- External-ADC sense (A2/PA4, 10k/10k divider) read ~6-9% low vs the PPK2
+  setpoint (resistor tolerance + ADC gain) — a calibration item; it does NOT
+  affect SoH, which depends on the *charge* between anchors, not absolute volts.
+  PPK2 setpoints were chosen so the firmware *reads* the 2950/2000 thresholds.
+- CONFIG_BATTERY_CAPACITY_MAH=10 was a bench override to keep the excursion to
+  minutes; not a committed/product value.
