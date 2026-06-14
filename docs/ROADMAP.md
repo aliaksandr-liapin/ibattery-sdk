@@ -66,7 +66,7 @@ ibattery-sdk is a lightweight, portable C SDK for battery intelligence on MCUs.
 
 ### Path A: Open-Source SDK with Commercial Extensions (Open Core)
 
-**Free tier (open-source, MIT/Apache 2.0):**
+**Free tier (open-source, Apache-2.0):**
 - Current functionality: voltage, SoC, telemetry, basic power states
 - Community builds trust, adoption, GitHub stars, contributors
 - Target audience: hobby developers, students, startups prototyping
@@ -347,6 +347,53 @@ monitoring and "advanced SoC" commercial-license models. Design + plan:
 3. **First paid offering** — consulting (immediate) vs commercial license (requires feature gap) vs SaaS (requires infrastructure)
 4. **Chemistry priority** — LiPo single-cell is the biggest market; LiFePO4 is growing in IoT/solar
 5. **Platform priority** — STM32 (professional market) vs ESP32 (maker community) first
+
+---
+
+## Brand & Visibility (the SDK is also a public proof asset)
+
+iBattery isn't only code — it's a public demonstration that the maintainer ships
+real, production-grade systems end to end. GitHub visitors, dev.to readers, and
+technical reviewers will read and judge it, so **presentation must read well to a
+competent reviewer who isn't a Zephyr specialist**, not just to embedded devs.
+(Keep this track focused on embedded — the AI/Cloud portfolio is a separate brand.)
+
+### Action items
+- [ ] **README rewrite (high ROI):** tighten the top — one-line value prop, who
+      it's for, a copy-paste quick-start, and a short **"vs. alternatives"** section
+      (vs. Zephyr's `fuel_gauge` API, which has **no battery-health property**; vs.
+      rolling your own; vs. a cloud-side BMS). The comparison content already exists
+      in `POSITIONING.md` — surface/link it from the README. Add a clear
+      **contribution CTA** (issues/PRs welcome).
+- [ ] **Runnable example + 2-minute quick-start:** the README has a Quick Start;
+      ensure a *runnable* minimal example. `tests/module_consumer/` is a minimal
+      module-consuming app that can be promoted/linked as that example.
+- [ ] **License consistency:** all repo text is **Apache-2.0** (LICENSE, package
+      metadata, README badge, CONTRIBUTING, POSITIONING). The only contradictions
+      are (a) an **external graphic** (GitHub social-preview card / promo image)
+      that says MIT — fix it to Apache-2.0 where it lives; (b) one loose "MIT/Apache
+      2.0" phrasing in this file — tightened below. The legally-operative LICENSE is
+      Apache-2.0 (patent protection + permissive; see "Key Decision Points").
+- [ ] **(Optional) `good-first-issue` labels** to invite contributors.
+- [ ] **Maintain a "post-worthy milestones" list** — kept at `POST_WORTHY.md` in
+      the repo root (intentionally *not* on the public docs site — it's internal
+      comms planning).
+
+### Distribution is room-specific (important)
+- **LinkedIn:** polished infographics work well.
+- **Reddit (r/embedded, r/Zephyr_RTOS) & Hacker News:** **no marketing graphics** —
+  they trigger spam filters and community pushback. Use plain text + genuine
+  technical screenshots (Grafana, serial/scope captures, architecture diagrams).
+  New/low-karma Reddit accounts get auto-filtered → participate before posting.
+
+### Credibility signals to grow and protect
+Consistent commit cadence (the contribution graph is real social proof); real
+adoption (PlatformIO downloads, stars, **no stale issues**); visible quality
+(tests, docs, CI badges, runnable examples).
+
+### Clean-room
+Nothing from the maintainer's employer or any proprietary/customer source enters
+this public repo. Ever.
 
 ---
 
